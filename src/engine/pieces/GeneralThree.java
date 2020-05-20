@@ -1,6 +1,6 @@
 package engine.pieces;
 
-import engine.Territory;
+import engine.Alliance;
 
 /**
  * Author: Mark Lucernas
@@ -11,7 +11,7 @@ public class GeneralThree extends Piece {
   private String rank = "G3";
   private int legalPieceInstanceCount = 1;
 
-  public GeneralThree(Territory pieceAlliance, int piecePosition) {
+  public GeneralThree(Alliance pieceAlliance, int piecePosition) {
     super(piecePosition, pieceAlliance);
   }
 

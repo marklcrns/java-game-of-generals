@@ -1,10 +1,10 @@
 package tests.engine;
 
-import java.util.List;
+import java.util.Map;
 
 import engine.Board;
 import utils.BoardUtils;
-import engine.Territory;
+import engine.Alliance;
 
 /**
  * Author: Mark Lucernas
@@ -12,25 +12,87 @@ import engine.Territory;
  */
 public class BoardTest extends Board {
 
+  private static Board board = new Board();
+  private static BoardBuilder builder = new BoardBuilder();
+  private static boolean territoryErrorDetected = false;
   private static boolean allianceErrorDetected = false;
+  private static boolean emptyBoardErrorDetected = false;
+  private static Map<Integer, String> tileTerritoryErrors;
+  private static Map<Integer, String> tilePieceAllianceErrors;
+  private static Map<Integer, String> emptyBoardTileErrors;
 
   public static void main(String[] args) {
-    // TODO: exception handilng
-    allianceCheck();
+    // TODO: exception handling
+    territoryCheck();
+    pieceAllianceCheck();
+    emptyBoardCheck();
   }
 
-  public static void allianceCheck() {
-    final List<Tile> board = initBoard();
-    for (int i = 0; i < board.size(); i++) {
-      if (board.get(i).getAlliance() == Territory.WHITE &&
-          i < BoardUtils.ALL_TILES_COUNT / 2)
-        allianceErrorDetected = true;
+  public static void territoryCheck() {
+    for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
+      final Tile currentTile = board.getTile(i);
+      if ((i < BoardUtils.ALL_TILES_COUNT / 2 &&
+          currentTile.getTerritory() != Alliance.BLACK) &&
+          (i > BoardUtils.ALL_TILES_COUNT / 2 &&
+          currentTile.getTerritory() != Alliance.WHITE)) {
+        territoryErrorDetected = true;
+        tileTerritoryErrors.put(i, "E: Tile alliance in enemy territory");
+      }
     }
 
-    if (allianceErrorDetected == true)
-      System.out.println("Board Alliance check FAILED");
-    else
-      System.out.println("Board Alliance check PASSED");
+    if (territoryErrorDetected) {
+      System.out.println("Board territory check FAILED");
+      for (Map.Entry<Integer, String> entry : tileTerritoryErrors.entrySet()) {
+        System.out.println("Tile" + entry.getKey() + ", " + entry.getValue());
+      }
+    } else {
+      System.out.println("Board territory check PASSED");
+    }
+  }
+
+  public static void pieceAllianceCheck() {
+    board.buildBoard(builder.createDemoBoardBuild());
+    for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
+      final Tile currentTile = board.getTile(i);
+      if (currentTile.isTileOccupied() &&
+          currentTile.getTerritory() != currentTile.getPiece().getAlliance()) {
+        allianceErrorDetected = true;
+        tilePieceAllianceErrors.put(i, "E: " + currentTile.getPiece().getAlliance() +
+            " " + currentTile.getPiece().getRank() +
+            " on " + currentTile.getTerritory() + " Territory");
+      }
+    }
+
+    if (allianceErrorDetected) {
+      System.out.println("Board tile piece alliance  check FAILED");
+      for (Map.Entry<Integer, String> entry : tilePieceAllianceErrors.entrySet()) {
+        System.out.println("Tile" + entry.getKey() + ", " + entry.getValue());
+      }
+    } else {
+      System.out.println("Board tile piece alliance check PASSED");
+    }
+  }
+
+  public static void emptyBoardCheck() {
+    board.emptyBoard();
+
+    for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
+      final Tile currentTile = board.getTile(i);
+      System.out.println(currentTile);
+      if (currentTile.isTileOccupied()) {
+        emptyBoardErrorDetected = true;
+        emptyBoardTileErrors.put(i, "E: Tile is not empty");
+      }
+    }
+
+    if (emptyBoardErrorDetected) {
+      System.out.println("Empty board check FAILED");
+      for (Map.Entry<Integer, String> entry : emptyBoardTileErrors.entrySet()) {
+        System.out.println("Tile" + entry.getKey() + ", " + entry.getValue());
+      }
+    } else {
+      System.out.println("Empty board check check PASSED");
+    }
   }
 
 }

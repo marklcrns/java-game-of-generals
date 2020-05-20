@@ -1,8 +1,9 @@
-package gui;
+package game;
 
 import javax.swing.SwingUtilities;
 
 import engine.Board;
+import engine.Board.BoardBuilder;
 
 /**
  * Author: Mark Lucernas
@@ -15,7 +16,10 @@ public class Main {
       @Override
       public void run() {
         Board board = new Board();
-        GUI gui  = new GUI(board);
+        BoardBuilder builder = new BoardBuilder();
+        builder = builder.createDemoBoardBuild();
+        board.buildBoard(builder);
+        board.displayBoard();
       }
     });
   }

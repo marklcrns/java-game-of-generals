@@ -1,6 +1,6 @@
 package engine.pieces;
 
-import engine.Territory;
+import engine.Alliance;
 
 /**
  * Author: Mark Lucernas
@@ -11,7 +11,7 @@ public class LtTwo extends Piece {
   private String rank = "LT2";
   private int legalPieceInstanceCount = 1;
 
-  public LtTwo(Territory pieceAlliance, int piecePosition) {
+  public LtTwo(Alliance pieceAlliance, int piecePosition) {
     super(piecePosition, pieceAlliance);
   }
 

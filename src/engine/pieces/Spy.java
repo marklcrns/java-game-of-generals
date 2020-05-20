@@ -1,6 +1,6 @@
 package engine.pieces;
 
-import engine.Territory;
+import engine.Alliance;
 
 /**
  * Author: Mark Lucernas
@@ -11,7 +11,7 @@ public class Spy extends Piece {
   private String rank = "S";
   private int legalPieceInstanceCount = 2;
 
-  public Spy(Territory pieceAlliance, int piecePosition) {
+  public Spy(Alliance pieceAlliance, int piecePosition) {
     super(piecePosition, pieceAlliance);
   }
 

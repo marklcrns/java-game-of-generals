@@ -1,6 +1,6 @@
 package engine.pieces;
 
-import engine.Territory;
+import engine.Alliance;
 
 /**
  * Author: Mark Lucernas
@@ -11,7 +11,7 @@ public class Colonel extends Piece {
   private String rank = "C";
   private int legalPieceInstanceCount = 1;
 
-  public Colonel(Territory pieceAlliance, int piecePosition) {
+  public Colonel(Alliance pieceAlliance, int piecePosition) {
     super(piecePosition, pieceAlliance);
   }
 

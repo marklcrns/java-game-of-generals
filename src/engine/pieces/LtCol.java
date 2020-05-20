@@ -1,6 +1,6 @@
 package engine.pieces;
 
-import engine.Territory;
+import engine.Alliance;
 
 /**
  * Author: Mark Lucernas
@@ -11,7 +11,7 @@ public class LtCol extends Piece {
   private String rank = "LT_COL";
   private int legalPieceInstanceCount = 1;
 
-  public LtCol(Territory pieceAlliance, int piecePosition) {
+  public LtCol(Alliance pieceAlliance, int piecePosition) {
     super(piecePosition, pieceAlliance);
   }
 

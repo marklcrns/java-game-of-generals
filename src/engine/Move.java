@@ -18,4 +18,9 @@ public class Move {
     this.currentPiece = piece;
     this.destinationCoords = destinationCoords;
   }
+
+  public void execute() {
+
+  }
+
 }

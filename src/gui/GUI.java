@@ -76,6 +76,7 @@ public class GUI {
 
       setPreferredSize(BOARD_PANEL_DIMENSION);
       validate();
+
       this.addMouseMotionListener(new MouseMotionListener() {
         @Override
         public void mouseDragged(MouseEvent e) {
