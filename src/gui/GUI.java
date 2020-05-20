@@ -58,22 +58,6 @@ public class GUI {
 
     this.boardPanel = new BoardPanel();
     frame.add(this.boardPanel, BorderLayout.CENTER);
-
-    boardPanel.addMouseMotionListener(new MouseMotionListener() {
-      @Override
-      public void mouseDragged(MouseEvent e) {
-      }
-
-      @Override
-      public void mouseMoved(MouseEvent e) {
-        mx = e.getX();
-        my = e.getY();
-        frame.repaint();
-        System.out.println("x: " + mx + "\nand y: " + my);
-      }
-    });
-
-    // TODO: frame.addMouseListener(new MouseListener);
   }
 
   private class BoardPanel extends JPanel {
@@ -103,9 +87,11 @@ public class GUI {
           my = e.getY();
 
           frame.repaint();
-          System.out.println("x: " + mx + "\nand y: " + my);
+          System.out.println("x: " + mx + ", y: " + my);
         }
       });
+
+      // TODO: frame.addMouseListener(new MouseListener);
 
     }
 
