@@ -88,7 +88,6 @@ public class GUI implements MouseMotionListener, MouseListener {
 
     TilePanel(final BoardPanel boardPanel,
               final int tileId) {
-      // TODO: research GridBagLayout() method
       super(new GridBagLayout());
       this.tileId = tileId;
       setPreferredSize(TILE_PANEL_DIMENSION);
@@ -120,7 +119,7 @@ public class GUI implements MouseMotionListener, MouseListener {
                   pieceRank + ".png"));
           }
           // Scale image
-          Image scaledImage = image.getScaledInstance(130, 130, Image.SCALE_SMOOTH);
+          Image scaledImage = image.getScaledInstance(110, 110, Image.SCALE_SMOOTH);
 
           add(new JLabel(new ImageIcon(scaledImage)));
         }
@@ -133,8 +132,13 @@ public class GUI implements MouseMotionListener, MouseListener {
       setBackground(this.tileId % 2 != 0 ? LIGHT_TILE_COLOR : DARK_TILE_COLOR);
     }
 
+    public void setTileColor(Color color) {
+      setBackground(color);
+    }
+
   } // TilePanel
 
+  //////////////// SCRAP CODES ////////////////////
   // public class Board extends JPanel {
   //
   //   private static final int TILE_SPACING = 3;
@@ -164,37 +168,4 @@ public class GUI implements MouseMotionListener, MouseListener {
   //   }
   // } // Board
 
-  // MouseMotionListener
-  @Override
-  public void mouseDragged(MouseEvent e) {
-  }
-
-  @Override
-  public void mouseMoved(MouseEvent e) {
-    mx = e.getX();
-    my = e.getY();
-    this.frame.repaint();
-    System.out.println("x: " + mx + "\nand y: " + my);
-  }
-
-  // MouseListener methods
-  @Override
-  public void mouseClicked(MouseEvent arg0) {
-  }
-
-  @Override
-  public void mouseEntered(MouseEvent arg0) {
-  }
-
-  @Override
-  public void mouseExited(MouseEvent arg0) {
-  }
-
-  @Override
-  public void mousePressed(MouseEvent arg0) {
-  }
-
-  @Override
-  public void mouseReleased(MouseEvent arg0) {
-  }
 } // GUI
