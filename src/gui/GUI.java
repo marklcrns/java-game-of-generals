@@ -30,37 +30,50 @@ import utils.BoardUtils;
  * Author: Mark Lucernas
  * Date: 2020-05-16
  */
-public class GUI implements MouseMotionListener, MouseListener {
+public class GUI {
 
   public int mx = 0;
   public int my = 0;
-  private final JFrame frame;
+  private static JFrame frame;
   private final Board gameStateBoard;
   private final BoardPanel boardPanel;
-  private final static Dimension FRAME_DIMENSION = new Dimension(1200, 900);
+  private final static Dimension FRAME_DIMENSION = new Dimension(1000, 900);
   private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(800, 800);
-  private final static Dimension TILE_PANEL_DIMENSION = new Dimension(320, 320);
+  private final static Dimension TILE_PANEL_DIMENSION = new Dimension(300, 300);
   private final static Color BOARD_COLOR = new Color(187, 159, 72);
-  private final static Color TILE_COLOR = new Color(204, 184, 114);
   private final static String ART_DIR_PATH = "art/pieces/original/";
   private final static Color DARK_TILE_COLOR = new Color(166, 99, 57);
   private final static Color LIGHT_TILE_COLOR = new Color(200, 130, 90);
+  private final static Color ENEMY_TILE_COLOR = new Color(230, 70, 120);
+  private final static Color ALLY_TILE_COLOR = new Color(70, 120, 230);
+  private final static Color INVALID_TILE_COLOR = new Color(100, 100, 100);
 
   public GUI(Board board) {
     gameStateBoard = board;
-    this.frame = new JFrame("Game of Generals");
-    this.frame.setSize(FRAME_DIMENSION);
-    this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    this.frame.setResizable(false);
-    this.frame.setVisible(true);
+    frame = new JFrame("Game of Generals");
+    frame.setSize(FRAME_DIMENSION);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setResizable(false);
+    frame.setVisible(true);
 
     this.boardPanel = new BoardPanel();
-    this.frame.add(this.boardPanel, BorderLayout.CENTER);
-    // Board board = new Board();
-    // frame.setContentPane(board);
+    frame.add(this.boardPanel, BorderLayout.CENTER);
 
-    // frame.addMouseMotionListener(this);
-    // frame.addMouseListener(this);
+    boardPanel.addMouseMotionListener(new MouseMotionListener() {
+      @Override
+      public void mouseDragged(MouseEvent e) {
+      }
+
+      @Override
+      public void mouseMoved(MouseEvent e) {
+        mx = e.getX();
+        my = e.getY();
+        frame.repaint();
+        System.out.println("x: " + mx + "\nand y: " + my);
+      }
+    });
+
+    // TODO: frame.addMouseListener(new MouseListener);
   }
 
   private class BoardPanel extends JPanel {
@@ -70,15 +83,31 @@ public class GUI implements MouseMotionListener, MouseListener {
     public BoardPanel() {
       super(new GridLayout(BoardUtils.TILE_COL_COUNT, BoardUtils.TILE_ROW_COUNT));
       this.boardTiles = new ArrayList<>();
+
       for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
         final TilePanel tilePanel = new TilePanel(this, i);
         this.boardTiles.add(tilePanel);
         add(tilePanel);
       }
+
       setPreferredSize(BOARD_PANEL_DIMENSION);
-      // TODO: research validate() method
       validate();
-    } // BoardPanel()
+      this.addMouseMotionListener(new MouseMotionListener() {
+        @Override
+        public void mouseDragged(MouseEvent e) {
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+          mx = e.getX();
+          my = e.getY();
+
+          frame.repaint();
+          System.out.println("x: " + mx + "\nand y: " + my);
+        }
+      });
+
+    }
 
   } // BoardPanel
 
