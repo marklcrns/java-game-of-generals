@@ -8,7 +8,8 @@ import engine.Alliance;
  */
 public class Colonel extends Piece {
 
-  private String rank = "C";
+  private final String rank = "C";
+  private final int powerLevel = 9;
   private int legalPieceInstanceCount = 1;
 
   public Colonel(Alliance pieceAlliance, int piecePosition) {
@@ -16,13 +17,18 @@ public class Colonel extends Piece {
   }
 
   @Override
-  public String getRank() {
+  public final String getRank() {
     return this.rank;
   }
 
   @Override
   public final int getLegalPieceInstanceCount() {
     return this.legalPieceInstanceCount;
+  }
+
+  @Override
+  public final int getPowerLevel() {
+    return this.powerLevel;
   }
 }
 

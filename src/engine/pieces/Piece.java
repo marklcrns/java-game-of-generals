@@ -1,6 +1,7 @@
 package engine.pieces;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ public abstract class Piece {
   public int pieceCoords;
   public int legalPieceInstanceCount;
   public String rank;
+  public int powerLevel;
   public final Alliance pieceAlliance;
   public final Map<String, Integer> mobility = Collections.unmodifiableMap(
       new HashMap<String, Integer>() {
@@ -40,60 +42,64 @@ public abstract class Piece {
     return this.pieceCoords;
   }
 
+  public Tile getTile(Board board) {
+    return board.getTile(pieceCoords);
+  }
+
   public Alliance getAlliance() {
     return this.pieceAlliance;
   }
 
   public Map<Move, Integer> evaluateMoves(Board board) {
 
-    int candidateMoveCoordinate;
+    int candidateMoveCoordinates;
     final Map<Move, Integer> legalMoves = new HashMap<>();
 
-    final Tile upAdjacentTile = board.getTile(
-        this.pieceCoords - mobility.get("u"));
-    final Tile downAdjacentTilePiece = board.getTile(
-        this.pieceCoords - mobility.get("d"));
-    final Tile leftAdjacentTilePiece = board.getTile(
-        this.pieceCoords - mobility.get("l"));
-    final Tile rightAdjacentTilePiece = board.getTile(
-        this.pieceCoords - mobility.get("r"));
+    final int upAdjacentTileCoords = this.pieceCoords - mobility.get("u");
+    final int downAdjacentTileCoords = this.pieceCoords - mobility.get("d");
+    final int leftAdjacentTileCoords = this.pieceCoords - mobility.get("l");
+    final int rightAdjacentTileCoords = this.pieceCoords - mobility.get("r");
+    final Tile upAdjacentTile = board.getTile(upAdjacentTileCoords);
+    final Tile downAdjacentTile = board.getTile(downAdjacentTileCoords);
+    final Tile leftAdjacentTile = board.getTile(leftAdjacentTileCoords);
+    final Tile rightAdjacentTile = board.getTile(rightAdjacentTileCoords);
 
     // TODO: adjust for edge out of bounds/wrapping  moves
-
+    // TODO: implement move type to bo automatically detected
     if (upAdjacentTile.isTileOccupied()) {
       if (upAdjacentTile.getPiece().getAlliance() != this.getAlliance())
-        legalMoves.add(aggressiveMove(board, upAdjacentTile), 2);
+        legalMoves.add(new Move(board, this, upAdjacentTileCoords).aggressive(), 2);
       else
-        legalMoves.add(invalidFriendlyMove(board, upAdjacentTile), 1);
+        legalMoves.add(new Move(board, this, upAdjacentTileCoords).invalid(), 1);
     } else {
-      legalMoves.add(normalMove(board, upAdjacentTile), 0);
+      legalMoves.add(new Move(board, this, upAdjacentTileCoords).normal(), 0);
     }
 
-    if (downAdjacentTile.isTileOccdownied()) {
+    if (downAdjacentTile.isTileOccupied()) {
       if (downAdjacentTile.getPiece().getAlliance() != this.getAlliance())
-        legalMoves.add(aggressiveMove(board, downAdjacentTile), 2);
+        legalMoves.add(new Move(board, this , downAdjacentTileCoords).aggressive(), 2);
       else
-        legalMoves.add(invalidFriendlyMove(board, downAdjacentTile), 1);
+        legalMoves.add(new Move(board, this, downAdjacentTileCoords).invalid(), 1);
     } else {
-      legalMoves.add(normalMove(board, downAdjacentTile), 0);
+      legalMoves.add(new Move(board, this, downAdjacentTileCoords).normal(), 0);
     }
 
-    if (leftAdjacentTile.isTileOccleftied()) {
+    if (leftAdjacentTile.isTileOccupied()) {
       if (leftAdjacentTile.getPiece().getAlliance() != this.getAlliance())
-        legalMoves.add(aggressiveMove(board, leftAdjacentTile), 2);
+        legalMoves.add(new Move(board, this, leftAdjacentTileCoords).aggressive(), 2);
       else
-        legalMoves.add(invalidFriendlyMove(board, leftAdjacentTile), 1);
+        legalMoves.add(new Move(board, this, leftAdjacentTileCoords).invalid(), 1);
     } else {
-      legalMoves.add(normalMove(board, leftAdjacentTile), 0);
+      legalMoves.add(new Move(board, this, leftAdjacentTileCoords).normal(), 0);
     }
 
-    if (rightAdjacentTile.isTileOccrightied()) {
+    if (rightAdjacentTile.isTileOccupied()) {
       if (rightAdjacentTile.getPiece().getAlliance() != this.getAlliance())
-        legalMoves.add(aggressiveMove(board, rightAdjacentTile), 2);
+        legalMoves.add(new Move(board, this, rightAdjacentTileCoords).aggressive();, 2);
       else
-        legalMoves.add(invalidFriendlyMove(board, rightAdjacentTile), 1);
+        legalMoves.add(new Move(board, this, rightAdjacentTileCoords).invalid(), 1);
     } else {
-      legalMoves.add(normalMove(board, rightAdjacentTile), 0);
+      legalMoves.add(new Move(board, this, rightAdjacentTileCoords).normal(), 0);
     }
 
     return null;
@@ -101,4 +107,5 @@ public abstract class Piece {
 
   public abstract String getRank();
   public abstract int getLegalPieceInstanceCount();
+  public abstract int getPowerLevel();
 }

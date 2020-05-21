@@ -8,7 +8,8 @@ import engine.Alliance;
  */
 public class LtCol extends Piece {
 
-  private String rank = "LT_COL";
+  private final String rank = "LT_COL";
+  private final int powerLevel = 8;
   private int legalPieceInstanceCount = 1;
 
   public LtCol(Alliance pieceAlliance, int piecePosition) {
@@ -16,13 +17,18 @@ public class LtCol extends Piece {
   }
 
   @Override
-  public String getRank() {
+  public final String getRank() {
     return this.rank;
   }
 
   @Override
   public final int getLegalPieceInstanceCount() {
     return this.legalPieceInstanceCount;
+  }
+
+  @Override
+  public final int getPowerLevel() {
+    return this.powerLevel;
   }
 }
 

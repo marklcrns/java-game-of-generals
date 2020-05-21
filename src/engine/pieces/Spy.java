@@ -8,7 +8,8 @@ import engine.Alliance;
  */
 public class Spy extends Piece {
 
-  private String rank = "S";
+  private final String rank = "S";
+  private final int powerLevel = 999;
   private int legalPieceInstanceCount = 2;
 
   public Spy(Alliance pieceAlliance, int piecePosition) {
@@ -16,13 +17,18 @@ public class Spy extends Piece {
   }
 
   @Override
-  public String getRank() {
+  public final String getRank() {
     return this.rank;
   }
 
   @Override
   public final int getLegalPieceInstanceCount() {
     return this.legalPieceInstanceCount;
+  }
+
+  @Override
+  public final int getPowerLevel() {
+    return this.powerLevel;
   }
 }
 

@@ -8,7 +8,8 @@ import engine.Alliance;
  */
 public class Major extends Piece {
 
-  private String rank = "M";
+  private final String rank = "M";
+  private final int powerLevel = 7;
   private int legalPieceInstanceCount = 1;
 
   public Major(Alliance pieceAlliance, int piecePosition) {
@@ -16,13 +17,18 @@ public class Major extends Piece {
   }
 
   @Override
-  public String getRank() {
+  public final String getRank() {
     return this.rank;
   }
 
   @Override
   public final int getLegalPieceInstanceCount() {
     return this.legalPieceInstanceCount;
+  }
+
+  @Override
+  public final int getPowerLevel() {
+    return this.powerLevel;
   }
 }
 
