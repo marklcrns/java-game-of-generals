@@ -1,6 +1,7 @@
 package engine.pieces;
 
 import engine.Alliance;
+import engine.player.Player;
 
 /**
  * Author: Mark Lucernas
@@ -12,8 +13,12 @@ public class Major extends Piece {
   private final int powerLevel = 7;
   private int legalPieceInstanceCount = 1;
 
-  public Major(Alliance pieceAlliance, int piecePosition) {
-    super(piecePosition, pieceAlliance);
+  public Major(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
+    super(pieceOwner, piecePosition, pieceAlliance);
+  }
+
+  public Major(Piece piece) {
+    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
   }
 
   @Override
@@ -29,6 +34,12 @@ public class Major extends Piece {
   @Override
   public final int getPowerLevel() {
     return this.powerLevel;
+  }
+
+  @Override
+  public final Piece makeCopy() {
+    Major copy = new Major(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
+    return copy;
   }
 }
 

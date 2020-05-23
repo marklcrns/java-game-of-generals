@@ -1,6 +1,7 @@
 package engine.pieces;
 
 import engine.Alliance;
+import engine.player.Player;
 
 /**
  * Author: Mark Lucernas
@@ -12,8 +13,12 @@ public class LtOne extends Piece {
   private final int powerLevel = 5;
   private int legalPieceInstanceCount = 1;
 
-  public LtOne(Alliance pieceAlliance, int piecePosition) {
-    super(piecePosition, pieceAlliance);
+  public LtOne(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
+    super(pieceOwner, piecePosition, pieceAlliance);
+  }
+
+  public LtOne(Piece piece) {
+    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
   }
 
   @Override
@@ -29,6 +34,12 @@ public class LtOne extends Piece {
   @Override
   public final int getPowerLevel() {
     return this.powerLevel;
+  }
+
+  @Override
+  public final Piece makeCopy() {
+    LtOne copy = new LtOne(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
+    return copy;
   }
 }
 

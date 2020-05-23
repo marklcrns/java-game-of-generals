@@ -77,20 +77,20 @@ public class GUI {
       setPreferredSize(BOARD_PANEL_DIMENSION);
       validate();
 
-      this.addMouseMotionListener(new MouseMotionListener() {
-        @Override
-        public void mouseDragged(MouseEvent e) {
-        }
-
-        @Override
-        public void mouseMoved(MouseEvent e) {
-          mx = e.getX();
-          my = e.getY();
-
-          frame.repaint();
-          System.out.println("x: " + mx + ", y: " + my);
-        }
-      });
+      // this.addMouseMotionListener(new MouseMotionListener() {
+      //   @Override
+      //   public void mouseDragged(MouseEvent e) {
+      //   }
+      // 
+      //   @Override
+      //   public void mouseMoved(MouseEvent e) {
+      //     mx = e.getX();
+      //     my = e.getY();
+      // 
+      //     frame.repaint();
+      //     System.out.println("x: " + mx + ", y: " + my);
+      //   }
+      // });
 
       // TODO: frame.addMouseListener(new MouseListener);
 

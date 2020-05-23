@@ -3,6 +3,8 @@ package tests.engine;
 import java.util.Map;
 
 import engine.Board;
+import engine.Board.BoardBuilder;
+import engine.Board.Tile;
 import utils.BoardUtils;
 import engine.Alliance;
 
@@ -10,7 +12,7 @@ import engine.Alliance;
  * Author: Mark Lucernas
  * Date: 2020-05-18
  */
-public class BoardTest extends Board {
+public class BoardTest {
 
   private static Board board = new Board();
   private static BoardBuilder builder = new BoardBuilder();
@@ -46,7 +48,7 @@ public class BoardTest extends Board {
         System.out.println("Tile" + entry.getKey() + ", " + entry.getValue());
       }
     } else {
-      System.out.println("Board territory check PASSED");
+      System.out.println("Board territory check ...PASSED");
     }
   }
 
@@ -69,16 +71,16 @@ public class BoardTest extends Board {
         System.out.println("Tile" + entry.getKey() + ", " + entry.getValue());
       }
     } else {
-      System.out.println("Board tile piece alliance check PASSED");
+      System.out.println("Board tile piece alliance check ...PASSED");
     }
   }
 
   public static void emptyBoardCheck() {
+    // TODO: add test with for non-empty board
     board.emptyBoard();
 
     for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
       final Tile currentTile = board.getTile(i);
-      System.out.println(currentTile);
       if (currentTile.isTileOccupied()) {
         emptyBoardErrorDetected = true;
         emptyBoardTileErrors.put(i, "E: Tile is not empty");
@@ -91,7 +93,7 @@ public class BoardTest extends Board {
         System.out.println("Tile" + entry.getKey() + ", " + entry.getValue());
       }
     } else {
-      System.out.println("Empty board check check PASSED");
+      System.out.println("Empty board check check ...PASSED");
     }
   }
 

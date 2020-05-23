@@ -20,6 +20,7 @@ public class Main {
         builder = builder.createDemoBoardBuild();
         board.buildBoard(builder);
         board.displayBoard();
+        System.out.println(board);
       }
     });
   }
