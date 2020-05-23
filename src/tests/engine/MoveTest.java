@@ -38,7 +38,11 @@ public class MoveTest {
 
     board.startGame();
 
-    playerWhite.makeMove(53, 54);
+    playerWhite.makeMove(54, 45);
+    playerBlack.makeMove(9, 18);
+    playerWhite.makeMove(45, 36);
+    playerBlack.makeMove(18, 27);
+    playerWhite.makeMove(36, 27);
 
     System.out.println(board);
 

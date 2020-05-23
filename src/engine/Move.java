@@ -49,33 +49,6 @@ public class Move {
       moveType = "normal";
   }
 
-  public boolean legalMoveCheck() {
-    // check if one of possible piece moves
-    Map<String, Move> possiblePieceMoves =
-      this.board.getTile(sourcePieceCoords).getPiece().evaluateMoves(board);
-
-    for (Map.Entry<String, Move> entry : possiblePieceMoves.entrySet()) {
-      if (entry.getValue().getDestinationCoords() == targetPieceCoords) {
-        return true;
-      }
-    };
-    moveType = "invalid";
-
-    // TODO: Tidy up
-    String targetPiece;
-    if (targetPieceCopy == null)
-      targetPiece = "NONE";
-    else
-      targetPiece = targetPieceCopy.getRank();
-    System.out.println(sourcePieceCopy.getAlliance() + " " +
-        sourcePieceCopy.getRank() + " " +
-        sourcePieceCoords + " to " +
-        targetPiece + " " +
-        targetPieceCoords + " " +
-        this.moveType + " ILLEGAL MOVE");
-    return false;
-  }
-
   // TODO: adjust for edge out of bounds/wrapping  moves
   public boolean execute() {
     if (legalMoveCheck()) {
@@ -110,26 +83,32 @@ public class Move {
     return false;
   }
 
-  // REMOVE THESE
-  // public Move aggressive() {
-  //   this.moveType = "aggressive";
-  //   return this;
-  // }
-  // 
-  // public Move draw() {
-  //   this.moveType = "draw";
-  //   return this;
-  // }
-  // 
-  // public Move normal() {
-  //   this.moveType = "normal";
-  //   return this;
-  // }
-  // 
-  // public Move invalid() {
-  //   this.moveType = "invalid";
-  //   return this;
-  // }
+  private boolean legalMoveCheck() {
+    // check if one of possible piece moves
+    Map<String, Move> possiblePieceMoves =
+      this.board.getTile(sourcePieceCoords).getPiece().evaluateMoves(board);
+
+    for (Map.Entry<String, Move> entry : possiblePieceMoves.entrySet()) {
+      if (entry.getValue().getDestinationCoords() == targetPieceCoords) {
+        return true;
+      }
+    };
+    moveType = "invalid";
+
+    // TODO: Tidy up
+    String targetPiece;
+    if (targetPieceCopy == null)
+      targetPiece = "";
+    else
+      targetPiece = targetPieceCopy.getRank();
+    System.out.println(sourcePieceCopy.getAlliance() + " " +
+        sourcePieceCopy.getRank() + " " +
+        sourcePieceCoords + " to " +
+        targetPiece + " " +
+        targetPieceCoords + " " +
+        this.moveType + " ILLEGAL MOVE");
+    return false;
+  }
 
   private boolean isSameRank() {
     if (sourcePieceCopy.getRank() == targetPieceCopy.getRank()) {
@@ -158,6 +137,10 @@ public class Move {
     return this.sourcePieceCoords;
   }
 
+  public String getMoveType() {
+    return this.moveType;
+  }
+
   public boolean undoExecution() {
     if (!this.isExecuted) {
       return false;
@@ -176,21 +159,19 @@ public class Move {
   public String toString() {
     String targetPiece;
     if (targetPieceCopy == null)
-      targetPiece = "NONE";
+      targetPiece = "";
     else
-      targetPiece = targetPieceCopy.getRank();
+      targetPiece = targetPieceCopy.getRank() + " ";
     if (isExecuted)
       return sourcePieceCopy.getAlliance() + " " +
         sourcePieceCopy.getRank() + " " +
         sourcePieceCoords + " to " +
-        targetPiece + " " +
-        targetPieceCoords + " " +
+        targetPiece + targetPieceCoords + " " +
         this.moveType + " EXECUTED";
     else
       return sourcePieceCopy.getAlliance() + " " +
         sourcePieceCopy.getRank() + " " +
         sourcePieceCoords + " to " +
-        targetPiece + " " +
-        targetPieceCoords + " ";
+        targetPiece + targetPieceCoords + " ";
   }
 }

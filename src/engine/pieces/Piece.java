@@ -34,7 +34,6 @@ public abstract class Piece {
       put("r", 1);
     }
   });
-  // TODO: convert to int and string for coords and movetype
   private Map<String, Move> moveSet;
 
   // TODO: remove pieceCoords and rely only to tileId
@@ -64,6 +63,7 @@ public abstract class Piece {
     this.pieceCoords = newCoords;
   }
 
+  // TODO: relate piece to board automatically
   public Map<String, Move> evaluateMoves(Board board) {
     moveSet = new HashMap<String, Move>();
 

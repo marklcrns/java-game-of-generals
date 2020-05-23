@@ -34,6 +34,7 @@ public class Board {
   private static List<Tile> gameBoard;
   private static Player playerBlack;
   private static Player playerWhite;
+  private Alliance moveMaker; // TODO
 
   public Board() {
     initBoard();
