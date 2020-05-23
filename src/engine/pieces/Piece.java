@@ -74,7 +74,7 @@ public abstract class Piece {
       moveSet.put("up", new Move(pieceOwner, board, pieceCoords, upAdjacentPieceCoords));
 
     final int downAdjacentPieceCoords = this.pieceCoords + mobility.get("d");
-    if (pieceCoords < BoardUtils.SECOND_TO_LAST_ROW_INIT)
+    if (pieceCoords < BoardUtils.LAST_ROW_INIT)
       moveSet.put("down", new Move(pieceOwner, board, pieceCoords, downAdjacentPieceCoords));
 
     final int leftAdjacentPieceCoords = this.pieceCoords + mobility.get("l");
