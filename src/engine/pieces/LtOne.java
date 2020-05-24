@@ -1,6 +1,7 @@
 package engine.pieces;
 
 import engine.Alliance;
+import utils.BoardUtils;
 import engine.player.Player;
 
 /**
@@ -9,7 +10,7 @@ import engine.player.Player;
  */
 public class LtOne extends Piece {
 
-  private final String rank = "LT1";
+  private final String rank = BoardUtils.LT_ONE_RANK;
   private final int powerLevel = 5;
   private int legalPieceInstanceCount = 1;
 

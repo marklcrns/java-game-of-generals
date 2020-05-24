@@ -1,6 +1,7 @@
 package engine.pieces;
 
 import engine.Alliance;
+import utils.BoardUtils;
 import engine.player.Player;
 
 /**
@@ -9,7 +10,7 @@ import engine.player.Player;
  */
 public class Spy extends Piece {
 
-  private final String rank = "S";
+  private final String rank = BoardUtils.SPY_RANK;
   private final int powerLevel = 999;
   private int legalPieceInstanceCount = 2;
 

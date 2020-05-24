@@ -1,6 +1,7 @@
 package engine.pieces;
 
 import engine.Alliance;
+import utils.BoardUtils;
 import engine.player.Player;
 
 /**
@@ -9,7 +10,7 @@ import engine.player.Player;
  */
 public class Captain extends Piece {
 
-  private final String rank = "CN";
+  private final String rank = BoardUtils.CAPTAIN_RANK;
   private final int powerLevel = 6;
   private int legalPieceInstanceCount = 1;
 

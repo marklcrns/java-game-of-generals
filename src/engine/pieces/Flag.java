@@ -1,6 +1,7 @@
 package engine.pieces;
 
 import engine.Alliance;
+import utils.BoardUtils;
 import engine.player.Player;
 
 /**
@@ -9,7 +10,7 @@ import engine.player.Player;
  */
 public class Flag extends Piece {
 
-  private final String rank = "F";
+  private final String rank = BoardUtils.FLAG_RANK;
   private final int powerLevel = 1;
   private int legalPieceInstanceCount = 1;
 

@@ -1,6 +1,7 @@
 package engine.pieces;
 
 import engine.Alliance;
+import utils.BoardUtils;
 import engine.player.Player;
 
 /**
@@ -9,7 +10,7 @@ import engine.player.Player;
  */
 public class GeneralFive extends Piece {
 
-  private final String rank = "G5";
+  private final String rank = BoardUtils.GENERAL_FIVE_RANK;
   private final int powerLevel = 14;
   private final int legalPieceInstanceCount = 1;
 

@@ -1,6 +1,7 @@
 package engine.pieces;
 
 import engine.Alliance;
+import utils.BoardUtils;
 import engine.player.Player;
 
 /**
@@ -9,7 +10,7 @@ import engine.player.Player;
  */
 public class Sergeant extends Piece {
 
-  private final String rank = "SN";
+  private final String rank = BoardUtils.SERGEANT_RANK;
   private final int powerLevel = 3;
   private int legalPieceInstanceCount = 1;
 
