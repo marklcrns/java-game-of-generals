@@ -34,7 +34,8 @@ public class Board {
   private static List<Tile> gameBoard;
   private static Player playerBlack;
   private static Player playerWhite;
-  private Alliance moveMaker; // TODO
+  private Alliance moveMaker;
+  private boolean debugMode;
 
   public Board() {
     initBoard();
@@ -114,6 +115,10 @@ public class Board {
     new GUI(this);
   }
 
+  public void setDebugMode(boolean debug) {
+    this.debugMode = debug;
+  }
+
   public Tile getTile(int coordinates) {
     return gameBoard.get(coordinates);
   }
@@ -128,6 +133,10 @@ public class Board {
       piece.updateCoords(tileId);
       this.getBoard().get(tileId).replacePiece(piece);
       this.getTile(tileId).replacePiece(piece);
+
+      if (debugMode)
+        System.out.println(this);
+
       return true;
     }
     return false;
@@ -141,6 +150,10 @@ public class Board {
       this.getTile(targetCoords).insertPiece(pieceCopy);
       // delete source piece
       this.getTile(sourceCoords).emptyTile();
+
+      if (debugMode)
+        System.out.println(this);
+
       return true;
     }
     return false;
@@ -149,6 +162,10 @@ public class Board {
   public boolean deletePiece(int pieceCoords) {
     if (this.getTile(pieceCoords).isTileOccupied()) {
       this.getTile(pieceCoords).emptyTile();
+
+      if (debugMode)
+        System.out.println(this);
+
       return true;
     }
     return false;

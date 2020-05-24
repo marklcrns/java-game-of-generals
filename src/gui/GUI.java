@@ -96,6 +96,7 @@ public class GUI {
       JButton undo = new JButton("Undo");
       JButton redo = new JButton("Redo");
       JButton surrender = new JButton("Surrender");
+      JButton rules = new JButton("Game Rules");
 
       this.add(save);
       this.add(load);
@@ -103,6 +104,7 @@ public class GUI {
       this.add(undo);
       this.add(redo);
       this.add(surrender);
+      this.add(rules);
     }
   }
 
@@ -123,6 +125,7 @@ public class GUI {
 
     private boolean enableHoverHighlight = true;
     private int activeTileId;
+    private int hoveredTileId;
     private final List<TilePanel> boardTiles;
     private final List<Integer> candidateMoveTiles;
     private Map<String, Move> pieceMoves;
@@ -176,12 +179,12 @@ public class GUI {
 
     private void highlightPieceMoves(int tileId) {
 
-      final Tile hoveredTile = gameStateBoard.getTile(tileId);
+      final Tile sourceTile = gameStateBoard.getTile(tileId);
 
-      if (hoveredTile.isTileOccupied()) {
+      if (sourceTile.isTileOccupied()) {
 
-        if (hoveredTile.getPiece().getAlliance() == gameStateBoard.getMoveMaker()) {
-          pieceMoves = hoveredTile.getPiece().evaluateMoves(gameStateBoard);
+        if (sourceTile.getPiece().getAlliance() == gameStateBoard.getMoveMaker()) {
+          pieceMoves = sourceTile.getPiece().evaluateMoves(gameStateBoard);
 
           for (Map.Entry<String, Move> entry : pieceMoves.entrySet()) {
             int destinationCoords = entry.getValue().getDestinationCoords();
@@ -221,6 +224,7 @@ public class GUI {
 
     private void deactivateCurrentTile() {
       if (this.activeTileId != -1) {
+        clearHighlights();
         boardTiles.get(activeTileId).setIsTileActive(false);
         this.activeTileId = -1;
       }
@@ -250,6 +254,8 @@ public class GUI {
         boardTiles.get(i).assignTilePieceIcon();
         boardTiles.get(i).validate();
       }
+
+      frame.repaint();
     }
 
     private void preLoadImages() {
@@ -312,6 +318,15 @@ public class GUI {
     private Map<String, Image> getWhitePieceIcons() {
       return whitePieceIcons;
     }
+
+    private int getHoveredTileId() {
+      return this.hoveredTileId;
+    }
+
+    private void setHoveredTileId(int tileId) {
+      this.hoveredTileId = tileId;
+    }
+
   }
 
   private class TilePanel extends JPanel {
@@ -337,7 +352,6 @@ public class GUI {
       assignTileColor();
       validate();
 
-      // TODO:
       this.addMouseListener(new MouseListener() {
 
         @Override
@@ -348,6 +362,7 @@ public class GUI {
         public void mouseEntered(MouseEvent e) {
           if (boardPanel.enableHoverHighlight)
             boardPanel.highlightPieceMoves(tileId);
+          boardPanel.setHoveredTileId(tileId);
         }
 
         @Override
@@ -358,24 +373,7 @@ public class GUI {
 
         @Override
         public void mousePressed(MouseEvent e) {
-          // TODO revise for efficiency
-          if (isCandidateMoveTile) {
-            final Piece activePiece = gameStateBoard.getTile(boardPanel.getActiveTileId()).getPiece();
-
-            Player player = gameStateBoard.getPlayer(activePiece.getAlliance());
-            player.makeMove(activePiece.getCoords(), tileId);
-
-            boardPanel.refreshBoardPanel();
-          }
-
-          boardPanel.deactivateCurrentTile();
-          boardPanel.setHoverHighlight(true);
-          boardPanel.clearHighlights();
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-          if (gameStateBoard.getTile(tileId).isTileOccupied()) {
+          if (gameStateBoard.getTile(tileId).isTileOccupied() && !isCandidateMoveTile) {
             if (gameStateBoard.getTile(tileId).getPiece().getAlliance() == gameStateBoard.getMoveMaker()) {
 
               boardPanel.clearHighlights();
@@ -390,6 +388,20 @@ public class GUI {
                 setBackground(ACTIVE_TILE_COLOR);
               }
             }
+          }
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+          if (isCandidateMoveTile && boardPanel.getHoveredTileId() == tileId) {
+            final Piece activePiece = gameStateBoard.getTile(boardPanel.getActiveTileId()).getPiece();
+
+            Player player = gameStateBoard.getPlayer(activePiece.getAlliance());
+            player.makeMove(activePiece.getCoords(), tileId);
+
+            boardPanel.refreshBoardPanel();
+            boardPanel.deactivateCurrentTile();
+            boardPanel.setHoverHighlight(true);
           }
         }
       });

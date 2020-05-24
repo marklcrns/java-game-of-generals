@@ -29,6 +29,7 @@ public class Main {
         board.addPlayerWhite(player1);
         board.addPlayerBlack(player2);
 
+        board.setDebugMode(true);
         board.startGame();
       }
     });
