@@ -45,7 +45,7 @@ public class Player {
     }
   }
 
-  public void setMoveMaker(boolean isMoveMaker) {
+  public void makeMoveMaker(boolean isMoveMaker) {
     this.isMoveMaker = isMoveMaker;
   }
 
@@ -69,6 +69,10 @@ public class Player {
       }
     }
     return false;
+  }
+
+  public Alliance getAlliance() {
+    return this.alliance;
   }
 
   public boolean isMoveMaker() {

@@ -104,8 +104,9 @@ public class Board {
       return false;
     }
 
-    playerBlack.setMoveMaker(false);
-    playerWhite.setMoveMaker(true);
+    setMoveMaker(playerWhite);
+
+    displayBoard();
     return true;
   }
 
@@ -159,11 +160,9 @@ public class Board {
 
   public void switchPlayerTurn() {
     if (this.getBlackPlayer().isMoveMaker()) {
-      playerBlack.setMoveMaker(false);
-      playerWhite.setMoveMaker(true);
+      setMoveMaker(playerWhite);
     } else {
-      playerBlack.setMoveMaker(true);
-      playerWhite.setMoveMaker(false);
+      setMoveMaker(playerBlack);
     }
   }
 
@@ -175,12 +174,41 @@ public class Board {
     playerWhite = player;
   }
 
+  public Player getPlayer(Alliance alliance) {
+    if (alliance == Alliance.BLACK)
+      return playerBlack;
+    else
+      return playerWhite;
+  }
+
   public Player getBlackPlayer() {
     return playerBlack;
   }
 
   public Player getWhitePlayer() {
     return playerWhite;
+  }
+
+  public Alliance getMoveMaker() {
+    return this.moveMaker;
+  }
+
+  public boolean setMoveMaker(Player player) {
+    if (!player.isMoveMaker()) {
+      if (player.getAlliance() == Alliance.BLACK) {
+        playerBlack.makeMoveMaker(true);
+        playerWhite.makeMoveMaker(false);
+        this.moveMaker = playerBlack.getAlliance();
+      } else {
+        playerBlack.makeMoveMaker(false);
+        playerWhite.makeMoveMaker(true);
+        this.moveMaker = playerWhite.getAlliance();
+      }
+      return true;
+    }
+    System.out.println("E: " + player.getAlliance() +
+                       " player is already the move maker");
+    return false;
   }
 
   @Override
@@ -210,7 +238,6 @@ public class Board {
   public static class BoardBuilder {
 
     private Map<Integer, Piece> boardConfig;
-    private Alliance moveMaker;
 
     public BoardBuilder() {
       this.boardConfig = new HashMap<>();
@@ -328,18 +355,14 @@ public class Board {
             pieceCounterWhite++;
         }
 
-        if (pieceCounterBlack > piece.getLegalPieceInstanceCount() &&
-            pieceCounterWhite > piece.getLegalPieceInstanceCount()) {
+        if (pieceCounterBlack > legalPieceInstanceCount &&
+            pieceCounterWhite > legalPieceInstanceCount) {
           System.out.println(piece.getRank() + " exceeded maximum instance." +
                              " Piece not inserted.");
           return false;
         }
       }
       return true;
-    }
-
-    public void setMoveMaker(Alliance moveMaker) {
-      this.moveMaker = moveMaker;
     }
 
   }

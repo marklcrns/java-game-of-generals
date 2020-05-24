@@ -29,6 +29,8 @@ import engine.Alliance;
 import engine.Board;
 import engine.Move;
 import engine.Board.Tile;
+import engine.pieces.Piece;
+import engine.player.Player;
 import utils.BoardUtils;
 
 /**
@@ -42,14 +44,13 @@ public class GUI {
 
   private static JFrame frame;
   private final Board gameStateBoard;
-  // TODO: set movemaker
-  private Alliance moveMaker;
 
   private final static Color DARK_TILE_COLOR = new Color(166, 99, 57);
   private final static Color LIGHT_TILE_COLOR = new Color(200, 130, 90);
-  private final static Color ENEMY_TILE_COLOR = new Color(230, 70, 120);
-  private final static Color VALID_TILE_COLOR = new Color(70, 120, 230);
-  private final static Color INVALID_TILE_COLOR = new Color(100, 100, 100);
+  private final static Color ENEMY_TILE_COLOR = new Color(255, 120, 140);
+  private final static Color VALID_TILE_COLOR = new Color(130, 150, 230);
+  private final static Color INVALID_TILE_COLOR = new Color(80, 80, 80);
+  private final static Color ACTIVE_TILE_COLOR = new Color(230, 230, 120);
 
   private final static Dimension FRAME_DIMENSION = new Dimension(1200, 835);
   private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(900, 800);
@@ -166,44 +167,51 @@ public class GUI {
     }
 
     private void highlightPieceMoves(int tileId) {
-      if (gameStateBoard.getTile(tileId).isTileOccupied()) {
-        pieceMoves = gameStateBoard.getTile(tileId).getPiece().evaluateMoves(gameStateBoard);
 
-        System.out.println("TILE: " + tileId);
+      final Tile hoveredTile = gameStateBoard.getTile(tileId);
 
-        for (Map.Entry<String, Move> entry : pieceMoves.entrySet()) {
-          int destinationCoords = entry.getValue().getDestinationCoords();
-          if (entry.getValue().getMoveType() == "aggressive" ||
-              entry.getValue().getMoveType() == "draw") {
-            boardTiles.get(destinationCoords).setBackground(ENEMY_TILE_COLOR);
+      if (hoveredTile.isTileOccupied()) {
 
-          } else if (entry.getValue().getMoveType() == "normal") {
-            boardTiles.get(destinationCoords).setBackground(VALID_TILE_COLOR);
+        if (hoveredTile.getPiece().getAlliance() == gameStateBoard.getMoveMaker()) {
+          pieceMoves = hoveredTile.getPiece().evaluateMoves(gameStateBoard);
 
-          } else if (entry.getValue().getMoveType() == "invalid") {
-            boardTiles.get(destinationCoords).setBackground(INVALID_TILE_COLOR);
-          }
+          for (Map.Entry<String, Move> entry : pieceMoves.entrySet()) {
+            int destinationCoords = entry.getValue().getDestinationCoords();
+            if (entry.getValue().getMoveType() == "aggressive" ||
+                entry.getValue().getMoveType() == "draw") {
+              boardTiles.get(destinationCoords).setBackground(ENEMY_TILE_COLOR);
 
-          candidateMoveTiles.add(destinationCoords);
-          boardTiles.get(destinationCoords).setIsCandidateMoveTile(true);
-        };
-        // TODO: DELETE ME LATER
-        // for (int i = 0; i < candidateMoveTiles.size(); i++) {
-        //   System.out.println(candidateMoveTiles.get(i));
-        // }
-        // System.out.println();
+            } else if (entry.getValue().getMoveType() == "normal") {
+              boardTiles.get(destinationCoords).setBackground(VALID_TILE_COLOR);
+
+            } else if (entry.getValue().getMoveType() == "invalid") {
+              boardTiles.get(destinationCoords).setBackground(INVALID_TILE_COLOR);
+            }
+
+            candidateMoveTiles.add(destinationCoords);
+            boardTiles.get(destinationCoords).setIsCandidateMoveTile(true);
+          };
+        }
       }
     }
 
     private void clearHighlights() {
+      // remove candidate move tile highlights
       for (int i = 0; i < candidateMoveTiles.size(); i++) {
         boardTiles.get(candidateMoveTiles.get(i)).assignTileColor();
         boardTiles.get(candidateMoveTiles.get(i)).setIsCandidateMoveTile(false);
       }
+      // remove active tile highlight
+      if (this.activeTileId != -1)
+        boardTiles.get(activeTileId).assignTileColor();
     }
 
     private int getActiveTileId() {
       return this.activeTileId;
+    }
+
+    private TilePanel getActiveTilePanel() {
+      return boardTiles.get(this.activeTileId);
     }
 
     private void setActiveTile(int newActiveTile) {
@@ -215,13 +223,24 @@ public class GUI {
     }
 
     private void deactivateCurrentTile() {
-      boardTiles.get(activeTileId).setIsTileActive(false);
-      this.activeTileId = -1;
+      if (this.activeTileId != -1) {
+        boardTiles.get(activeTileId).setIsTileActive(false);
+        this.activeTileId = -1;
+      }
     }
 
     private void setHoverHighlight(boolean enabled) {
       this.enableHoverHighlight = enabled;
     }
+
+    private void refreshBoardPanel() {
+      for (int i = 0; i < boardTiles.size(); i++) {
+        boardTiles.get(i).assignTilePieceIcon(gameStateBoard);
+        boardTiles.get(i).validate();
+      }
+      frame.repaint();
+    }
+
   }
 
   private class TilePanel extends JPanel {
@@ -229,6 +248,7 @@ public class GUI {
     private final int tileId;
     private boolean isTileActive = false;
     private boolean isCandidateMoveTile = false;
+    private boolean isPieceHidden;
 
     TilePanel(final BoardPanel boardPanel,
               final int tileId) {
@@ -243,13 +263,59 @@ public class GUI {
       this.addMouseListener(new MouseListener() {
 
         @Override
-        public void mouseClicked(MouseEvent e) {}
+        public void mouseClicked(MouseEvent e) {
+          // TODO revise for efficiency
+          if (isCandidateMoveTile) {
+            final Piece activePiece = gameStateBoard.getTile(boardPanel.getActiveTileId()).getPiece();
+            final Alliance activeTileAlliance = activePiece.getAlliance();
+            final TilePanel activeTilePanel = boardPanel.getActiveTilePanel();
+
+            Player player = gameStateBoard.getPlayer(activeTileAlliance);
+            player.makeMove(activePiece.getCoords(), tileId);
+
+            // refresh both tiles
+            // activeTilePanel.assignTilePieceIcon(gameStateBoard);
+            // activeTilePanel.validate();
+            // assignTilePieceIcon(gameStateBoard);
+
+            boardPanel.refreshBoardPanel();
+
+            // TODO make method
+            boardPanel.deactivateCurrentTile();
+            boardPanel.setHoverHighlight(true);
+            boardPanel.clearHighlights();
+
+            return;
+          }
+
+          if (gameStateBoard.getTile(tileId).isTileOccupied()) {
+            if (gameStateBoard.getTile(tileId).getPiece().getAlliance() == gameStateBoard.getMoveMaker()) {
+              if (isTileActive) {
+                boardPanel.deactivateCurrentTile();
+                boardPanel.setHoverHighlight(true);
+                boardPanel.clearHighlights();
+              } else {
+                boardPanel.setActiveTile(tileId);
+                boardPanel.setHoverHighlight(false);
+                boardPanel.clearHighlights();
+                boardPanel.highlightPieceMoves(tileId);
+                setBackground(ACTIVE_TILE_COLOR);
+              }
+            }
+          } else {
+            boardPanel.deactivateCurrentTile();
+            boardPanel.setHoverHighlight(true);
+            boardPanel.clearHighlights();
+          }
+        }
 
         @Override
         public void mouseEntered(MouseEvent e) {
           if (boardPanel.enableHoverHighlight)
             boardPanel.highlightPieceMoves(tileId);
+          // TODO Delete later
           System.out.println("ActiveTile: " + isTileActive);
+          System.out.println("ID: " + boardPanel.getActiveTileId());
           System.out.println("CandidateTile: " + isCandidateMoveTile);
           System.out.println();
         }
@@ -261,28 +327,7 @@ public class GUI {
         }
 
         @Override
-        public void mousePressed(MouseEvent e) {
-          if (isCandidateMoveTile) {
-            System.out.println("Move executed");
-          }
-
-          if (gameStateBoard.getTile(tileId).isTileOccupied()) {
-            if (isTileActive) {
-              boardPanel.deactivateCurrentTile();
-              boardPanel.setHoverHighlight(true);
-              boardPanel.clearHighlights();
-            } else {
-              boardPanel.setActiveTile(tileId);
-              boardPanel.setHoverHighlight(false);
-              boardPanel.clearHighlights();
-              boardPanel.highlightPieceMoves(tileId);
-            }
-          } else {
-            boardPanel.deactivateCurrentTile();
-            boardPanel.setHoverHighlight(true);
-            boardPanel.clearHighlights();
-          }
-        }
+        public void mousePressed(MouseEvent e) {}
 
         @Override
         public void mouseReleased(MouseEvent e) {}
@@ -290,28 +335,25 @@ public class GUI {
       });
     } // TilePanel()
 
+    // TODO: pre-load both images for better performance
     private void assignTilePieceIcon(Board board) {
       this.removeAll();
       final Tile currTile = board.getTile(tileId);
       final BufferedImage image;
       try {
         if (currTile.isTileOccupied()) {
-          String pieceAlliance = "" + currTile.getPiece().getAlliance();
+          Alliance pieceAlliance = currTile.getPiece().getAlliance();
           String pieceRank = currTile.getPiece().getRank();
-          // TODO: Modify to blank if other player's turn
-          // Load image. Blank if BLACK alliance
-          if (pieceAlliance.equals("BLACK")) {
-            image = ImageIO.read(
-                new File(ART_DIR_PATH +
-                  pieceAlliance.toLowerCase() + "/" +
-                  pieceAlliance + "_HIDDEN.png"));
-          } else {
-            image = ImageIO.read(
-                new File(ART_DIR_PATH +
-                  pieceAlliance.toLowerCase() + "/" +
-                  pieceAlliance + "_" +
-                  pieceRank + ".png"));
-          }
+          String iconPath = ART_DIR_PATH + ("" + pieceAlliance).toLowerCase() +
+            "/" + pieceAlliance + "_";
+
+          if (pieceAlliance == gameStateBoard.getMoveMaker())
+            iconPath += pieceRank + ".png";
+          else
+            iconPath += "HIDDEN.png";
+
+          image = ImageIO.read(new File(iconPath));
+
           // Scale image
           Image scaledImage = image.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
 
@@ -328,6 +370,10 @@ public class GUI {
 
     private void setIsCandidateMoveTile(boolean isCandidateMoveTile) {
       this.isCandidateMoveTile = isCandidateMoveTile;
+    }
+
+    private void setIsPieceHidden(boolean isPieceHidden) {
+      this.isPieceHidden = isPieceHidden;
     }
 
     private void assignTileColor() {
