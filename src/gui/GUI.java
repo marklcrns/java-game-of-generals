@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -45,11 +46,11 @@ public class GUI {
   private static JFrame frame;
   private final Board gameStateBoard;
 
-  private final static Color DARK_TILE_COLOR = new Color(166, 99, 57);
-  private final static Color LIGHT_TILE_COLOR = new Color(200, 130, 90);
-  private final static Color ENEMY_TILE_COLOR = new Color(255, 120, 140);
-  private final static Color VALID_TILE_COLOR = new Color(130, 150, 230);
-  private final static Color INVALID_TILE_COLOR = new Color(80, 80, 80);
+  private final static Color DARK_TILE_COLOR = new Color(50, 50, 50);
+  private final static Color LIGHT_TILE_COLOR = new Color(200, 200, 200);
+  private final static Color ENEMY_TILE_COLOR = new Color(200, 100, 120);
+  private final static Color VALID_TILE_COLOR = new Color(130, 200, 120);
+  private final static Color INVALID_TILE_COLOR = new Color(130, 150, 230);
   private final static Color ACTIVE_TILE_COLOR = new Color(230, 230, 120);
 
   private final static Dimension FRAME_DIMENSION = new Dimension(1200, 835);
@@ -93,12 +94,14 @@ public class GUI {
       JButton quit = new JButton("Quit");
       JButton undo = new JButton("Undo");
       JButton redo = new JButton("Redo");
+      JButton surrender = new JButton("Surrender");
 
       this.add(save);
       this.add(load);
       this.add(quit);
       this.add(undo);
       this.add(redo);
+      this.add(surrender);
     }
   }
 
@@ -255,6 +258,7 @@ public class GUI {
       super(new GridBagLayout());
       this.tileId = tileId;
       setPreferredSize(TILE_PANEL_DIMENSION);
+      setBorder(BorderFactory.createLineBorder(Color.GRAY, 3));
       assignTileColor();
       assignTilePieceIcon(gameStateBoard);
       validate();
@@ -377,7 +381,14 @@ public class GUI {
     }
 
     private void assignTileColor() {
-      setBackground(this.tileId % 2 != 0 ? LIGHT_TILE_COLOR : DARK_TILE_COLOR);
+      // Checkered  board
+      // setBackground(this.tileId % 2 != 0 ? LIGHT_TILE_COLOR : DARK_TILE_COLOR);
+
+      // Solid colored board on respective territories
+      if (gameStateBoard.getTile(tileId).getTerritory() == Alliance.BLACK)
+        setBackground(DARK_TILE_COLOR);
+      else
+        setBackground(LIGHT_TILE_COLOR);
     }
   } // TilePanel
 
