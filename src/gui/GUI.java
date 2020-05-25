@@ -26,6 +26,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import engine.Alliance;
@@ -118,27 +119,31 @@ public class GUI {
 
   private class MoveHistoryPanel extends JPanel {
 
-    private JTextArea moveHistory = new JTextArea();
+    private JTextArea moveHistoryTextArea = new JTextArea();
 
     public MoveHistoryPanel() {
       this.setLayout(new BorderLayout());
       this.setPreferredSize(MOVE_HISTORY_PANEL_DIMENSION);
-      moveHistory.setEditable(false);
+      moveHistoryTextArea.setEditable(false);
 
       JLabel label = new JLabel("MOVE HISTORY");
       label.setHorizontalAlignment(JLabel.CENTER);
       label.setVerticalAlignment(JLabel.CENTER);
       label.setFont(new Font("SansSerif", Font.BOLD, 18));
 
-      moveHistory.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-      moveHistory.setFont(new Font("SansSerif", Font.PLAIN, 14));
+      moveHistoryTextArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+      moveHistoryTextArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+      // set scrollable vertically as needed
+      JScrollPane moveHistoryVScrollable = new JScrollPane(moveHistoryTextArea);
+      moveHistoryVScrollable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
       this.add(label, BorderLayout.NORTH);
-      this.add(moveHistory, BorderLayout.CENTER);
+      this.add(moveHistoryVScrollable, BorderLayout.CENTER);
     }
 
     public void addMoveHistory(String move) {
-      moveHistory.append(move);
+      moveHistoryTextArea.append(move);
     }
   }
 
@@ -422,9 +427,26 @@ public class GUI {
 
             Move lastMove = gameStateBoard.getLastMove();
 
-            moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                                            ": " + lastMove.getOriginCoords() +
-                                            " to " + lastMove.getDestinationCoords());
+            // TODO specify piece alliance in aggressive. specify draw
+            if (lastMove.getMoveType() == "aggressive") {
+              Alliance superiorPieceAlliance =
+                lastMove.getEliminatedPiece().getAlliance() == Alliance.BLACK ?
+                Alliance.WHITE : Alliance.BLACK;
+
+              moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                                              ": " + lastMove.getOriginCoords() +
+                                              " to " + lastMove.getDestinationCoords() +
+                                              " " + superiorPieceAlliance);
+            } else if (lastMove.getMoveType() == "draw") {
+              moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                                              ": " + lastMove.getOriginCoords() +
+                                              " to " + lastMove.getDestinationCoords() +
+                                              " DRAW");
+            } else {
+              moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                                              ": " + lastMove.getOriginCoords() +
+                                              " to " + lastMove.getDestinationCoords());
+            }
 
             boardPanel.refreshBoardPanel();
             boardPanel.deactivateCurrentTile();
