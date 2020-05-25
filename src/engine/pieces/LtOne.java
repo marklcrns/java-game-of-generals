@@ -14,12 +14,16 @@ public class LtOne extends Piece {
   private final int powerLevel = 5;
   private int legalPieceInstanceCount = 1;
 
-  public LtOne(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
-    super(pieceOwner, piecePosition, pieceAlliance);
+  public LtOne(Player owner, Alliance alliance) {
+    super(owner, alliance);
+  }
+
+  public LtOne(Player owner, Alliance alliance, int coords) {
+    super(owner, alliance, coords);
   }
 
   public LtOne(Piece piece) {
-    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
+    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
   }
 
   @Override

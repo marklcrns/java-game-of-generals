@@ -14,12 +14,16 @@ public class Private extends Piece {
   private final int powerLevel = 2;
   private int legalPieceInstanceCount = 6;
 
-  public Private(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
-    super(pieceOwner, piecePosition, pieceAlliance);
+  public Private(Player owner, Alliance alliance) {
+    super(owner, alliance);
+  }
+
+  public Private(Player owner, Alliance alliance, int coords) {
+    super(owner, alliance, coords);
   }
 
   public Private(Piece piece) {
-    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
+    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
   }
 
   @Override

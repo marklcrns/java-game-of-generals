@@ -14,12 +14,16 @@ public class GeneralFour extends Piece {
   private final int powerLevel = 13;
   private final int legalPieceInstanceCount = 1;
 
-  public GeneralFour(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
-    super(pieceOwner, piecePosition, pieceAlliance);
+  public GeneralFour(Player owner, Alliance alliance) {
+    super(owner, alliance);
+  }
+
+  public GeneralFour(Player owner, Alliance alliance, int coords) {
+    super(owner, alliance, coords);
   }
 
   public GeneralFour(Piece piece) {
-    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
+    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
   }
 
   @Override

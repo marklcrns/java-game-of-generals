@@ -14,12 +14,16 @@ public class LtTwo extends Piece {
   private final int powerLevel = 4;
   private int legalPieceInstanceCount = 1;
 
-  public LtTwo(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
-    super(pieceOwner, piecePosition, pieceAlliance);
+  public LtTwo(Player owner, Alliance alliance) {
+    super(owner, alliance);
+  }
+
+  public LtTwo(Player owner, Alliance alliance, int coords) {
+    super(owner, alliance, coords);
   }
 
   public LtTwo(Piece piece) {
-    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
+    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
   }
 
   @Override

@@ -41,7 +41,7 @@ public class Move {
 
   private void evaluateMove() {
     if (board.getTile(targetTileCoords).isTileOccupied())
-      if (targetPieceCopy.getAlliance() != sourcePieceCopy.getAlliance())
+      if (targetPieceCopy.getPieceAlliance() != sourcePieceCopy.getPieceAlliance())
         if (isSameRank())
           moveType = "draw";
         else
@@ -60,30 +60,34 @@ public class Move {
 
           // TODO end game
           if (isTargetPieceFlag()) {
-            System.out.println("\n" + sourcePieceCopy.getAlliance() +
+            System.out.println("\n" + sourcePieceCopy.getPieceAlliance() +
                 " player WON!\n");
-            board.setEndGameWinner(sourcePieceCopy.getAlliance());
+            board.setEndGameWinner(sourcePieceCopy.getPieceAlliance());
+          } else if (isSourcePieceFlag()){
+            System.out.println("\n" + targetPieceCopy.getPieceAlliance() +
+                " player WON!\n");
+            board.setEndGameWinner(targetPieceCopy.getPieceAlliance());
           }
 
           if (isTargetPieceEliminated()) {
             board.replacePiece(targetTileCoords, sourcePieceCopy);
-            board.getTile(sourceTileCoords).emptyTile();
+            board.getTile(sourceTileCoords).empty();
             eliminatedPiece = targetPieceCopy;
           } else {
-            board.getTile(sourceTileCoords).emptyTile();
+            board.getTile(sourceTileCoords).empty();
             eliminatedPiece = sourcePieceCopy;
           }
           this.isExecuted = true;
           break;
         case "draw":
-          board.getTile(sourceTileCoords).emptyTile();
-          board.getTile(targetTileCoords).emptyTile();
+          board.getTile(sourceTileCoords).empty();
+          board.getTile(targetTileCoords).empty();
           break;
         case "normal":
           board.movePiece(sourceTileCoords, targetTileCoords);
 
           if (isFlagSucceeded())
-            System.out.println("\n" + sourcePieceCopy.getAlliance() +
+            System.out.println("\n" + sourcePieceCopy.getPieceAlliance() +
                 " player WON!\n");
 
           this.isExecuted = true;
@@ -120,7 +124,7 @@ public class Move {
       targetPiece = "";
     else
       targetPiece = targetPieceCopy.getRank();
-    System.out.println(sourcePieceCopy.getAlliance() + " " +
+    System.out.println(sourcePieceCopy.getPieceAlliance() + " " +
         sourcePieceCopy.getRank() + " " +
         sourceTileCoords + " to " +
         targetPiece + " " +
@@ -152,12 +156,19 @@ public class Move {
       return false;
   }
 
+  private boolean isSourcePieceFlag() {
+    if (sourcePieceCopy.getRank() == "F")
+      return true;
+    else
+      return false;
+  }
+
   private boolean isFlagSucceeded() {
     if (sourcePieceCopy.getRank() == "F" &&
         board.getTile(targetTileCoords).isTileEmpty())
-      if ((sourcePieceCopy.getAlliance() == Alliance.BLACK &&
+      if ((sourcePieceCopy.getPieceAlliance() == Alliance.BLACK &&
           targetTileCoords >= BoardUtils.LAST_ROW_INIT) &&
-          (sourcePieceCopy.getAlliance() == Alliance.WHITE &&
+          (sourcePieceCopy.getPieceAlliance() == Alliance.WHITE &&
           targetTileCoords < BoardUtils.SECOND_ROW_INIT))
         return true;
 
@@ -212,17 +223,17 @@ public class Move {
     if (isExecuted) {
       String superiorPieceAlliance = "";
       if (this.moveType == "aggressive") {
-        superiorPieceAlliance = eliminatedPiece.getAlliance() == Alliance.BLACK ?
+        superiorPieceAlliance = eliminatedPiece.getPieceAlliance() == Alliance.BLACK ?
           Alliance.WHITE + " ": Alliance.BLACK + " ";
       }
-      return sourcePieceCopy.getAlliance() + " " +
+      return sourcePieceCopy.getPieceAlliance() + " " +
         sourcePieceCopy.getRank() + " " +
         sourceTileCoords + " to " +
         targetPiece + targetTileCoords + " " +
         superiorPieceAlliance + this.moveType +
         " EXECUTED";
     } else {
-      return sourcePieceCopy.getAlliance() + " " +
+      return sourcePieceCopy.getPieceAlliance() + " " +
         sourcePieceCopy.getRank() + " " +
         sourceTileCoords + " to " +
         targetPiece + targetTileCoords + " ";

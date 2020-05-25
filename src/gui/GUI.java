@@ -209,7 +209,7 @@ public class GUI {
 
       if (sourceTile.isTileOccupied()) {
 
-        if (sourceTile.getPiece().getAlliance() == gameStateBoard.getMoveMaker()) {
+        if (sourceTile.getPiece().getPieceAlliance() == gameStateBoard.getMoveMaker()) {
           pieceMoves = sourceTile.getPiece().evaluateMoves(gameStateBoard);
 
           for (Map.Entry<String, Move> entry : pieceMoves.entrySet()) {
@@ -386,32 +386,38 @@ public class GUI {
 
         @Override
         public void mouseEntered(MouseEvent e) {
-          if (boardPanel.enableHoverHighlight)
-            boardPanel.highlightPieceMoves(tileId);
-          boardPanel.setHoveredTileId(tileId);
+          if (gameStateBoard.getEndGameWinner() == null) {
+            if (boardPanel.enableHoverHighlight)
+              boardPanel.highlightPieceMoves(tileId);
+            boardPanel.setHoveredTileId(tileId);
+          }
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-          if (boardPanel.enableHoverHighlight)
-            boardPanel.clearHighlights();
+          if (gameStateBoard.getEndGameWinner() == null) {
+            if (boardPanel.enableHoverHighlight)
+              boardPanel.clearHighlights();
+          }
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
-          if (gameStateBoard.getTile(tileId).isTileOccupied() && !isCandidateMoveTile) {
-            if (gameStateBoard.getTile(tileId).getPiece().getAlliance() == gameStateBoard.getMoveMaker()) {
+          if (gameStateBoard.getEndGameWinner() == null) {
+            if (gameStateBoard.getTile(tileId).isTileOccupied() && !isCandidateMoveTile) {
+              if (gameStateBoard.getTile(tileId).getPiece().getPieceAlliance() == gameStateBoard.getMoveMaker()) {
 
-              boardPanel.clearHighlights();
+                boardPanel.clearHighlights();
 
-              if (isTileActive) {
-                boardPanel.deactivateCurrentTile();
-                boardPanel.setHoverHighlight(true);
-              } else {
-                boardPanel.setActiveTile(tileId);
-                boardPanel.setHoverHighlight(false);
-                boardPanel.highlightPieceMoves(tileId);
-                setBackground(ACTIVE_TILE_COLOR);
+                if (isTileActive) {
+                  boardPanel.deactivateCurrentTile();
+                  boardPanel.setHoverHighlight(true);
+                } else {
+                  boardPanel.setActiveTile(tileId);
+                  boardPanel.setHoverHighlight(false);
+                  boardPanel.highlightPieceMoves(tileId);
+                  setBackground(ACTIVE_TILE_COLOR);
+                }
               }
             }
           }
@@ -419,44 +425,46 @@ public class GUI {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-          if (isCandidateMoveTile && boardPanel.getHoveredTileId() == tileId) {
-            final Piece activePiece = gameStateBoard.getTile(boardPanel.getActiveTileId()).getPiece();
+          if (gameStateBoard.getEndGameWinner() == null) {
+            if (isCandidateMoveTile && boardPanel.getHoveredTileId() == tileId) {
+              final Piece activePiece = gameStateBoard.getTile(boardPanel.getActiveTileId()).getPiece();
 
-            Player player = gameStateBoard.getPlayer(activePiece.getAlliance());
-            player.makeMove(activePiece.getCoords(), tileId);
+              Player player = gameStateBoard.getPlayer(activePiece.getPieceAlliance());
+              player.makeMove(activePiece.getPieceCoords(), tileId);
 
-            Move lastMove = gameStateBoard.getLastMove();
+              Move lastMove = gameStateBoard.getLastMove();
 
-            if (lastMove.getMoveType() == "aggressive") {
-              Alliance superiorPieceAlliance =
-                lastMove.getEliminatedPiece().getAlliance() == Alliance.BLACK ?
-                Alliance.WHITE : Alliance.BLACK;
+              if (lastMove.getMoveType() == "aggressive") {
+                Alliance superiorPieceAlliance =
+                  lastMove.getEliminatedPiece().getPieceAlliance() == Alliance.BLACK ?
+                  Alliance.WHITE : Alliance.BLACK;
 
-              moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                                              ": " + lastMove.getOriginCoords() +
-                                              " to " + lastMove.getDestinationCoords() +
-                                              " " + superiorPieceAlliance);
-            } else if (lastMove.getMoveType() == "draw") {
-              moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                                              ": " + lastMove.getOriginCoords() +
-                                              " to " + lastMove.getDestinationCoords() +
-                                              " DRAW");
-            } else {
-              moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                                              ": " + lastMove.getOriginCoords() +
-                                              " to " + lastMove.getDestinationCoords());
+                moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                    ": " + lastMove.getOriginCoords() +
+                    " to " + lastMove.getDestinationCoords() +
+                    " " + superiorPieceAlliance);
+              } else if (lastMove.getMoveType() == "draw") {
+                moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                    ": " + lastMove.getOriginCoords() +
+                    " to " + lastMove.getDestinationCoords() +
+                    " DRAW");
+              } else {
+                moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                    ": " + lastMove.getOriginCoords() +
+                    " to " + lastMove.getDestinationCoords());
+              }
+
+              if (gameStateBoard.isEndGame()) {
+                String endGameMessage = "GAME OVER, " +
+                  gameStateBoard.getEndGameWinner() + " PLAYER WON!";
+                String separator = "\n**********************************\n";
+                moveHistoryPanel.addMoveHistory(separator + endGameMessage + separator);
+              }
+
+              boardPanel.refreshBoardPanel();
+              boardPanel.deactivateCurrentTile();
+              boardPanel.setHoverHighlight(true);
             }
-
-            if (gameStateBoard.isEndGame()) {
-              String endGameMessage = "GAME OVER, " +
-                gameStateBoard.getEndGameWinner() + " PLAYER WON!";
-              String separator = "\n**********************************\n";
-              moveHistoryPanel.addMoveHistory(separator + endGameMessage + separator);
-            }
-
-            boardPanel.refreshBoardPanel();
-            boardPanel.deactivateCurrentTile();
-            boardPanel.setHoverHighlight(true);
           }
         }
       });
@@ -466,7 +474,7 @@ public class GUI {
       // Pre-load piece image
       if (gameStateBoard.getTile(tileId).isTileOccupied()) {
         final Tile currTile = gameStateBoard.getTile(tileId);
-        Alliance pieceAlliance = currTile.getPiece().getAlliance();
+        Alliance pieceAlliance = currTile.getPiece().getPieceAlliance();
         String pieceRank = currTile.getPiece().getRank();
 
         if (pieceAlliance == Alliance.BLACK) {
@@ -485,11 +493,16 @@ public class GUI {
       if (gameStateBoard.getTile(tileId).isTileOccupied()) {
         final Tile currTile = gameStateBoard.getTile(tileId);
 
-        // Load normal icon if isMoveMaker, else hidden icon
-        if (currTile.getPiece().getAlliance() == gameStateBoard.getMoveMaker())
+        if (gameStateBoard.getEndGameWinner() == null) {
+          // Load normal icon if isMoveMaker, else hidden icon
+          if (currTile.getPiece().getPieceAlliance() == gameStateBoard.getMoveMaker())
+            add(new JLabel(new ImageIcon(iconNormal)));
+          else
+            add(new JLabel(new ImageIcon(iconHidden)));
+
+        } else {
           add(new JLabel(new ImageIcon(iconNormal)));
-        else
-          add(new JLabel(new ImageIcon(iconHidden)));
+        }
       }
     }
 

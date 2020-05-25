@@ -14,12 +14,16 @@ public class GeneralTwo extends Piece {
   private final int powerLevel = 11;
   private int legalPieceInstanceCount = 1;
 
-  public GeneralTwo(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
-    super(pieceOwner, piecePosition, pieceAlliance);
+  public GeneralTwo(Player owner, Alliance alliance) {
+    super(owner, alliance);
+  }
+
+  public GeneralTwo(Player owner, Alliance alliance, int coords) {
+    super(owner, alliance, coords);
   }
 
   public GeneralTwo(Piece piece) {
-    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
+    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
   }
 
   @Override

@@ -26,9 +26,9 @@ public class BoardUtils {
   public static final String LT_ONE_RANK = "LT1";
   public static final String LT_TWO_RANK = "LT2";
   public static final String SERGEANT_RANK = "SN";
-  public static final String SPY_RANK = "S";
   public static final String PRIVATE_RANK = "P";
   public static final String FLAG_RANK = "F";
+  public static final String SPY_RANK = "S";
 
   public static final int FIRST_ROW_INIT = 0;
   public static final int SECOND_ROW_INIT = FIRST_ROW_INIT + TILE_COLUMN_COUNT;

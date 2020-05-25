@@ -37,7 +37,7 @@ public class Player {
   private void collectPieces() {
     for (int i = 0; i < board.getBoard().size(); i++) {
       if (board.getTile(i).isTileOccupied()) {
-        if (board.getTile(i).getPiece().getAlliance() == alliance) {
+        if (board.getTile(i).getPiece().getPieceAlliance() == alliance) {
           ownedPieces.add(board.getTile(i).getPiece());
         }
       }
@@ -92,12 +92,12 @@ public class Player {
   }
 
   public boolean pieceOwnerCheck(int pieceCoords) {
-    if (board.getTile(pieceCoords).getPiece().getAlliance() == alliance)
+    if (board.getTile(pieceCoords).getPiece().getPieceAlliance() == alliance)
       return true;
     else
       System.out.println("E: " + alliance +
           " player DOES NOT own " +
-          board.getTile(pieceCoords).getPiece().getAlliance() + " " +
+          board.getTile(pieceCoords).getPiece().getPieceAlliance() + " " +
           board.getTile(pieceCoords).getPiece().getRank() + " at Tile " +
           pieceCoords);
       return false;

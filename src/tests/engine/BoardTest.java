@@ -57,9 +57,9 @@ public class BoardTest {
     for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
       final Tile currentTile = board.getTile(i);
       if (currentTile.isTileOccupied() &&
-          currentTile.getTerritory() != currentTile.getPiece().getAlliance()) {
+          currentTile.getTerritory() != currentTile.getPiece().getPieceAlliance()) {
         allianceErrorDetected = true;
-        tilePieceAllianceErrors.put(i, "E: " + currentTile.getPiece().getAlliance() +
+        tilePieceAllianceErrors.put(i, "E: " + currentTile.getPiece().getPieceAlliance() +
             " " + currentTile.getPiece().getRank() +
             " on " + currentTile.getTerritory() + " Territory");
       }

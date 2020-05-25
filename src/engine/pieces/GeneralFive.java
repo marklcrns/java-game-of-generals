@@ -14,12 +14,16 @@ public class GeneralFive extends Piece {
   private final int powerLevel = 14;
   private final int legalPieceInstanceCount = 1;
 
-  public GeneralFive(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
-    super(pieceOwner, piecePosition, pieceAlliance);
+  public GeneralFive(Player owner, Alliance alliance) {
+    super(owner, alliance);
+  }
+
+  public GeneralFive(Player owner, Alliance alliance, int coords) {
+    super(owner, alliance, coords);
   }
 
   public GeneralFive(Piece piece) {
-    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
+    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
   }
 
   @Override

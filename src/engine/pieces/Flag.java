@@ -14,12 +14,16 @@ public class Flag extends Piece {
   private final int powerLevel = 1;
   private int legalPieceInstanceCount = 1;
 
-  public Flag(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
-    super(pieceOwner, piecePosition, pieceAlliance);
+  public Flag(Player owner, Alliance alliance) {
+    super(owner, alliance);
+  }
+
+  public Flag(Player owner, Alliance alliance, int coords) {
+    super(owner, alliance, coords);
   }
 
   public Flag(Piece piece) {
-    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
+    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
   }
 
   @Override

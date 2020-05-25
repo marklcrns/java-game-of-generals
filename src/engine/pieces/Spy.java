@@ -14,12 +14,16 @@ public class Spy extends Piece {
   private final int powerLevel = 999;
   private int legalPieceInstanceCount = 2;
 
-  public Spy(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
-    super(pieceOwner, piecePosition, pieceAlliance);
+  public Spy(Player owner, Alliance alliance) {
+    super(owner, alliance);
+  }
+
+  public Spy(Player owner, Alliance alliance, int coords) {
+    super(owner, alliance, coords);
   }
 
   public Spy(Piece piece) {
-    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
+    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
   }
 
   @Override

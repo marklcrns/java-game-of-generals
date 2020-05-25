@@ -23,7 +23,7 @@ public class Main {
         Player player2 = new Player(board, Alliance.BLACK);
 
         // TODO evaluate player owned pieces after building
-        builder = builder.createDemoBoardBuild();
+        builder = builder.createRandomBuild();
         board.buildBoard(builder);
 
         board.addPlayerWhite(player1);

@@ -14,12 +14,16 @@ public class Sergeant extends Piece {
   private final int powerLevel = 3;
   private int legalPieceInstanceCount = 1;
 
-  public Sergeant(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
-    super(pieceOwner, piecePosition, pieceAlliance);
+  public Sergeant(Player owner, Alliance alliance) {
+    super(owner, alliance);
+  }
+
+  public Sergeant(Player owner, Alliance alliance, int coords) {
+    super(owner, alliance, coords);
   }
 
   public Sergeant(Piece piece) {
-    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
+    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
   }
 
   @Override

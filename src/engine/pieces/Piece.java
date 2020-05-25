@@ -36,26 +36,37 @@ public abstract class Piece {
   });
   private Map<String, Move> moveSet;
 
+  public Piece(final Player owner, final Alliance alliance) {
+    this.pieceOwner = owner;
+    this.pieceAlliance = alliance;
+    this.pieceCoords = -1;
+  }
+
   // TODO: remove pieceCoords and rely only to tileId
-  public Piece(final Player pieceOwner, final int pieceCoords, final Alliance pieceAlliance) {
-    this.pieceOwner = pieceOwner;
-    this.pieceAlliance = pieceAlliance;
-    this.pieceCoords = pieceCoords;
+  public Piece(final Player owner, final Alliance alliance,
+               final int coords) {
+    this.pieceOwner = owner;
+    this.pieceAlliance = alliance;
+    this.pieceCoords = coords;
   }
 
   public Player getPieceOwner() {
     return this.pieceOwner;
   }
 
-  public int getCoords() {
+  public int getPieceCoords() {
     return this.pieceCoords;
+  }
+
+  public void setPieceCoords(int coords) {
+    this.pieceCoords = coords;
   }
 
   public Tile getTile(Board board) {
     return board.getTile(pieceCoords);
   }
 
-  public Alliance getAlliance() {
+  public Alliance getPieceAlliance() {
     return this.pieceAlliance;
   }
 

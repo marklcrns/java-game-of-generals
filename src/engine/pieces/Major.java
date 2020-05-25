@@ -14,12 +14,16 @@ public class Major extends Piece {
   private final int powerLevel = 7;
   private int legalPieceInstanceCount = 1;
 
-  public Major(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
-    super(pieceOwner, piecePosition, pieceAlliance);
+  public Major(Player owner, Alliance alliance) {
+    super(owner, alliance);
+  }
+
+  public Major(Player owner, Alliance alliance, int coords) {
+    super(owner, alliance, coords);
   }
 
   public Major(Piece piece) {
-    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
+    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
   }
 
   @Override

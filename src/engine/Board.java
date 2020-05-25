@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import engine.pieces.Captain;
 import engine.pieces.Colonel;
@@ -24,6 +25,7 @@ import engine.pieces.Spy;
 import engine.player.Player;
 import gui.GUI;
 import utils.BoardUtils;
+import utils.Utils;
 
 /**
  * Author: Mark Lucernas
@@ -34,8 +36,10 @@ public class Board {
   private static List<Tile> gameBoard;
   private static Player playerBlack;
   private static Player playerWhite;
+  private static int blackPiecesLeft = 0;
+  private static int whitePiecesLeft = 0;
   private boolean gameStarted = false;
-  private boolean debugMode;
+  private static boolean debugMode;
   private int currentTurn;
   private Move lastMove;
   private Alliance moveMaker;
@@ -85,12 +89,15 @@ public class Board {
     for (Map.Entry<Integer, Piece> entry : builder.boardConfig.entrySet()) {
       if (gameBoard.get(entry.getKey()).isTileEmpty()) {
         // insert piece to tile
-        gameBoard.get(entry.getKey()).insertPiece(entry.getValue());
+        gameBoard.get(entry.getKey()).insert(entry.getValue());
         // change tile state
         // TODO: make setOccupied(true) built into the insertPiece method
         gameBoard.get(entry.getKey()).setOccupied(true);
       }
     };
+
+    blackPiecesLeft = builder.getBlackPiecesCount();
+    whitePiecesLeft = builder.getWhitePiecesCount();
   }
 
   public boolean startGame() {
@@ -115,7 +122,7 @@ public class Board {
 
     displayBoard();
 
-    if (debugMode) {
+    if (isDebugMode()) {
       System.out.println(this);
       System.out.println("CurrentTurn: " + currentTurn + "\n");
     }
@@ -135,11 +142,11 @@ public class Board {
   }
 
   public void setDebugMode(boolean debug) {
-    this.debugMode = debug;
+    debugMode = debug;
   }
 
-  public boolean isDebugMode() {
-    return this.debugMode;
+  public static boolean isDebugMode() {
+    return debugMode;
   }
 
   public Tile getTile(int coordinates) {
@@ -154,8 +161,8 @@ public class Board {
     if (this.getTile(tileId).isTileOccupied()) {
       // TODO: improve piece manipulation efficiency
       piece.updateCoords(tileId);
-      this.getBoard().get(tileId).replacePiece(piece);
-      this.getTile(tileId).replacePiece(piece);
+      this.getBoard().get(tileId).replace(piece);
+      this.getTile(tileId).replace(piece);
 
       return true;
     }
@@ -167,9 +174,9 @@ public class Board {
     if (this.getTile(targetCoords).isTileEmpty()) {
       Piece pieceCopy = this.getTile(sourceCoords).getPiece().makeCopy();
       pieceCopy.updateCoords(targetCoords);
-      this.getTile(targetCoords).insertPiece(pieceCopy);
+      this.getTile(targetCoords).insert(pieceCopy);
       // delete source piece
-      this.getTile(sourceCoords).emptyTile();
+      this.getTile(sourceCoords).empty();
 
       return true;
     }
@@ -178,9 +185,9 @@ public class Board {
 
   public boolean deletePiece(int pieceCoords) {
     if (this.getTile(pieceCoords).isTileOccupied()) {
-      this.getTile(pieceCoords).emptyTile();
+      this.getTile(pieceCoords).empty();
 
-      if (debugMode)
+      if (isDebugMode())
         System.out.println(this);
 
       return true;
@@ -200,7 +207,7 @@ public class Board {
     }
     this.currentTurn++;
 
-    if (debugMode) {
+    if (isDebugMode()) {
       System.out.println(this);
       System.out.println("Current Turn: " + currentTurn + "\n");
     }
@@ -290,7 +297,26 @@ public class Board {
   public String toString() {
     String debugBoard = "\n    0 1 2 3 4 5 6 7 8\n";
     debugBoard += "    _________________\n";
-    for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i += 9) {
+    for (int i = 0; i < BoardUtils.ALL_TILES_COUNT / 2; i += 9) {
+      if (i < 10)
+        debugBoard += " " + i + " |";
+      else
+        debugBoard += i + " |";
+      for (int j = i; j < i + 9; j++) {
+        if (this.getTile(j).isTileEmpty()) {
+          debugBoard += "-";
+        } else {
+          String rank = this.getTile(j).getPiece().getRank();
+          debugBoard += rank.substring(0, 1);
+        }
+        debugBoard += " ";
+      }
+      debugBoard += "\n";
+    }
+
+    debugBoard += "   |-----------------\n";
+
+    for (int i = BoardUtils.ALL_TILES_COUNT / 2; i < BoardUtils.ALL_TILES_COUNT; i += 9) {
       if (i < 10)
         debugBoard += " " + i + " |";
       else
@@ -313,9 +339,21 @@ public class Board {
   public static class BoardBuilder {
 
     private Map<Integer, Piece> boardConfig;
+    private int blackPiecesCount;
+    private int whitePiecesCount;
 
     public BoardBuilder() {
       this.boardConfig = new HashMap<>();
+      this.blackPiecesCount = 0;
+      this.whitePiecesCount = 0;
+    }
+
+    public int getBlackPiecesCount() {
+      return blackPiecesCount;
+    }
+
+    public int getWhitePiecesCount() {
+      return blackPiecesCount;
     }
 
     public BoardBuilder createDemoBoardBuild() {
@@ -352,6 +390,7 @@ public class Board {
 
       // White territory
       boardOffset = BoardUtils.ALL_TILES_COUNT / 2;
+
       // row 0
       builder.setPiece(new GeneralFive(playerWhite, Alliance.BLACK, boardOffset + row[0] + 1));
       builder.setPiece(new GeneralFive(playerWhite, Alliance.WHITE, boardOffset + row[0] + 2));
@@ -381,66 +420,193 @@ public class Board {
       return builder;
     }
 
+    public BoardBuilder createRandomBuild() {
+      BoardBuilder builder = new BoardBuilder();
+      int[] occupiedTiles = {};
+
+      if (isDebugMode())
+        System.out.println("Inserting random pieces...");
+
+      // Black pieces
+      int[] blackTerritoryBounds = {0, (BoardUtils.ALL_TILES_COUNT / 2) - 1};
+
+      List<Piece> unsetBlackPieces = new ArrayList<>();
+
+      unsetBlackPieces.add(new GeneralFive(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new GeneralFour(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new GeneralThree(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new GeneralTwo(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new GeneralOne(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new Colonel(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new LtCol(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new Major(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new Captain(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new LtOne(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new LtTwo(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new Sergeant(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new Private(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new Flag(playerBlack, Alliance.BLACK));
+      unsetBlackPieces.add(new Spy(playerBlack, Alliance.BLACK));
+
+      for (Piece unsetPiece : unsetBlackPieces) {
+
+        if (debugMode)
+          System.out.println("Inserting " + unsetPiece.getPieceAlliance() + " " +
+                            unsetPiece.getRank() + "...");
+
+        setAllPieceInstanceRandomly(builder, unsetPiece, blackTerritoryBounds[0],
+                                    blackTerritoryBounds[1], occupiedTiles);
+      }
+
+      // White pieces
+      int[] whiteTerritoryBounds = {BoardUtils.ALL_TILES_COUNT / 2,
+        (BoardUtils.ALL_TILES_COUNT) - 1};
+
+      List<Piece> unsetWhitePieces = new ArrayList<>();
+
+      unsetWhitePieces.add(new GeneralFive(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new GeneralFour(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new GeneralThree(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new GeneralTwo(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new GeneralOne(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new Colonel(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new LtCol(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new Major(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new Captain(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new LtOne(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new LtTwo(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new Sergeant(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new Private(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new Flag(playerWhite, Alliance.WHITE));
+      unsetWhitePieces.add(new Spy(playerWhite, Alliance.WHITE));
+
+      for (Piece unsetPiece : unsetWhitePieces) {
+
+        if (debugMode)
+          System.out.println("Inserting " + unsetPiece.getPieceAlliance() + " " +
+                            unsetPiece.getRank() + "...");
+
+        setAllPieceInstanceRandomly(builder, unsetPiece, whiteTerritoryBounds[0],
+                                    whiteTerritoryBounds[1], occupiedTiles);
+      }
+
+      return builder;
+    }
+
     public boolean setPiece(final Piece piece) {
-      // checks if wihtin bounds, correct territory, and piece legal count
+      // checks if within bounds, correct territory, and piece legal count
       if (isPieceWithinBounds(piece) &&
           isPieceInCorrectTerritory(piece) &&
-          isLegalPieceInstanceChecker(piece)) {
-        boardConfig.put(piece.getCoords(), piece);
+          isLegalPieceInstanceChecker(piece) &&
+          isTileEmpty(piece.getPieceCoords())) {
+        boardConfig.put(piece.getPieceCoords(), piece);
+
+        if (isDebugMode())
+          System.out.println(piece.getPieceAlliance() + " piece inserted at " +
+                             piece.getPieceCoords());
+
+        if (piece.getPieceAlliance() == Alliance.BLACK)
+          this.blackPiecesCount++;
+        else
+          this.whitePiecesCount++;
+
         return true;
       }
       return false;
     }
 
+    public void setAllPieceInstanceRandomly(BoardBuilder builder, Piece piece,
+                                            int from, int to,
+                                            int[] occupiedTiles) {
+      if (isDebugMode())
+        System.out.println("Placing " + piece.getPieceAlliance() + " " +
+            piece.getRank() + " at " + piece.getPieceCoords() + " randomly...");
+
+      Piece pieceCopy = piece.makeCopy();
+      int pieceInstanceCounter = countPieceInstances(piece.getRank(),
+                                                     piece.getPieceAlliance());
+      int randomEmptyTile;
+
+      while (pieceInstanceCounter < piece.getLegalPieceInstanceCount()) {
+        randomEmptyTile = Utils.getRandomWithExclusion(new Random(), from, to, occupiedTiles);
+        pieceCopy.setPieceCoords(randomEmptyTile);
+        if (builder.setPiece(pieceCopy)) {
+          pieceCopy = piece.makeCopy();
+          Utils.appendToIntArray(occupiedTiles, randomEmptyTile);
+          pieceInstanceCounter++;
+
+          if (isDebugMode())
+            System.out.println(piece.getPieceAlliance() + " " + piece.getRank() +
+                " at " + piece.getPieceCoords() + " inserted");
+        }
+      }
+    }
+
+    public int countPieceInstances(String rank, Alliance alliance) {
+      int pieceInstanceCounter = 0;
+
+      for (Map.Entry<Integer, Piece> entry : boardConfig.entrySet()) {
+        if (entry.getValue().getRank() == rank &&
+            entry.getValue().getPieceAlliance() == alliance)
+          pieceInstanceCounter++;
+      }
+
+      return pieceInstanceCounter;
+    }
+
     public boolean isPieceWithinBounds(Piece piece) {
-      if (piece.getCoords() < BoardUtils.ALL_TILES_COUNT &&
-          piece.getCoords() > 0) {
+      if (piece.getPieceCoords() < BoardUtils.ALL_TILES_COUNT &&
+          piece.getPieceCoords() > 0) {
         return true;
       }
 
-      System.out.println(piece.getAlliance() + " " +
-                         piece.getRank() + " at Tile" +
-                         piece.getCoords() + " is out of bounds." +
-                         " Piece not inserted.");
+      if (isDebugMode())
+        System.out.println(piece.getPieceAlliance() + " " +
+                          piece.getRank() + " at Tile" +
+                          piece.getPieceCoords() + " is out of bounds." +
+                          " Piece not inserted.");
       return false;
     }
 
     public boolean isPieceInCorrectTerritory(Piece piece) {
-      if ((piece.getAlliance() == Alliance.BLACK &&
-            piece.getCoords() < BoardUtils.ALL_TILES_COUNT / 2) ||
-          (piece.getAlliance() == Alliance.WHITE &&
-            piece.getCoords() > BoardUtils.ALL_TILES_COUNT / 2)) {
+      if ((piece.getPieceAlliance() == Alliance.BLACK &&
+            piece.getPieceCoords() < BoardUtils.ALL_TILES_COUNT / 2) ||
+          (piece.getPieceAlliance() == Alliance.WHITE &&
+            piece.getPieceCoords() > BoardUtils.ALL_TILES_COUNT / 2)) {
         return true;
       }
 
-      System.out.println(piece.getAlliance() + " " +
-                         piece.getRank() + " at Tile " +
-                         piece.getCoords() + " is in illegal territory." +
-                         " Piece not inserted.");
+      if (isDebugMode())
+        System.out.println("E: " + piece.getPieceAlliance() + " " +
+                          piece.getRank() + " at Tile " +
+                          piece.getPieceCoords() + " is in illegal territory." +
+                          " Piece not inserted.");
       return false;
     }
 
     public boolean isLegalPieceInstanceChecker(Piece piece) {
-      // TODO: NOT WORKING
-      final int legalPieceInstanceCount = piece.getLegalPieceInstanceCount();
-      int pieceCounterBlack = 0;
-      int pieceCounterWhite = 0;
+      int pieceInstanceCounter = 0;
       for (Map.Entry<Integer, Piece> entry : this.boardConfig.entrySet()) {
-        if (piece.getRank() == entry.getValue().getRank()) {
-          if (piece.getAlliance() == Alliance.BLACK)
-            pieceCounterBlack++;
-          else
-            pieceCounterWhite++;
-        }
+        if (piece.getRank() == entry.getValue().getRank() &&
+            piece.getPieceAlliance() == entry.getValue().getPieceAlliance())
+          pieceInstanceCounter++;
       }
 
-      if (pieceCounterBlack <= legalPieceInstanceCount &&
-          pieceCounterWhite <= legalPieceInstanceCount) {
+      if (pieceInstanceCounter <= piece.getLegalPieceInstanceCount())
         return true;
-      }
 
-      System.out.println(piece.getRank() + " exceeded maximum instance." +
-          " Piece not inserted.");
+      if (isDebugMode())
+        System.out.println("E: " + piece.getRank() + " exceeded maximum instance." +
+            " Piece not inserted.");
+      return false;
+    }
+
+    public boolean isTileEmpty(int coords) {
+      if (!boardConfig.containsKey(coords))
+        return true;
+
+      if (isDebugMode())
+        System.out.println("E: TIle " + coords + " is occupied");
       return false;
     }
 
@@ -489,7 +655,7 @@ public class Board {
       return this.piece;
     }
 
-    public boolean insertPiece(Piece piece) {
+    public boolean insert(Piece piece) {
       if (isTileEmpty()) {
         this.piece = piece;
         this.occupied = true;
@@ -498,7 +664,7 @@ public class Board {
       return false;
     }
 
-    public boolean replacePiece(Piece piece) {
+    public boolean replace(Piece piece) {
       if (isTileOccupied()) {
         this.piece = piece;
         return true;
@@ -506,7 +672,7 @@ public class Board {
       return false;
     }
 
-    public boolean emptyTile() {
+    public boolean empty() {
       if (isTileOccupied()) {
         this.piece = null;
         this.occupied = false;
@@ -519,7 +685,7 @@ public class Board {
     public String toString() {
       if (this.occupied)
         return "Tile " + this.tileId + " contains " +
-          this.piece.getAlliance() + " " + this.piece.getRank();
+          this.piece.getPieceAlliance() + " " + this.piece.getRank();
       else
         return "Tile " + this.tileId + " is empty";
     }

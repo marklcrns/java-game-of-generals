@@ -14,12 +14,16 @@ public class LtCol extends Piece {
   private final int powerLevel = 8;
   private int legalPieceInstanceCount = 1;
 
-  public LtCol(Player pieceOwner, Alliance pieceAlliance, int piecePosition) {
-    super(pieceOwner, piecePosition, pieceAlliance);
+  public LtCol(Player owner, Alliance alliance) {
+    super(owner, alliance);
+  }
+
+  public LtCol(Player owner, Alliance alliance, int coords) {
+    super(owner, alliance, coords);
   }
 
   public LtCol(Piece piece) {
-    super(piece.getPieceOwner(), piece.getCoords(), piece.getAlliance());
+    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
   }
 
   @Override
