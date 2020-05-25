@@ -35,9 +35,10 @@ public class Board {
   private static Player playerBlack;
   private static Player playerWhite;
   private boolean debugMode;
-  private Alliance moveMaker;
   private int currentTurn;
   private Move lastMove;
+  private Alliance moveMaker;
+  private Alliance endGameWinner;
 
   public Board() {
     initBoard();
@@ -254,6 +255,25 @@ public class Board {
     }
     System.out.println("E: " + player.getAlliance() +
                        " player is already the move maker");
+    return false;
+  }
+
+  public boolean isEndGame() {
+    if (this.endGameWinner != null) {
+      return true;
+    }
+    return false;
+  }
+
+  public Alliance getEndGameWinner() {
+    return this.endGameWinner;
+  }
+
+  public boolean setEndGameWinner(Alliance endGameWinner) {
+    if (endGameWinner != null) {
+      this.endGameWinner = endGameWinner;
+      return true;
+    }
     return false;
   }
 

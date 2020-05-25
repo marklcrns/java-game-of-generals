@@ -427,7 +427,6 @@ public class GUI {
 
             Move lastMove = gameStateBoard.getLastMove();
 
-            // TODO specify piece alliance in aggressive. specify draw
             if (lastMove.getMoveType() == "aggressive") {
               Alliance superiorPieceAlliance =
                 lastMove.getEliminatedPiece().getAlliance() == Alliance.BLACK ?
@@ -446,6 +445,13 @@ public class GUI {
               moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
                                               ": " + lastMove.getOriginCoords() +
                                               " to " + lastMove.getDestinationCoords());
+            }
+
+            if (gameStateBoard.isEndGame()) {
+              String endGameMessage = "GAME OVER, " +
+                gameStateBoard.getEndGameWinner() + " PLAYER WON!";
+              String separator = "\n**********************************\n";
+              moveHistoryPanel.addMoveHistory(separator + endGameMessage + separator);
             }
 
             boardPanel.refreshBoardPanel();

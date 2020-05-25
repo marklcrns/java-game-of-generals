@@ -12,6 +12,7 @@ import utils.BoardUtils;
  * Date: 2020-05-18
  */
 public class Move {
+  private int turnId;
   private final Board board;
   private final Player player;
   private final int sourceTileCoords;
@@ -20,7 +21,6 @@ public class Move {
   private final Piece targetPieceCopy;
   private boolean isExecuted = false;
   private Piece eliminatedPiece;
-  private int turnId;
   private String moveType;
 
   public Move(final Player player,
@@ -57,8 +57,14 @@ public class Move {
     if (legalMoveCheck()) {
       switch (this.moveType) {
         case "aggressive":
+
           // TODO end game
-          // if (isTargetPieceFlag())
+          if (isTargetPieceFlag()) {
+            System.out.println("\n" + sourcePieceCopy.getAlliance() +
+                " player WON!\n");
+            board.setEndGameWinner(sourcePieceCopy.getAlliance());
+          }
+
           if (isTargetPieceEliminated()) {
             board.replacePiece(targetTileCoords, sourcePieceCopy);
             board.getTile(sourceTileCoords).emptyTile();
@@ -75,8 +81,11 @@ public class Move {
           break;
         case "normal":
           board.movePiece(sourceTileCoords, targetTileCoords);
-          // TODO end game
-          // if (isFlagSucceeded())
+
+          if (isFlagSucceeded())
+            System.out.println("\n" + sourcePieceCopy.getAlliance() +
+                " player WON!\n");
+
           this.isExecuted = true;
           break;
         case "invalid":
@@ -182,6 +191,7 @@ public class Move {
     return null;
   }
 
+  // TODO: implement
   public boolean undoExecution() {
     if (!this.isExecuted) {
       return false;
@@ -191,8 +201,8 @@ public class Move {
     return true;
   }
 
+  // TODO: implement
   public boolean redoExecution() {
-    // TODO: implement
     return true;
   }
 
