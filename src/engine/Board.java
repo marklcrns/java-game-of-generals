@@ -381,13 +381,15 @@ public class Board {
       return builder;
     }
 
-    public void setPiece(final Piece piece) {
-      // checks if in the correct territory and piece legal count
+    public boolean setPiece(final Piece piece) {
+      // checks if wihtin bounds, correct territory, and piece legal count
       if (isPieceWithinBounds(piece) &&
           isPieceInCorrectTerritory(piece) &&
-          isLegalPieceInstanceChecker(piece))
+          isLegalPieceInstanceChecker(piece)) {
         boardConfig.put(piece.getCoords(), piece);
-      // TODO: Throw wrong territory exception here
+        return true;
+      }
+      return false;
     }
 
     public boolean isPieceWithinBounds(Piece piece) {
@@ -407,8 +409,9 @@ public class Board {
       if ((piece.getAlliance() == Alliance.BLACK &&
             piece.getCoords() < BoardUtils.ALL_TILES_COUNT / 2) ||
           (piece.getAlliance() == Alliance.WHITE &&
-            piece.getCoords() > BoardUtils.ALL_TILES_COUNT / 2))
+            piece.getCoords() > BoardUtils.ALL_TILES_COUNT / 2)) {
         return true;
+      }
 
       System.out.println(piece.getAlliance() + " " +
                          piece.getRank() + " at Tile " +
@@ -433,11 +436,12 @@ public class Board {
 
       if (pieceCounterBlack <= legalPieceInstanceCount &&
           pieceCounterWhite <= legalPieceInstanceCount) {
-        System.out.println(piece.getRank() + " exceeded maximum instance." +
-            " Piece not inserted.");
-        return false;
+        return true;
       }
-      return true;
+
+      System.out.println(piece.getRank() + " exceeded maximum instance." +
+          " Piece not inserted.");
+      return false;
     }
 
   } // BoardBuilder
