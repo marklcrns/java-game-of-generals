@@ -34,8 +34,10 @@ public class Board {
   private static List<Tile> gameBoard;
   private static Player playerBlack;
   private static Player playerWhite;
-  private Alliance moveMaker;
   private boolean debugMode;
+  private Alliance moveMaker;
+  private int currentTurn;
+  private Move lastMove;
 
   public Board() {
     initBoard();
@@ -106,8 +108,15 @@ public class Board {
     }
 
     setMoveMaker(playerWhite);
+    this.currentTurn = 1;
 
     displayBoard();
+
+    if (debugMode) {
+      System.out.println(this);
+      System.out.println("CurrentTurn: " + currentTurn + "\n");
+    }
+
     return true;
   }
 
@@ -117,6 +126,10 @@ public class Board {
 
   public void setDebugMode(boolean debug) {
     this.debugMode = debug;
+  }
+
+  public boolean isDebugMode() {
+    return this.debugMode;
   }
 
   public Tile getTile(int coordinates) {
@@ -134,9 +147,6 @@ public class Board {
       this.getBoard().get(tileId).replacePiece(piece);
       this.getTile(tileId).replacePiece(piece);
 
-      if (debugMode)
-        System.out.println(this);
-
       return true;
     }
     return false;
@@ -150,9 +160,6 @@ public class Board {
       this.getTile(targetCoords).insertPiece(pieceCopy);
       // delete source piece
       this.getTile(sourceCoords).emptyTile();
-
-      if (debugMode)
-        System.out.println(this);
 
       return true;
     }
@@ -181,6 +188,28 @@ public class Board {
     } else {
       setMoveMaker(playerBlack);
     }
+    this.currentTurn++;
+
+    if (debugMode) {
+      System.out.println(this);
+      System.out.println("Current Turn: " + currentTurn + "\n");
+    }
+  }
+
+  public int getCurrentTurn() {
+    return this.currentTurn;
+  }
+
+  public void setCurrentTurn(int turn) {
+    this.currentTurn = turn;
+  }
+
+  public Move getLastMove() {
+    return this.lastMove;
+  }
+
+  public void setLastMove(Move move) {
+    this.lastMove = move;
   }
 
   public void addPlayerBlack(Player player) {

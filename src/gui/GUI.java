@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
@@ -47,12 +48,17 @@ public class GUI {
   private static JFrame frame;
   private final Board gameStateBoard;
 
+  private final static String ART_DIR_PATH = "art/pieces/original/";
   private final static Color DARK_TILE_COLOR = new Color(50, 50, 50);
   private final static Color LIGHT_TILE_COLOR = new Color(200, 200, 200);
   private final static Color ENEMY_TILE_COLOR = new Color(200, 100, 120);
   private final static Color VALID_TILE_COLOR = new Color(130, 200, 120);
   private final static Color INVALID_TILE_COLOR = new Color(130, 150, 230);
   private final static Color ACTIVE_TILE_COLOR = new Color(230, 230, 120);
+
+  private static MenuBarPanel menuBarPanel;
+  private static MoveHistoryPanel moveHistoryPanel;
+  private static BoardPanel boardPanel;
 
   private final static Dimension FRAME_DIMENSION = new Dimension(1200, 835);
   private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(900, 800);
@@ -66,8 +72,6 @@ public class GUI {
       (int) (FRAME_DIMENSION.getWidth() - BOARD_PANEL_DIMENSION.getWidth()),
       (int) (FRAME_DIMENSION.getHeight() - MENU_BAR_PANEL_DIMENSION.getHeight()));
 
-  private final static String ART_DIR_PATH = "art/pieces/original/";
-
   public GUI(Board board) {
     gameStateBoard = board;
     frame = new JFrame("Game of Generals");
@@ -80,9 +84,13 @@ public class GUI {
     Container container = frame.getContentPane();
     container.setLayout(new BorderLayout());
 
-    container.add(new MenuBarPanel(), BorderLayout.NORTH);
-    container.add(new MoveHistoryPanel(), BorderLayout.WEST);
-    container.add(new BoardPanel(), BorderLayout.CENTER);
+    menuBarPanel = new MenuBarPanel();
+    moveHistoryPanel = new MoveHistoryPanel();
+    boardPanel = new BoardPanel();
+
+    container.add(menuBarPanel, BorderLayout.NORTH);
+    container.add(moveHistoryPanel, BorderLayout.WEST);
+    container.add(boardPanel, BorderLayout.CENTER);
   }
 
   private class MenuBarPanel extends JPanel {
@@ -110,14 +118,27 @@ public class GUI {
 
   private class MoveHistoryPanel extends JPanel {
 
+    private JTextArea moveHistory = new JTextArea();
+
     public MoveHistoryPanel() {
-      this.setLayout(new FlowLayout());
+      this.setLayout(new BorderLayout());
       this.setPreferredSize(MOVE_HISTORY_PANEL_DIMENSION);
-      JLabel label = new JLabel("Move History");
-      JTextArea moveHistoryTextArea = new JTextArea();
-      moveHistoryTextArea.setEditable(false);
-      this.add(label);
-      this.add(moveHistoryTextArea);
+      moveHistory.setEditable(false);
+
+      JLabel label = new JLabel("MOVE HISTORY");
+      label.setHorizontalAlignment(JLabel.CENTER);
+      label.setVerticalAlignment(JLabel.CENTER);
+      label.setFont(new Font("SansSerif", Font.BOLD, 18));
+
+      moveHistory.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+      moveHistory.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+      this.add(label, BorderLayout.NORTH);
+      this.add(moveHistory, BorderLayout.CENTER);
+    }
+
+    public void addMoveHistory(String move) {
+      moveHistory.append(move);
     }
   }
 
@@ -398,6 +419,12 @@ public class GUI {
 
             Player player = gameStateBoard.getPlayer(activePiece.getAlliance());
             player.makeMove(activePiece.getCoords(), tileId);
+
+            Move lastMove = gameStateBoard.getLastMove();
+
+            moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                                            ": " + lastMove.getOriginCoords() +
+                                            " to " + lastMove.getDestinationCoords());
 
             boardPanel.refreshBoardPanel();
             boardPanel.deactivateCurrentTile();

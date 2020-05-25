@@ -17,8 +17,9 @@ public class Move {
   private final int targetPieceCoords;
   private final Piece sourcePieceCopy;
   private final Piece targetPieceCopy;
-  private String moveType;
   private boolean isExecuted = false;
+  private int turnId;
+  private String moveType;
 
   public Move(final Player player,
               final Board board,
@@ -77,6 +78,7 @@ public class Move {
         default:
           return false;
       }
+      this.turnId = board.getCurrentTurn();
       this.isExecuted = true;
       return true;
     }
@@ -139,6 +141,10 @@ public class Move {
 
   public String getMoveType() {
     return this.moveType;
+  }
+
+  public int getTurnId() {
+    return this.turnId;
   }
 
   public boolean undoExecution() {

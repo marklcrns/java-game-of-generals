@@ -20,7 +20,6 @@ public class Player {
   private final Alliance alliance;
   private Map<Integer, Move> moveHistory;
   private List<Piece> ownedPieces;
-  private int turnId = 0;
   private boolean isMoveMaker = false;
   // TODO calculate total activate pieces left
 
@@ -63,8 +62,12 @@ public class Player {
       Move move = new Move(this, board, pieceCoords, destinationCoords);
 
       if (move.execute()) {
+        if (board.isDebugMode()) {
+          System.out.println("Turn " + move.getTurnId() + ": " + move);
+        }
         recordMove(move);
-        this.board.switchPlayerTurn();
+        this.board.setLastMove(move);
+        board.switchPlayerTurn();
         return true;
       }
     }
@@ -101,21 +104,17 @@ public class Player {
   }
 
   private void recordMove(Move move) {
-    moveHistory.put(this.turnId, move);
-    this.turnId++;
+    moveHistory.put(move.getTurnId(), move);
   }
 
   public Move undoLastMove() {
-    Move lastMove = this.moveHistory.get(this.turnId);
-    this.moveHistory.remove(this.turnId);
+    int currentTurn = board.getCurrentTurn();
+    Move lastMove = this.moveHistory.get(currentTurn);
+    this.moveHistory.remove(currentTurn);
     lastMove.undoExecution();
-    this.turnId--;
+    board.setCurrentTurn(currentTurn - 1);
     return lastMove;
     // TODO: decide whether to execute automatically
-  }
-
-  public int getCurrentTurnId() {
-    return this.turnId;
   }
 
   @Override
