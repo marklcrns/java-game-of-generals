@@ -34,6 +34,7 @@ public class Board {
   private static List<Tile> gameBoard;
   private static Player playerBlack;
   private static Player playerWhite;
+  private boolean gameStarted = false;
   private boolean debugMode;
   private int currentTurn;
   private Move lastMove;
@@ -108,6 +109,7 @@ public class Board {
       return false;
     }
 
+    this.gameStarted = true;
     setMoveMaker(playerWhite);
     this.currentTurn = 1;
 
@@ -119,6 +121,13 @@ public class Board {
     }
 
     return true;
+  }
+
+  public boolean isGameStarted() {
+    if (gameStarted)
+      return true;
+    else
+      return false;
   }
 
   public void displayBoard() {
@@ -420,18 +429,18 @@ public class Board {
           else
             pieceCounterWhite++;
         }
+      }
 
-        if (pieceCounterBlack > legalPieceInstanceCount &&
-            pieceCounterWhite > legalPieceInstanceCount) {
-          System.out.println(piece.getRank() + " exceeded maximum instance." +
-                             " Piece not inserted.");
-          return false;
-        }
+      if (pieceCounterBlack <= legalPieceInstanceCount &&
+          pieceCounterWhite <= legalPieceInstanceCount) {
+        System.out.println(piece.getRank() + " exceeded maximum instance." +
+            " Piece not inserted.");
+        return false;
       }
       return true;
     }
 
-  }
+  } // BoardBuilder
 
   public static class Tile {
 
