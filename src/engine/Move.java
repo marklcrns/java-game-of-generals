@@ -5,6 +5,7 @@ import java.util.Map;
 import engine.Board.Tile;
 import engine.pieces.Piece;
 import engine.player.Player;
+import utils.BoardUtils;
 
 /**
  * Author: Mark Lucernas
@@ -13,11 +14,12 @@ import engine.player.Player;
 public class Move {
   private final Board board;
   private final Player player;
-  private final int sourcePieceCoords;
-  private final int targetPieceCoords;
+  private final int sourceTileCoords;
+  private final int targetTileCoords;
   private final Piece sourcePieceCopy;
   private final Piece targetPieceCopy;
   private boolean isExecuted = false;
+  private Piece eliminatedPiece;
   private int turnId;
   private String moveType;
 
@@ -27,8 +29,8 @@ public class Move {
               final int targetPieceCoords) {
     this.player = player;
     this.board = board;
-    this.sourcePieceCoords = sourcePieceCoords;
-    this.targetPieceCoords = targetPieceCoords;
+    this.sourceTileCoords = sourcePieceCoords;
+    this.targetTileCoords = targetPieceCoords;
     this.sourcePieceCopy = board.getTile(sourcePieceCoords).getPiece().makeCopy();
     if (board.getTile(targetPieceCoords).isTileOccupied())
       this.targetPieceCopy = board.getTile(targetPieceCoords).getPiece().makeCopy();
@@ -38,7 +40,7 @@ public class Move {
   }
 
   private void evaluateMove() {
-    if (board.getTile(targetPieceCoords).isTileOccupied())
+    if (board.getTile(targetTileCoords).isTileOccupied())
       if (targetPieceCopy.getAlliance() != sourcePieceCopy.getAlliance())
         if (isSameRank())
           moveType = "draw";
@@ -55,24 +57,30 @@ public class Move {
     if (legalMoveCheck()) {
       switch (this.moveType) {
         case "aggressive":
+          // TODO end game
+          // if (isTargetPieceFlag())
           if (isTargetPieceEliminated()) {
-            board.replacePiece(sourcePieceCoords, sourcePieceCopy);
-            board.getTile(sourcePieceCoords).emptyTile();
+            board.replacePiece(targetTileCoords, sourcePieceCopy);
+            board.getTile(sourceTileCoords).emptyTile();
+            eliminatedPiece = targetPieceCopy;
           } else {
-            board.getTile(sourcePieceCoords).emptyTile();
+            board.getTile(sourceTileCoords).emptyTile();
+            eliminatedPiece = sourcePieceCopy;
           }
           this.isExecuted = true;
           break;
         case "draw":
-          board.getTile(sourcePieceCoords).emptyTile();
-          board.getTile(targetPieceCoords).emptyTile();
+          board.getTile(sourceTileCoords).emptyTile();
+          board.getTile(targetTileCoords).emptyTile();
           break;
         case "normal":
-          board.movePiece(sourcePieceCoords, targetPieceCoords);
+          board.movePiece(sourceTileCoords, targetTileCoords);
+          // TODO end game
+          // if (isFlagSucceeded())
           this.isExecuted = true;
           break;
         case "invalid":
-          System.out.println("Sorry, invalid move");
+          System.out.println("E: Invalid move");
           System.out.println(this.toString());
           return false;
         default:
@@ -88,10 +96,10 @@ public class Move {
   private boolean legalMoveCheck() {
     // check if one of possible piece moves
     Map<String, Move> possiblePieceMoves =
-      this.board.getTile(sourcePieceCoords).getPiece().evaluateMoves(board);
+      this.board.getTile(sourceTileCoords).getPiece().evaluateMoves(board);
 
     for (Map.Entry<String, Move> entry : possiblePieceMoves.entrySet()) {
-      if (entry.getValue().getDestinationCoords() == targetPieceCoords) {
+      if (entry.getValue().getDestinationCoords() == targetTileCoords) {
         return true;
       }
     };
@@ -105,9 +113,9 @@ public class Move {
       targetPiece = targetPieceCopy.getRank();
     System.out.println(sourcePieceCopy.getAlliance() + " " +
         sourcePieceCopy.getRank() + " " +
-        sourcePieceCoords + " to " +
+        sourceTileCoords + " to " +
         targetPiece + " " +
-        targetPieceCoords + " " +
+        targetTileCoords + " " +
         this.moveType + " ILLEGAL MOVE");
     return false;
   }
@@ -120,23 +128,43 @@ public class Move {
   }
 
   private boolean isTargetPieceEliminated() {
-    if (sourcePieceCopy.getPowerLevel() >
-        targetPieceCopy.getPowerLevel()) {
+    if (sourcePieceCopy.getRank() == "S" && targetPieceCopy.getRank() == "P")
+      return false;
+    else if (sourcePieceCopy.getPowerLevel() > targetPieceCopy.getPowerLevel())
       return true;
-    }
+    else
+      return false;
+  }
+
+  private boolean isTargetPieceFlag() {
+    if (targetPieceCopy.getRank() == "F")
+      return true;
+    else
+      return false;
+  }
+
+  private boolean isFlagSucceeded() {
+    if (sourcePieceCopy.getRank() == "F" &&
+        board.getTile(targetTileCoords).isTileEmpty())
+      if ((sourcePieceCopy.getAlliance() == Alliance.BLACK &&
+          targetTileCoords >= BoardUtils.LAST_ROW_INIT) &&
+          (sourcePieceCopy.getAlliance() == Alliance.WHITE &&
+          targetTileCoords < BoardUtils.SECOND_ROW_INIT))
+        return true;
+
     return false;
   }
 
   public Tile getCurrentTile() {
-    return board.getTile(sourcePieceCoords);
+    return board.getTile(sourceTileCoords);
   }
 
   public int getDestinationCoords() {
-    return this.targetPieceCoords;
+    return this.targetTileCoords;
   }
 
   public int getOriginCoords() {
-    return this.sourcePieceCoords;
+    return this.sourceTileCoords;
   }
 
   public String getMoveType() {
@@ -145,6 +173,13 @@ public class Move {
 
   public int getTurnId() {
     return this.turnId;
+  }
+
+  public Piece getEliminatedPiece() {
+    if (isExecuted && eliminatedPiece != null) {
+      return this.eliminatedPiece;
+    }
+    return null;
   }
 
   public boolean undoExecution() {
@@ -163,21 +198,24 @@ public class Move {
 
   @Override
   public String toString() {
-    String targetPiece;
-    if (targetPieceCopy == null)
-      targetPiece = "";
-    else
-      targetPiece = targetPieceCopy.getRank() + " ";
-    if (isExecuted)
+    String targetPiece = targetPieceCopy == null ? "" : targetPieceCopy.getRank() + " ";
+    if (isExecuted) {
+      String superiorPieceAlliance = "";
+      if (this.moveType == "aggressive") {
+        superiorPieceAlliance = eliminatedPiece.getAlliance() == Alliance.BLACK ?
+          Alliance.WHITE + " ": Alliance.BLACK + " ";
+      }
       return sourcePieceCopy.getAlliance() + " " +
         sourcePieceCopy.getRank() + " " +
-        sourcePieceCoords + " to " +
-        targetPiece + targetPieceCoords + " " +
-        this.moveType + " EXECUTED";
-    else
+        sourceTileCoords + " to " +
+        targetPiece + targetTileCoords + " " +
+        superiorPieceAlliance + this.moveType +
+        " EXECUTED";
+    } else {
       return sourcePieceCopy.getAlliance() + " " +
         sourcePieceCopy.getRank() + " " +
-        sourcePieceCoords + " to " +
-        targetPiece + targetPieceCoords + " ";
+        sourceTileCoords + " to " +
+        targetPiece + targetTileCoords + " ";
+    }
   }
 }
