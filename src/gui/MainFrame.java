@@ -162,12 +162,10 @@ public class MainFrame {
     });
 
     quitAbortBtn.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         mainMenuQuitPrompt.setVisible(false);
       }
-
     });
   }
 
@@ -176,14 +174,14 @@ public class MainFrame {
     menuBarQuitPrompt.setLayout(new BorderLayout());
     menuBarQuitPrompt.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-    JLabel quitMessageLbl = new JLabel("Are you sure you want to quit?");
+    JLabel quitMessageLbl = new JLabel("Back to main menu?");
     quitMessageLbl.setFont(new Font("TimesRoman", Font.PLAIN, 20));
     JPanel menuBarQuitPromptOptionsPanel = new JPanel();
+    JButton quitBackToMain = new JButton("Back to main");
     JButton quitConfirmBtn = new JButton("Quit");
-    JButton quitExitToMain = new JButton("Exit to main");
 
+    menuBarQuitPromptOptionsPanel.add(quitBackToMain);
     menuBarQuitPromptOptionsPanel.add(quitConfirmBtn);
-    menuBarQuitPromptOptionsPanel.add(quitExitToMain);
 
     menuBarQuitPrompt.add(quitMessageLbl, BorderLayout.NORTH);
     menuBarQuitPrompt.add(menuBarQuitPromptOptionsPanel, BorderLayout.CENTER);
@@ -195,15 +193,14 @@ public class MainFrame {
       }
     });
 
-    quitExitToMain.addActionListener(new ActionListener() {
-
+    quitBackToMain.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        menuBarQuitPrompt.setVisible(false);
         boardPanel.setVisible(false);
         mainMenuPanel.setVisible(true);
-        mainMenuQuitPrompt.setVisible(false);
+        mainMenuPanel.getStartBtn().setText("Continue Game");
       }
-
     });
   }
 }

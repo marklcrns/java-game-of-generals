@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 
@@ -35,24 +36,29 @@ public class MainMenuPanel extends JPanel {
     this.add(title, gbc);
 
     start = new JButton("Start Game");
+    start.setPreferredSize(new Dimension(200, 30));
+    start.setSize(100, 100);
     gbc.gridx = 0;
     gbc.gridy = 1;
     gbc.gridheight = 1;
     this.add(start, gbc);
 
     load  = new JButton("Load Game");
+    load.setPreferredSize(new Dimension(200, 30));
     gbc.gridx = 0;
     gbc.gridy = 2;
     gbc.gridheight = 1;
     this.add(load, gbc);
 
     howToPlay = new JButton("How To Play");
+    howToPlay.setPreferredSize(new Dimension(200, 30));
     gbc.gridx = 0;
     gbc.gridy = 3;
     gbc.gridheight = 1;
     this.add(howToPlay, gbc);
 
     quit = new JButton("Quit");
+    quit.setPreferredSize(new Dimension(200, 30));
     gbc.gridx = 0;
     gbc.gridy = 4;
     gbc.gridheight = 1;
