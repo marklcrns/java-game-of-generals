@@ -2,7 +2,6 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -23,11 +22,11 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.border.EmptyBorder;
 
 import engine.Alliance;
 import engine.Board;
@@ -41,13 +40,18 @@ import utils.BoardUtils;
  * Author: Mark Lucernas
  * Date: 2020-05-16
  */
-public class BoardGUI {
+public class BoardPanel extends JPanel {
 
   public int mx = 0;
   public int my = 0;
 
-  private static JFrame frame;
-  private final Board gameStateBoard;
+  private static Board gameStateBoard;
+  private static JButton saveButton, loadButton, quitButton, undoButton,
+                         redoButton, surrenderButton, rulesButton;
+
+  private static MenuBarPanel menuBarPanel;
+  private static MoveHistoryPanel moveHistoryPanel;
+  private static InnerBoardPanel boardPanel;
 
   private final static String ART_DIR_PATH = "art/pieces/original/";
   private final static Color DARK_TILE_COLOR = new Color(50, 50, 50);
@@ -56,10 +60,6 @@ public class BoardGUI {
   private final static Color VALID_TILE_COLOR = new Color(130, 200, 120);
   private final static Color INVALID_TILE_COLOR = new Color(130, 150, 230);
   private final static Color ACTIVE_TILE_COLOR = new Color(230, 230, 120);
-
-  private static MenuBarPanel menuBarPanel;
-  private static MoveHistoryPanel moveHistoryPanel;
-  private static BoardPanel boardPanel;
 
   private final static Dimension FRAME_DIMENSION = new Dimension(1200, 835);
   private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(900, 800);
@@ -73,48 +73,84 @@ public class BoardGUI {
       (int) (FRAME_DIMENSION.getWidth() - BOARD_PANEL_DIMENSION.getWidth()),
       (int) (FRAME_DIMENSION.getHeight() - MENU_BAR_PANEL_DIMENSION.getHeight()));
 
-  public BoardGUI(Board board) {
+  public BoardPanel(Board board) {
     gameStateBoard = board;
-    frame = new JFrame("Game of Generals");
-    frame.setLayout(new BorderLayout());
-    frame.setSize(FRAME_DIMENSION);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setResizable(false);
-    frame.setVisible(true);
-
-    Container container = frame.getContentPane();
-    container.setLayout(new BorderLayout());
+    this.setLayout(new BorderLayout());
+    this.setVisible(true);
 
     menuBarPanel = new MenuBarPanel();
     moveHistoryPanel = new MoveHistoryPanel();
-    boardPanel = new BoardPanel();
+    boardPanel = new InnerBoardPanel();
 
-    container.add(menuBarPanel, BorderLayout.NORTH);
-    container.add(moveHistoryPanel, BorderLayout.WEST);
-    container.add(boardPanel, BorderLayout.CENTER);
+    this.add(menuBarPanel, BorderLayout.NORTH);
+    this.add(moveHistoryPanel, BorderLayout.WEST);
+    this.add(boardPanel, BorderLayout.CENTER);
+  }
+
+  public final JButton getSaveButton() {
+    return saveButton;
+  }
+
+  public final JButton getLoadButton() {
+    return loadButton;
+  }
+
+  public final JButton getQuitButton() {
+    return quitButton;
+  }
+
+  public final JButton getUndoButton() {
+    return undoButton;
+  }
+
+  public final JButton getRedoButton() {
+    return redoButton;
+  }
+
+  public final JButton getSurrenderButton() {
+    return surrenderButton;
+  }
+
+  public final JButton getRulesButton() {
+    return rulesButton;
   }
 
   private class MenuBarPanel extends JPanel {
 
+    private JButton save, load, quit, undo, redo, surrender, rules;
+
     public MenuBarPanel() {
       this.setLayout(new FlowLayout());
       this.setPreferredSize(MENU_BAR_PANEL_DIMENSION);
-      JButton save = new JButton("Save");
-      JButton load = new JButton("Load");
-      JButton quit = new JButton("Quit");
-      JButton undo = new JButton("Undo");
-      JButton redo = new JButton("Redo");
-      JButton surrender = new JButton("Surrender");
-      JButton rules = new JButton("Game Rules");
 
+      save = new JButton("Save");
       this.add(save);
+      load = new JButton("Load");
       this.add(load);
+      quit = new JButton("Quit");
       this.add(quit);
+      undo = new JButton("Undo");
       this.add(undo);
+      redo = new JButton("Redo");
       this.add(redo);
+      surrender = new JButton("Surrender");
       this.add(surrender);
+      rules = new JButton("Game Rules");
       this.add(rules);
+
+      setAllButtons();
     }
+
+    public void setAllButtons() {
+      saveButton = save;
+      loadButton = load;
+      quitButton = quit;
+      undoButton = undo;
+      redoButton = redo;
+      surrenderButton = surrender;
+      rulesButton = rules;
+    }
+
   }
 
   private class MoveHistoryPanel extends JPanel {
@@ -123,6 +159,7 @@ public class BoardGUI {
 
     public MoveHistoryPanel() {
       this.setLayout(new BorderLayout());
+      this.setBorder(new EmptyBorder(0, 0, 0, 5));
       this.setPreferredSize(MOVE_HISTORY_PANEL_DIMENSION);
       moveHistoryTextArea.setEditable(false);
 
@@ -147,7 +184,7 @@ public class BoardGUI {
     }
   }
 
-  private class BoardPanel extends JPanel {
+  private class InnerBoardPanel extends JPanel {
 
     private boolean enableHoverHighlight = true;
     private int activeTileId;
@@ -158,7 +195,7 @@ public class BoardGUI {
     private Map<String, Image> blackPieceIcons;
     private Map<String, Image> whitePieceIcons;
 
-    public BoardPanel() {
+    public InnerBoardPanel() {
       super(new GridLayout(BoardUtils.TILE_ROW_COUNT, BoardUtils.TILE_COLUMN_COUNT));
       this.boardTiles = new ArrayList<>();
       this.candidateMoveTiles = new ArrayList<>();
@@ -270,7 +307,7 @@ public class BoardGUI {
       if (this.activeTileId != -1)
         boardTiles.get(activeTileId).assignTileColor();
 
-      frame.repaint();
+      // frame.repaint();
     }
 
     private void refreshBoardPanel() {
@@ -280,7 +317,7 @@ public class BoardGUI {
         boardTiles.get(i).validate();
       }
 
-      frame.repaint();
+      // frame.repaint();
     }
 
     private void refreshBoardPanelBackground() {
@@ -289,7 +326,7 @@ public class BoardGUI {
         boardTiles.get(i).validate();
       }
 
-      frame.repaint();
+      // frame.repaint();
     }
 
     private void preLoadImages() {
@@ -366,13 +403,13 @@ public class BoardGUI {
   private class TilePanel extends JPanel {
 
     private final int tileId;
-    private final BoardPanel boardPanel;
+    private final InnerBoardPanel boardPanel;
     private boolean isTileActive = false;
     private boolean isCandidateMoveTile = false;
     private Image iconHidden;
     private Image iconNormal;
 
-    TilePanel(final BoardPanel boardPanel,
+    TilePanel(final InnerBoardPanel boardPanel,
               final int tileId) {
       super(new GridBagLayout());
       this.tileId = tileId;
