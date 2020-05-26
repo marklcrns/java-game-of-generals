@@ -252,6 +252,7 @@ public class BoardPanel extends JPanel {
       // });
     }
 
+    // TODO: add tileId on top left of tile panel
     private void highlightPieceMoves(int tileId) {
 
       final Tile sourceTile = gameStateBoard.getTile(tileId);
@@ -483,6 +484,7 @@ public class BoardPanel extends JPanel {
 
         @Override
         public void mouseReleased(MouseEvent e) {
+          // TODO: create method for endgame check
           if (gameStateBoard.getEndGameWinner() == null) {
             if (isCandidateMoveTile && boardPanel.getHoveredTileId() == tileId) {
               final Piece activePiece = gameStateBoard.getTile(boardPanel.getActiveTileId()).getPiece();

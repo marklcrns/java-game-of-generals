@@ -25,7 +25,6 @@ public class Main {
           Player player1 = new Player(board, Alliance.WHITE);
           Player player2 = new Player(board, Alliance.BLACK);
 
-          // TODO evaluate player owned pieces after building
           builder = builder.createRandomBuild();
           board.buildBoard(builder);
 
@@ -35,8 +34,6 @@ public class Main {
           board.setDebugMode(true);
           board.startGame();
           MainFrame frame = new MainFrame(board);
-          frame.pack();
-          frame.setVisible(true);
 
         } catch (Exception e) {
           e.printStackTrace();
