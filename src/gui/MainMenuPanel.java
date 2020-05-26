@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 
 /**
@@ -24,9 +25,10 @@ public class MainMenuPanel extends JPanel {
 
     GridBagConstraints gbc = new GridBagConstraints();
 
-    gbc.insets = new Insets(5, 5, 5, 5);
+    gbc.insets = new Insets(8, 8, 8, 8);
 
-    JLabel title = new JLabel("Game of Generals");
+    JLabel title = new JLabel("Game of the Generals");
+    title.setFont(new Font("TimesRoman", Font.BOLD, 70));
     gbc.gridx = 0;
     gbc.gridy = 0;
     gbc.gridheight = 1;
@@ -57,19 +59,19 @@ public class MainMenuPanel extends JPanel {
     this.add(quit, gbc);
   }
 
-  public JButton getStartButton() {
+  public JButton getStartBtn() {
     return this.start;
   }
 
-  public JButton getLoadButton() {
+  public JButton getLoadBtn() {
     return this.load;
   }
 
-  public JButton getHowToPlayButton() {
+  public JButton getHowToPlayBtn() {
     return this.howToPlay;
   }
 
-  public JButton getQuitButton() {
+  public JButton getQuitBtn() {
     return this.quit;
   }
 }

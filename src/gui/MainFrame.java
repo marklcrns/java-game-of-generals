@@ -20,6 +20,18 @@ import engine.Board;
 public class MainFrame extends JFrame {
 
   private JButton mainMenuStartBtn;
+  private JButton mainMenuLoadBtn;
+  private JButton mainMenuHowToPlayBtn;
+  private JButton mainMenuQuitBtn;
+
+  private JButton menuBarSaveBtn;
+  private JButton menuBarLoadBtn;
+  private JButton menuBarQuitBtn;
+  private JButton menuBarUndoBtn;
+  private JButton menuBarRedoBtn;
+  private JButton menuBarSurrenderBtn;
+  private JButton menuBarGameRulesBtn;
+
   private BoardPanel boardPanel;
   private MainMenuPanel mainMenuPanel;
   private JLayeredPane layeredPane;
@@ -40,6 +52,7 @@ public class MainFrame extends JFrame {
     boardPanel = new BoardPanel(board);
     mainMenuPanel = new MainMenuPanel();
 
+    fetchMenuBarButtons(boardPanel);
     fetchMainMenuButtons(mainMenuPanel);
     addButtonEventListeners();
 
@@ -70,7 +83,19 @@ public class MainFrame extends JFrame {
   }
 
   private void fetchMainMenuButtons(MainMenuPanel mainMenu) {
-    mainMenuStartBtn = mainMenu.getStartButton();
-    // mainMenuStartBtn.setFocusable(false);
+    mainMenuStartBtn = mainMenu.getStartBtn();
+    mainMenuLoadBtn = mainMenu.getLoadBtn();
+    mainMenuHowToPlayBtn = mainMenu.getHowToPlayBtn();
+    mainMenuQuitBtn = mainMenu.getQuitBtn();
+  }
+
+  private void fetchMenuBarButtons(BoardPanel board) {
+    menuBarSaveBtn = board.getSaveBtn();
+    menuBarLoadBtn = board.getLoadBtn();
+    menuBarQuitBtn = board.getQuitBtn();
+    menuBarUndoBtn = board.getUndoBtn();
+    menuBarRedoBtn = board.getRedoBtn();
+    menuBarSurrenderBtn = board.getSurrenderBtn();
+    menuBarGameRulesBtn = board.getGameRulesBtn();
   }
 }

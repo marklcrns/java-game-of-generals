@@ -42,7 +42,9 @@ public class Move {
   private void evaluateMove() {
     if (board.getTile(targetTileCoords).isTileOccupied())
       if (targetPieceCopy.getPieceAlliance() != sourcePieceCopy.getPieceAlliance())
-        if (isSameRank())
+        if (isSameRank() && isTargetPieceFlag())
+          moveType = "aggressive";
+        else if (isSameRank())
           moveType = "draw";
         else
           moveType = "aggressive";
@@ -63,7 +65,7 @@ public class Move {
             System.out.println("\n" + sourcePieceCopy.getPieceAlliance() +
                                " player WON!\n");
             board.setEndGameWinner(sourcePieceCopy.getPieceAlliance());
-          } else if (isSourcePieceFlag()){
+          } else if (isSourcePieceFlag() && !isTargetPieceFlag()){
             System.out.println("\n" + targetPieceCopy.getPieceAlliance() +
                                " player WON!\n");
             board.setEndGameWinner(targetPieceCopy.getPieceAlliance());
@@ -146,6 +148,8 @@ public class Move {
   private boolean isTargetPieceEliminated() {
     if (sourcePieceCopy.getRank() == "S" && targetPieceCopy.getRank() == "P")
       return false;
+    else if (isSourcePieceFlag() && isTargetPieceFlag())
+      return true;
     else if (sourcePieceCopy.getPowerLevel() > targetPieceCopy.getPowerLevel())
       return true;
     else

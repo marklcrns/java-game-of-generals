@@ -25,7 +25,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import engine.Alliance;
@@ -46,8 +48,8 @@ public class BoardPanel extends JPanel {
   public int my = 0;
 
   private static Board gameStateBoard;
-  private static JButton saveButton, loadButton, quitButton, undoButton,
-                         redoButton, surrenderButton, rulesButton;
+  private static JButton saveBtn, loadBtn, quitBtn, undoBtn,
+                         redoBtn, surrenderBtn, rulesBtn;
 
   private static MenuBarPanel menuBarPanel;
   private static MoveHistoryPanel moveHistoryPanel;
@@ -87,32 +89,32 @@ public class BoardPanel extends JPanel {
     this.add(boardPanel, BorderLayout.CENTER);
   }
 
-  public final JButton getSaveButton() {
-    return saveButton;
+  public final JButton getSaveBtn() {
+    return saveBtn;
   }
 
-  public final JButton getLoadButton() {
-    return loadButton;
+  public final JButton getLoadBtn() {
+    return loadBtn;
   }
 
-  public final JButton getQuitButton() {
-    return quitButton;
+  public final JButton getQuitBtn() {
+    return quitBtn;
   }
 
-  public final JButton getUndoButton() {
-    return undoButton;
+  public final JButton getUndoBtn() {
+    return undoBtn;
   }
 
-  public final JButton getRedoButton() {
-    return redoButton;
+  public final JButton getRedoBtn() {
+    return redoBtn;
   }
 
-  public final JButton getSurrenderButton() {
-    return surrenderButton;
+  public final JButton getSurrenderBtn() {
+    return surrenderBtn;
   }
 
-  public final JButton getRulesButton() {
-    return rulesButton;
+  public final JButton getGameRulesBtn() {
+    return rulesBtn;
   }
 
   private class MenuBarPanel extends JPanel {
@@ -129,10 +131,20 @@ public class BoardPanel extends JPanel {
       this.add(load);
       quit = new JButton("Quit");
       this.add(quit);
+
+      this.add(new JSeparator(SwingConstants.HORIZONTAL));
+      this.add(new JSeparator(SwingConstants.HORIZONTAL));
+      this.add(new JSeparator(SwingConstants.HORIZONTAL));
+
       undo = new JButton("Undo");
       this.add(undo);
       redo = new JButton("Redo");
       this.add(redo);
+
+      this.add(new JSeparator(SwingConstants.HORIZONTAL));
+      this.add(new JSeparator(SwingConstants.HORIZONTAL));
+      this.add(new JSeparator(SwingConstants.HORIZONTAL));
+
       surrender = new JButton("Surrender");
       this.add(surrender);
       rules = new JButton("Game Rules");
@@ -142,13 +154,13 @@ public class BoardPanel extends JPanel {
     }
 
     public void setAllButtons() {
-      saveButton = save;
-      loadButton = load;
-      quitButton = quit;
-      undoButton = undo;
-      redoButton = redo;
-      surrenderButton = surrender;
-      rulesButton = rules;
+      saveBtn = save;
+      loadBtn = load;
+      quitBtn = quit;
+      undoBtn = undo;
+      redoBtn = redo;
+      surrenderBtn = surrender;
+      rulesBtn = rules;
     }
 
   }
