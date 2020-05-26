@@ -147,10 +147,12 @@ public class Move {
   }
 
   private boolean isTargetPieceEliminated() {
-    if (sourcePieceCopy.getRank() == "S" && targetPieceCopy.getRank() == "P")
-      return false;
-    else if (isSourcePieceFlag() && isTargetPieceFlag())
+    if (isSourcePieceFlag() && isTargetPieceFlag())
       return true;
+    else if (sourcePieceCopy.getRank() == "P" && targetPieceCopy.getRank() == "S")
+      return true;
+    else if (sourcePieceCopy.getRank() == "S" && targetPieceCopy.getRank() == "P")
+      return false;
     else if (sourcePieceCopy.getPowerLevel() > targetPieceCopy.getPowerLevel())
       return true;
     else
