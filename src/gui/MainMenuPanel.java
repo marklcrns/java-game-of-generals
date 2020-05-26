@@ -25,7 +25,7 @@ public class MainMenuPanel extends JPanel {
 
     GridBagConstraints gbc = new GridBagConstraints();
 
-    gbc.insets = new Insets(8, 8, 8, 8);
+    gbc.insets = new Insets(5, 5, 5, 5);
 
     JLabel title = new JLabel("Game of the Generals");
     title.setFont(new Font("TimesRoman", Font.BOLD, 70));

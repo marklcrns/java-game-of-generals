@@ -449,10 +449,9 @@ public class Board {
       unsetBlackPieces.add(new Spy(playerBlack, Alliance.BLACK));
 
       for (Piece unsetPiece : unsetBlackPieces) {
-
         if (debugMode)
           System.out.println("Inserting " + unsetPiece.getPieceAlliance() + " " +
-                            unsetPiece.getRank() + "...");
+                             unsetPiece.getRank() + "...");
 
         setAllPieceInstanceRandomly(builder, unsetPiece, blackTerritoryBounds[0],
                                     blackTerritoryBounds[1], occupiedTiles);
@@ -481,10 +480,9 @@ public class Board {
       unsetWhitePieces.add(new Spy(playerWhite, Alliance.WHITE));
 
       for (Piece unsetPiece : unsetWhitePieces) {
-
         if (debugMode)
           System.out.println("Inserting " + unsetPiece.getPieceAlliance() + " " +
-                            unsetPiece.getRank() + "...");
+                             unsetPiece.getRank() + "...");
 
         setAllPieceInstanceRandomly(builder, unsetPiece, whiteTerritoryBounds[0],
                                     whiteTerritoryBounds[1], occupiedTiles);
@@ -562,9 +560,9 @@ public class Board {
 
       if (isDebugMode())
         System.out.println(piece.getPieceAlliance() + " " +
-                          piece.getRank() + " at Tile" +
-                          piece.getPieceCoords() + " is out of bounds." +
-                          " Piece not inserted.");
+                           piece.getRank() + " at Tile" +
+                           piece.getPieceCoords() + " is out of bounds." +
+                           " Piece not inserted.");
       return false;
     }
 
@@ -578,9 +576,9 @@ public class Board {
 
       if (isDebugMode())
         System.out.println("E: " + piece.getPieceAlliance() + " " +
-                          piece.getRank() + " at Tile " +
-                          piece.getPieceCoords() + " is in illegal territory." +
-                          " Piece not inserted.");
+                           piece.getRank() + " at Tile " +
+                           piece.getPieceCoords() + " is in illegal territory." +
+                           " Piece not inserted.");
       return false;
     }
 
@@ -597,7 +595,7 @@ public class Board {
 
       if (isDebugMode())
         System.out.println("E: " + piece.getRank() + " exceeded maximum instance." +
-            " Piece not inserted.");
+                           " Piece not inserted.");
       return false;
     }
 

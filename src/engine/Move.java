@@ -58,9 +58,8 @@ public class Move {
   public boolean execute() {
     if (legalMoveCheck()) {
       switch (this.moveType) {
-        case "aggressive":
 
-          // TODO end game
+        case "aggressive":
           if (isTargetPieceFlag()) {
             System.out.println("\n" + sourcePieceCopy.getPieceAlliance() +
                                " player WON!\n");
@@ -81,29 +80,31 @@ public class Move {
           }
           this.isExecuted = true;
           break;
-        case "draw":
-          board.getTile(sourceTileCoords).empty();
-          board.getTile(targetTileCoords).empty();
-          break;
-        case "normal":
 
+        case "normal":
           if (isFlagSucceeded()) {
             System.out.println("\n" + sourcePieceCopy.getPieceAlliance() +
                 " player WON!\n");
             board.setEndGameWinner(sourcePieceCopy.getPieceAlliance());
           }
-
           board.movePiece(sourceTileCoords, targetTileCoords);
-
           this.isExecuted = true;
           break;
+
+        case "draw":
+          board.getTile(sourceTileCoords).empty();
+          board.getTile(targetTileCoords).empty();
+          break;
+
         case "invalid":
           System.out.println("E: Invalid move");
           System.out.println(this.toString());
+          this.turnId = board.getCurrentTurn();
           return false;
         default:
           return false;
       }
+
       this.turnId = board.getCurrentTurn();
       this.isExecuted = true;
       return true;

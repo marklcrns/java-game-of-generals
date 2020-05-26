@@ -69,6 +69,8 @@ public class Player {
         this.board.setLastMove(move);
         board.switchPlayerTurn();
         return true;
+      } else {
+        this.board.setLastMove(move);
       }
     }
     return false;

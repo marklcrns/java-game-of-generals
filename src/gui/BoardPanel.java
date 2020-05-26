@@ -462,7 +462,8 @@ public class BoardPanel extends JPanel {
         public void mousePressed(MouseEvent e) {
           if (gameStateBoard.getEndGameWinner() == null) {
             if (gameStateBoard.getTile(tileId).isTileOccupied() && !isCandidateMoveTile) {
-              if (gameStateBoard.getTile(tileId).getPiece().getPieceAlliance() == gameStateBoard.getMoveMaker()) {
+              if (gameStateBoard.getTile(tileId).getPiece().getPieceAlliance() ==
+                  gameStateBoard.getMoveMaker()) {
 
                 boardPanel.clearHighlights();
 
@@ -489,33 +490,41 @@ public class BoardPanel extends JPanel {
               Player player = gameStateBoard.getPlayer(activePiece.getPieceAlliance());
               player.makeMove(activePiece.getPieceCoords(), tileId);
 
-              Move lastMove = gameStateBoard.getLastMove();
+              if (gameStateBoard.getLastMove() != null) {
+                Move lastMove = gameStateBoard.getLastMove();
 
-              if (lastMove.getMoveType() == "aggressive") {
-                Alliance superiorPieceAlliance =
-                  lastMove.getEliminatedPiece().getPieceAlliance() == Alliance.BLACK ?
-                  Alliance.WHITE : Alliance.BLACK;
+                if (lastMove.getMoveType() == "aggressive") {
+                  Alliance superiorPieceAlliance =
+                    lastMove.getEliminatedPiece().getPieceAlliance() ==
+                    Alliance.BLACK ? Alliance.WHITE : Alliance.BLACK;
 
-                moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                    ": " + lastMove.getOriginCoords() +
-                    " to " + lastMove.getDestinationCoords() +
-                    " " + superiorPieceAlliance);
-              } else if (lastMove.getMoveType() == "draw") {
-                moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                    ": " + lastMove.getOriginCoords() +
-                    " to " + lastMove.getDestinationCoords() +
-                    " DRAW");
-              } else {
-                moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                    ": " + lastMove.getOriginCoords() +
-                    " to " + lastMove.getDestinationCoords());
+                  moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                      ": " + lastMove.getOriginCoords() +
+                      " to " + lastMove.getDestinationCoords() +
+                      " " + superiorPieceAlliance);
+                } else if (lastMove.getMoveType() == "draw") {
+                  moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                      ": " + lastMove.getOriginCoords() +
+                      " to " + lastMove.getDestinationCoords() +
+                      " DRAW");
+                } else if (lastMove.getMoveType() == "normal") {
+                  moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                      ": " + lastMove.getOriginCoords() +
+                      " to " + lastMove.getDestinationCoords());
+                } else {
+                  // TODO: Fix invalid move movehistory register
+                  moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                      ": " + lastMove.getOriginCoords() +
+                      " to " + lastMove.getDestinationCoords() + " INVALID MOVE");
+                }
               }
 
               if (gameStateBoard.isEndGame()) {
                 String endGameMessage = "GAME OVER, " +
                   gameStateBoard.getEndGameWinner() + " PLAYER WON!";
                 String separator = "\n**********************************\n";
-                moveHistoryPanel.addMoveHistory(separator + endGameMessage + separator);
+                moveHistoryPanel.addMoveHistory("\n" + separator +
+                                                endGameMessage + separator);
                 boardPanel.refreshBoardPanelBackground();
               }
 
