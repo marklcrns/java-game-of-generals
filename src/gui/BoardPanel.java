@@ -56,10 +56,10 @@ public class BoardPanel extends JPanel {
   private final static String ART_DIR_PATH = "art/pieces/original/";
   private final static Color DARK_TILE_COLOR = new Color(50, 50, 50);
   private final static Color LIGHT_TILE_COLOR = new Color(200, 200, 200);
-  private final static Color ENEMY_TILE_COLOR = new Color(200, 100, 120);
-  private final static Color VALID_TILE_COLOR = new Color(130, 200, 120);
-  private final static Color INVALID_TILE_COLOR = new Color(130, 150, 230);
-  private final static Color ACTIVE_TILE_COLOR = new Color(230, 230, 120);
+  private final static Color ENEMY_TILE_COLOR = new Color(120, 0, 0);
+  private final static Color VALID_TILE_COLOR = new Color(170, 210, 240);
+  private final static Color INVALID_TILE_COLOR = new Color(125, 125, 125);
+  private final static Color ACTIVE_TILE_COLOR = new Color(230, 210, 25);
 
   private final static Dimension FRAME_DIMENSION = new Dimension(1200, 835);
   private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(900, 800);
