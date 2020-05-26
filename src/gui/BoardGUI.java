@@ -41,7 +41,7 @@ import utils.BoardUtils;
  * Author: Mark Lucernas
  * Date: 2020-05-16
  */
-public class GUI {
+public class BoardGUI {
 
   public int mx = 0;
   public int my = 0;
@@ -73,7 +73,7 @@ public class GUI {
       (int) (FRAME_DIMENSION.getWidth() - BOARD_PANEL_DIMENSION.getWidth()),
       (int) (FRAME_DIMENSION.getHeight() - MENU_BAR_PANEL_DIMENSION.getHeight()));
 
-  public GUI(Board board) {
+  public BoardGUI(Board board) {
     gameStateBoard = board;
     frame = new JFrame("Game of Generals");
     frame.setLayout(new BorderLayout());
@@ -275,9 +275,17 @@ public class GUI {
 
     private void refreshBoardPanel() {
       for (int i = 0; i < boardTiles.size(); i++) {
-        // TODO: Pre load all images in boarddPanel as a field
         boardTiles.get(i).loadPieceIcons();
         boardTiles.get(i).assignTilePieceIcon();
+        boardTiles.get(i).validate();
+      }
+
+      frame.repaint();
+    }
+
+    private void refreshBoardPanelBackground() {
+      for (int i = 0; i < boardTiles.size(); i++) {
+        boardTiles.get(i).assignTileColor();
         boardTiles.get(i).validate();
       }
 
@@ -459,6 +467,7 @@ public class GUI {
                   gameStateBoard.getEndGameWinner() + " PLAYER WON!";
                 String separator = "\n**********************************\n";
                 moveHistoryPanel.addMoveHistory(separator + endGameMessage + separator);
+                boardPanel.refreshBoardPanelBackground();
               }
 
               boardPanel.refreshBoardPanel();
@@ -515,14 +524,20 @@ public class GUI {
     }
 
     private void assignTileColor() {
-      // Checkered  board
-      // setBackground(this.tileId % 2 != 0 ? LIGHT_TILE_COLOR : DARK_TILE_COLOR);
+      if (gameStateBoard.getEndGameWinner() == null) {
+        // Checkered  board
+        // setBackground(this.tileId % 2 != 0 ? LIGHT_TILE_COLOR : DARK_TILE_COLOR);
 
-      // Solid colored board on respective territories
-      if (gameStateBoard.getTile(tileId).getTerritory() == Alliance.BLACK)
-        setBackground(DARK_TILE_COLOR);
-      else
-        setBackground(LIGHT_TILE_COLOR);
+        // Solid colored board on respective territories
+        if (gameStateBoard.getTile(tileId).getTerritory() == Alliance.BLACK)
+          setBackground(DARK_TILE_COLOR);
+        else
+          setBackground(LIGHT_TILE_COLOR);
+      } else {
+        setBackground(
+            gameStateBoard.getEndGameWinner() == Alliance.BLACK ?
+            DARK_TILE_COLOR : LIGHT_TILE_COLOR);
+      }
     }
   } // TilePanel
 

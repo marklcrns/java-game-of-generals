@@ -23,7 +23,7 @@ import engine.pieces.Private;
 import engine.pieces.Sergeant;
 import engine.pieces.Spy;
 import engine.player.Player;
-import gui.GUI;
+import gui.BoardGUI;
 import utils.BoardUtils;
 import utils.Utils;
 
@@ -138,7 +138,7 @@ public class Board {
   }
 
   public void displayBoard() {
-    new GUI(this);
+    new BoardGUI(this);
   }
 
   public void setDebugMode(boolean debug) {

@@ -61,11 +61,11 @@ public class Move {
           // TODO end game
           if (isTargetPieceFlag()) {
             System.out.println("\n" + sourcePieceCopy.getPieceAlliance() +
-                " player WON!\n");
+                               " player WON!\n");
             board.setEndGameWinner(sourcePieceCopy.getPieceAlliance());
           } else if (isSourcePieceFlag()){
             System.out.println("\n" + targetPieceCopy.getPieceAlliance() +
-                " player WON!\n");
+                               " player WON!\n");
             board.setEndGameWinner(targetPieceCopy.getPieceAlliance());
           }
 
@@ -84,11 +84,14 @@ public class Move {
           board.getTile(targetTileCoords).empty();
           break;
         case "normal":
-          board.movePiece(sourceTileCoords, targetTileCoords);
 
-          if (isFlagSucceeded())
+          if (isFlagSucceeded()) {
             System.out.println("\n" + sourcePieceCopy.getPieceAlliance() +
                 " player WON!\n");
+            board.setEndGameWinner(sourcePieceCopy.getPieceAlliance());
+          }
+
+          board.movePiece(sourceTileCoords, targetTileCoords);
 
           this.isExecuted = true;
           break;
@@ -167,7 +170,7 @@ public class Move {
     if (sourcePieceCopy.getRank() == "F" &&
         board.getTile(targetTileCoords).isTileEmpty())
       if ((sourcePieceCopy.getPieceAlliance() == Alliance.BLACK &&
-          targetTileCoords >= BoardUtils.LAST_ROW_INIT) &&
+          targetTileCoords >= BoardUtils.LAST_ROW_INIT) ||
           (sourcePieceCopy.getPieceAlliance() == Alliance.WHITE &&
           targetTileCoords < BoardUtils.SECOND_ROW_INIT))
         return true;
