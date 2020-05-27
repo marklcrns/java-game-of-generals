@@ -49,7 +49,8 @@ public class BoardPanel extends JPanel {
 
   private static Board gameStateBoard;
   private static JButton saveBtn, loadBtn, quitBtn, undoBtn,
-                         redoBtn, surrenderBtn, rulesBtn;
+                         redoBtn, surrenderBtn, rulesBtn,
+                         doneArrangingBtn, startGameBtn;
 
   private static MenuBarPanel menuBarPanel;
   private static MoveHistoryPanel moveHistoryPanel;
@@ -117,6 +118,23 @@ public class BoardPanel extends JPanel {
     return rulesBtn;
   }
 
+  public final JButton getDoneArrangingBtn() {
+    return doneArrangingBtn;
+  }
+
+  public final JButton getStartGameBtn() {
+    return startGameBtn;
+  }
+
+  public final void refreshBoardPanel() {
+    boardPanel.setActiveTile(-1);
+    boardPanel.refreshInnerBoardPanel();
+    boardPanel.refreshInnerBoardPanelBackground();
+    moveHistoryPanel.clearMoveHistory();
+    if (!gameStateBoard.isGameStarted())
+      moveHistoryPanel.printOpeningMessage();
+  }
+
   private class MenuBarPanel extends JPanel {
 
     private JButton save, load, quit, undo, redo, surrender, rules;
@@ -168,6 +186,7 @@ public class BoardPanel extends JPanel {
   private class MoveHistoryPanel extends JPanel {
 
     private JTextArea moveHistoryTextArea = new JTextArea();
+    private String openingMessage;
 
     public MoveHistoryPanel() {
       this.setLayout(new BorderLayout());
@@ -180,6 +199,15 @@ public class BoardPanel extends JPanel {
       label.setVerticalAlignment(JLabel.CENTER);
       label.setFont(new Font("SansSerif", Font.BOLD, 18));
 
+      JButton doneArrangingBtn = new JButton("Done Arranging");
+      JButton startGameBtn = new JButton("Start Game");
+      setDoneArrangingBtn(doneArrangingBtn);
+      setStartGameBtn(startGameBtn);
+
+      JPanel initGameButtonsPanel = new JPanel();
+      initGameButtonsPanel.add(doneArrangingBtn);
+      initGameButtonsPanel.add(startGameBtn);
+
       moveHistoryTextArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
       moveHistoryTextArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
@@ -189,17 +217,44 @@ public class BoardPanel extends JPanel {
 
       this.add(label, BorderLayout.NORTH);
       this.add(moveHistoryVScrollable, BorderLayout.CENTER);
+      this.add(initGameButtonsPanel, BorderLayout.SOUTH);
+
+      printOpeningMessage();
     }
 
     public void addMoveHistory(String move) {
       moveHistoryTextArea.append(move);
+    }
+
+    public void clearMoveHistory() {
+      moveHistoryTextArea.selectAll();
+      moveHistoryTextArea.replaceSelection("");
+    }
+
+    public void printOpeningMessage() {
+      clearMoveHistory();
+      openingMessage = "Welcome to the Game of the Generals!\n\n" +
+                       "Please arrange your pieces however\n" +
+                       "you like within your territory (" +
+                       gameStateBoard.getMoveMaker() + ").\n\n" +
+                       "Once you are ready, please click the\n" +
+                       "'Start Game' button below.\n";
+      moveHistoryTextArea.append(openingMessage);
+    }
+
+    public void setDoneArrangingBtn(JButton doneArranging) {
+      doneArrangingBtn = doneArranging;
+    }
+
+    public void setStartGameBtn(JButton startGame) {
+      startGameBtn = startGame;
     }
   }
 
   private class InnerBoardPanel extends JPanel {
 
     private boolean enableHoverHighlight = true;
-    private int activeTileId;
+    private int activeTileId = -1;
     private int hoveredTileId;
     private final List<TilePanel> boardTiles;
     private final List<Integer> candidateMoveTiles;
@@ -258,27 +313,24 @@ public class BoardPanel extends JPanel {
       final Tile sourceTile = gameStateBoard.getTile(tileId);
 
       if (sourceTile.isTileOccupied()) {
+        pieceMoves = sourceTile.getPiece().evaluateMoves(gameStateBoard);
 
-        if (sourceTile.getPiece().getPieceAlliance() == gameStateBoard.getMoveMaker()) {
-          pieceMoves = sourceTile.getPiece().evaluateMoves(gameStateBoard);
+        for (Map.Entry<String, Move> entry : pieceMoves.entrySet()) {
+          int destinationCoords = entry.getValue().getDestinationCoords();
+          if (entry.getValue().getMoveType() == "aggressive" ||
+              entry.getValue().getMoveType() == "draw") {
+            boardTiles.get(destinationCoords).setBackground(ENEMY_TILE_COLOR);
 
-          for (Map.Entry<String, Move> entry : pieceMoves.entrySet()) {
-            int destinationCoords = entry.getValue().getDestinationCoords();
-            if (entry.getValue().getMoveType() == "aggressive" ||
-                entry.getValue().getMoveType() == "draw") {
-              boardTiles.get(destinationCoords).setBackground(ENEMY_TILE_COLOR);
+          } else if (entry.getValue().getMoveType() == "normal") {
+            boardTiles.get(destinationCoords).setBackground(VALID_TILE_COLOR);
 
-            } else if (entry.getValue().getMoveType() == "normal") {
-              boardTiles.get(destinationCoords).setBackground(VALID_TILE_COLOR);
+          } else if (entry.getValue().getMoveType() == "invalid") {
+            boardTiles.get(destinationCoords).setBackground(INVALID_TILE_COLOR);
+          }
 
-            } else if (entry.getValue().getMoveType() == "invalid") {
-              boardTiles.get(destinationCoords).setBackground(INVALID_TILE_COLOR);
-            }
-
-            candidateMoveTiles.add(destinationCoords);
-            boardTiles.get(destinationCoords).setIsCandidateMoveTile(true);
-          };
-        }
+          candidateMoveTiles.add(destinationCoords);
+          boardTiles.get(destinationCoords).setIsCandidateMoveTile(true);
+        };
       }
     }
 
@@ -291,18 +343,34 @@ public class BoardPanel extends JPanel {
     }
 
     private void setActiveTile(int newActiveTile) {
-      if (this.activeTileId != -1)
-        boardTiles.get(this.activeTileId).setIsTileActive(false);
-
-      this.activeTileId = newActiveTile;
-      boardTiles.get(newActiveTile).setIsTileActive(true);
+      if (newActiveTile == -1) {
+        if (this.activeTileId != -1) {
+          boardTiles.get(this.activeTileId).setIsTileActive(false);
+          this.activeTileId = -1;
+        }
+      } else {
+        if (this.activeTileId == -1) {
+          this.activeTileId = newActiveTile;
+          boardTiles.get(newActiveTile).setIsTileActive(true);
+        } else {
+          boardTiles.get(this.activeTileId).setIsTileActive(false);
+          this.activeTileId = newActiveTile;
+          boardTiles.get(newActiveTile).setIsTileActive(true);
+        }
+      }
     }
 
-    private void deactivateCurrentTile() {
+    private void deactivateActiveTile() {
       if (this.activeTileId != -1) {
         clearHighlights();
         boardTiles.get(activeTileId).setIsTileActive(false);
         this.activeTileId = -1;
+      }
+    }
+
+    private void deactivateTile(int tileId) {
+      if (boardTiles.get(tileId).isTileActive()) {
+        boardTiles.get(tileId).deactivateTile();
       }
     }
 
@@ -319,27 +387,21 @@ public class BoardPanel extends JPanel {
       // remove active tile highlight
       if (this.activeTileId != -1)
         boardTiles.get(activeTileId).assignTileColor();
-
-      // frame.repaint();
     }
 
-    private void refreshBoardPanel() {
+    private void refreshInnerBoardPanel() {
       for (int i = 0; i < boardTiles.size(); i++) {
         boardTiles.get(i).loadPieceIcons();
         boardTiles.get(i).assignTilePieceIcon();
         boardTiles.get(i).validate();
       }
-
-      // frame.repaint();
     }
 
-    private void refreshBoardPanelBackground() {
+    private void refreshInnerBoardPanelBackground() {
       for (int i = 0; i < boardTiles.size(); i++) {
         boardTiles.get(i).assignTileColor();
         boardTiles.get(i).validate();
       }
-
-      // frame.repaint();
     }
 
     private void preLoadImages() {
@@ -436,6 +498,7 @@ public class BoardPanel extends JPanel {
       assignTileColor();
       validate();
 
+      // TODO: improve READABILITY
       this.addMouseListener(new MouseListener() {
 
         @Override
@@ -444,39 +507,76 @@ public class BoardPanel extends JPanel {
 
         @Override
         public void mouseEntered(MouseEvent e) {
-          if (gameStateBoard.getEndGameWinner() == null) {
-            if (boardPanel.enableHoverHighlight)
-              boardPanel.highlightPieceMoves(tileId);
-            boardPanel.setHoveredTileId(tileId);
+          if (gameStateBoard.getEndGameWinner() == null &&
+              gameStateBoard.isGameStarted()) {
+            if (isOccupyingPieceOwnedByMoveMaker() || isCandidateMoveTile) {
+              if (boardPanel.enableHoverHighlight)
+                boardPanel.highlightPieceMoves(tileId);
+
+              boardPanel.setHoveredTileId(tileId);
+            }
+          } else if (gameStateBoard.isGameInitialized() &&
+              !gameStateBoard.isGameStarted()) {
+            if ((gameStateBoard.getMoveMaker() == Alliance.BLACK &&
+                 tileId < BoardUtils.ALL_TILES_COUNT / 2) ||
+                (gameStateBoard.getMoveMaker() == Alliance.WHITE &&
+                 tileId >= BoardUtils.ALL_TILES_COUNT / 2 )) {
+
+              boardPanel.setHoveredTileId(tileId);
+            }
           }
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-          if (gameStateBoard.getEndGameWinner() == null) {
-            if (boardPanel.enableHoverHighlight)
-              boardPanel.clearHighlights();
+          if (gameStateBoard.getEndGameWinner() == null &&
+              gameStateBoard.isGameStarted()) {
+            if (isOccupyingPieceOwnedByMoveMaker()) {
+              if (boardPanel.enableHoverHighlight)
+                boardPanel.clearHighlights();
+            }
           }
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
-          if (gameStateBoard.getEndGameWinner() == null) {
-            if (gameStateBoard.getTile(tileId).isTileOccupied() && !isCandidateMoveTile) {
-              if (gameStateBoard.getTile(tileId).getPiece().getPieceAlliance() ==
-                  gameStateBoard.getMoveMaker()) {
+          if (gameStateBoard.getEndGameWinner() == null &&
+              gameStateBoard.isGameStarted()) {
+            if (isOccupyingPieceOwnedByMoveMaker()) {
+              if (gameStateBoard.getTile(tileId).isTileOccupied() && !isCandidateMoveTile) {
+                if (gameStateBoard.getTile(tileId).getPiece().getPieceAlliance() ==
+                    gameStateBoard.getMoveMaker()) {
 
-                boardPanel.clearHighlights();
+                  boardPanel.clearHighlights();
 
-                if (isTileActive) {
-                  boardPanel.deactivateCurrentTile();
-                  boardPanel.setHoverHighlight(true);
-                } else {
-                  boardPanel.setActiveTile(tileId);
-                  boardPanel.setHoverHighlight(false);
-                  boardPanel.highlightPieceMoves(tileId);
-                  setBackground(ACTIVE_TILE_COLOR);
+                  if (isTileActive) {
+                    boardPanel.deactivateActiveTile();
+                    boardPanel.setHoverHighlight(true);
+                  } else {
+                    boardPanel.setActiveTile(tileId);
+                    boardPanel.setHoverHighlight(false);
+                    boardPanel.highlightPieceMoves(tileId);
+                    setBackground(ACTIVE_TILE_COLOR);
+                  }
                 }
+              }
+            }
+          } else if (gameStateBoard.isGameInitialized() &&
+                    !gameStateBoard.isGameStarted()) {
+              if ((gameStateBoard.getMoveMaker() == Alliance.BLACK &&
+                   tileId < BoardUtils.ALL_TILES_COUNT / 2) ||
+                  (gameStateBoard.getMoveMaker() == Alliance.WHITE &&
+                   tileId >= BoardUtils.ALL_TILES_COUNT / 2 )) {
+
+              // pre-game active tile highlights
+              if (isTileActive) {
+                boardPanel.deactivateActiveTile();
+              } else if (boardPanel.getActiveTileId() != -1 &&
+                        gameStateBoard.getTile(boardPanel.getActiveTileId()).isTileOccupied()) {
+                boardPanel.deactivateTile(tileId);
+              } else if (gameStateBoard.getTile(tileId).isTileOccupied()) {
+                boardPanel.setActiveTile(tileId);
+                setBackground(ACTIVE_TILE_COLOR);
               }
             }
           }
@@ -484,55 +584,97 @@ public class BoardPanel extends JPanel {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-          // TODO: create method for endgame check
-          if (gameStateBoard.getEndGameWinner() == null) {
-            if (isCandidateMoveTile && boardPanel.getHoveredTileId() == tileId) {
-              final Piece activePiece = gameStateBoard.getTile(boardPanel.getActiveTileId()).getPiece();
+          // TODO: CLEANUP create method for endgame check
+          if (gameStateBoard.getEndGameWinner() == null &&
+              gameStateBoard.isGameStarted()) {
+            if (isOccupyingPieceOwnedByMoveMaker() || isCandidateMoveTile) {
+              if (isCandidateMoveTile && boardPanel.getHoveredTileId() == tileId) {
+                final Piece activePiece = gameStateBoard.getTile(boardPanel.getActiveTileId()).getPiece();
 
-              Player player = gameStateBoard.getPlayer(activePiece.getPieceAlliance());
-              player.makeMove(activePiece.getPieceCoords(), tileId);
+                Player player = gameStateBoard.getPlayer(activePiece.getPieceAlliance());
+                player.makeMove(activePiece.getPieceCoords(), tileId);
 
-              if (gameStateBoard.getLastMove() != null) {
-                Move lastMove = gameStateBoard.getLastMove();
+                if (gameStateBoard.getLastMove() != null) {
+                  Move lastMove = gameStateBoard.getLastMove();
 
-                if (lastMove.getMoveType() == "aggressive") {
-                  Alliance superiorPieceAlliance =
-                    lastMove.getEliminatedPiece().getPieceAlliance() ==
-                    Alliance.BLACK ? Alliance.WHITE : Alliance.BLACK;
+                  if (lastMove.getMoveType() == "aggressive") {
+                    Alliance superiorPieceAlliance =
+                      lastMove.getEliminatedPiece().getPieceAlliance() ==
+                      Alliance.BLACK ? Alliance.WHITE : Alliance.BLACK;
 
-                  moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                      ": " + lastMove.getOriginCoords() +
-                      " to " + lastMove.getDestinationCoords() +
-                      " " + superiorPieceAlliance);
-                } else if (lastMove.getMoveType() == "draw") {
-                  moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                      ": " + lastMove.getOriginCoords() +
-                      " to " + lastMove.getDestinationCoords() +
-                      " DRAW");
-                } else if (lastMove.getMoveType() == "normal") {
-                  moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                      ": " + lastMove.getOriginCoords() +
-                      " to " + lastMove.getDestinationCoords());
-                } else {
-                  // TODO: Fix invalid move movehistory register
-                  moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                      ": " + lastMove.getOriginCoords() +
-                      " to " + lastMove.getDestinationCoords() + " INVALID MOVE");
+                    moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                        ": " + lastMove.getOriginCoords() +
+                        " to " + lastMove.getDestinationCoords() +
+                        " " + superiorPieceAlliance);
+                  } else if (lastMove.getMoveType() == "draw") {
+                    moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                        ": " + lastMove.getOriginCoords() +
+                        " to " + lastMove.getDestinationCoords() +
+                        " DRAW");
+                  } else if (lastMove.getMoveType() == "normal") {
+                    moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                        ": " + lastMove.getOriginCoords() +
+                        " to " + lastMove.getDestinationCoords());
+                  } else {
+                    // TODO: Fix invalid move movehistory register
+                    moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
+                        ": " + lastMove.getOriginCoords() +
+                        " to " + lastMove.getDestinationCoords() + " INVALID MOVE");
+                  }
                 }
-              }
 
-              if (gameStateBoard.isEndGame()) {
-                String endGameMessage = "GAME OVER, " +
-                  gameStateBoard.getEndGameWinner() + " PLAYER WON!";
-                String separator = "\n**********************************\n";
-                moveHistoryPanel.addMoveHistory("\n" + separator +
-                                                endGameMessage + separator);
-                boardPanel.refreshBoardPanelBackground();
-              }
+                if (gameStateBoard.isEndGame()) {
+                  String endGameMessage = "GAME OVER, " +
+                    gameStateBoard.getEndGameWinner() + " PLAYER WON!";
+                  String separator = "\n**********************************\n";
+                  moveHistoryPanel.addMoveHistory("\n" + separator +
+                                                  endGameMessage + separator);
+                  boardPanel.refreshInnerBoardPanelBackground();
+                }
 
-              boardPanel.refreshBoardPanel();
-              boardPanel.deactivateCurrentTile();
-              boardPanel.setHoverHighlight(true);
+                boardPanel.refreshInnerBoardPanel();
+                boardPanel.deactivateActiveTile();
+                boardPanel.setHoverHighlight(true);
+              }
+            }
+          } else if (gameStateBoard.isGameInitialized() &&
+                      !gameStateBoard.isGameStarted()) {
+            if ((gameStateBoard.getMoveMaker() == Alliance.BLACK &&
+                 tileId < BoardUtils.ALL_TILES_COUNT / 2) ||
+                (gameStateBoard.getMoveMaker() == Alliance.WHITE &&
+                 tileId >= BoardUtils.ALL_TILES_COUNT / 2 )) {
+              int hoveredTileId = boardPanel.getHoveredTileId();
+              int activeTileId = boardPanel.getActiveTileId();
+
+              if (gameStateBoard.isDebugMode()) {
+                System.out.println("hoveredTileId: " + hoveredTileId);
+                System.out.println("activeTileId: " + activeTileId);
+                System.out.println("Current tileId: " + tileId);
+                System.out.println("\n");
+              }
+              if (hoveredTileId == tileId && hoveredTileId != activeTileId &&
+                  activeTileId != -1) {
+
+                if (gameStateBoard.getTile(tileId).isTileEmpty()) {
+                  gameStateBoard.movePiece(activeTileId, tileId);
+
+                  if (gameStateBoard.isDebugMode())
+                    System.out.println(gameStateBoard.getTile(tileId).getPiece().getRank() +
+                        " at " + activeTileId + " moved to " + tileId);
+                } else {
+                  gameStateBoard.swapPiece(activeTileId, tileId);
+
+                  if (gameStateBoard.isDebugMode())
+                    System.out.println(gameStateBoard.getTile(tileId).getPiece().getRank() +
+                        " at " + activeTileId + " swapped with " +
+                        gameStateBoard.getTile(activeTileId).getPiece().getRank() +
+                        " at " + tileId);
+                }
+
+
+                boardPanel.refreshInnerBoardPanel();
+                boardPanel.deactivateActiveTile();
+              }
             }
           }
         }
@@ -554,6 +696,15 @@ public class BoardPanel extends JPanel {
           this.iconHidden = boardPanel.getWhitePieceIcons().get("HIDDEN");
         }
       }
+    }
+
+    private boolean isOccupyingPieceOwnedByMoveMaker() {
+      if (gameStateBoard.getTile(tileId).isTileOccupied()) {
+        if (gameStateBoard.getTile(tileId).getPiece().getPieceAlliance() ==
+            gameStateBoard.getMoveMaker())
+          return true;
+      }
+      return false;
     }
 
     private void assignTilePieceIcon() {
@@ -581,6 +732,14 @@ public class BoardPanel extends JPanel {
 
     private void setIsCandidateMoveTile(boolean isCandidateMoveTile) {
       this.isCandidateMoveTile = isCandidateMoveTile;
+    }
+
+    private boolean isTileActive() {
+      return this.isTileActive;
+    }
+
+    private void deactivateTile() {
+      this.isTileActive = false;
     }
 
     private void assignTileColor() {

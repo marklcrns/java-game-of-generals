@@ -38,6 +38,7 @@ public class Board {
   private static Player playerWhite;
   private static int blackPiecesLeft = 0;
   private static int whitePiecesLeft = 0;
+  private boolean gameInitialized = false;
   private boolean gameStarted = false;
   private static boolean debugMode;
   private int currentTurn;
@@ -100,7 +101,7 @@ public class Board {
     whitePiecesLeft = builder.getWhitePiecesCount();
   }
 
-  public boolean startGame() {
+  public boolean initGame() {
     // TODO throw appropriate exception
     if (playerBlack != null) {
       playerBlack.initPlayer();
@@ -116,25 +117,39 @@ public class Board {
       return false;
     }
 
-    this.gameStarted = true;
-    setMoveMaker(playerWhite);
+    this.gameInitialized = true;
     this.currentTurn = 1;
+    setMoveMaker(playerWhite);
 
     displayBoard();
+
+    return true;
+  }
+
+  public void playerDoneArranging() {
+    if (this.getBlackPlayer().isMoveMaker()) {
+      setMoveMaker(playerWhite);
+    } else {
+      setMoveMaker(playerBlack);
+    }
+  }
+
+  public void startGame() {
+    this.gameStarted = true;
+    this.gameInitialized = false;
 
     if (isDebugMode()) {
       System.out.println(this);
       System.out.println("CurrentTurn: " + currentTurn + "\n");
     }
+  }
 
-    return true;
+  public boolean isGameInitialized() {
+    return gameInitialized;
   }
 
   public boolean isGameStarted() {
-    if (gameStarted)
-      return true;
-    else
-      return false;
+    return gameStarted;
   }
 
   public void displayBoard() {
@@ -157,12 +172,27 @@ public class Board {
     return gameBoard;
   }
 
-  public boolean replacePiece(int tileId, Piece piece) {
-    if (this.getTile(tileId).isTileOccupied()) {
+  public boolean swapPiece(int sourceCoords, int targetCoords) {
+    if (this.getTile(sourceCoords).isTileOccupied() &&
+        this.getTile(targetCoords).isTileOccupied()) {
+      Piece sourcePiece = this.getTile(sourceCoords).getPiece().makeCopy();
+      Piece targetPiece = this.getTile(targetCoords).getPiece().makeCopy();
+      sourcePiece.updateCoords(targetCoords);
+      targetPiece.updateCoords(sourceCoords);
+      this.getBoard().get(sourceCoords).replace(targetPiece);
+      this.getBoard().get(targetCoords).replace(sourcePiece);
+
+      return true;
+    }
+    return false;
+  }
+
+  public boolean replacePiece(int targetCoords, Piece sourcePiece) {
+    if (this.getTile(targetCoords).isTileOccupied()) {
       // TODO: improve piece manipulation efficiency
-      piece.updateCoords(tileId);
-      this.getBoard().get(tileId).replace(piece);
-      this.getTile(tileId).replace(piece);
+      sourcePiece.updateCoords(targetCoords);
+      this.getBoard().get(targetCoords).replace(sourcePiece);
+      this.getTile(targetCoords).replace(sourcePiece);
 
       return true;
     }
@@ -172,9 +202,9 @@ public class Board {
   public boolean movePiece(int sourceCoords, int targetCoords) {
     // insert copy of source piece into target tile
     if (this.getTile(targetCoords).isTileEmpty()) {
-      Piece pieceCopy = this.getTile(sourceCoords).getPiece().makeCopy();
-      pieceCopy.updateCoords(targetCoords);
-      this.getTile(targetCoords).insert(pieceCopy);
+      Piece sourcePieceCopy = this.getTile(sourceCoords).getPiece().makeCopy();
+      sourcePieceCopy.updateCoords(targetCoords);
+      this.getTile(targetCoords).insert(sourcePieceCopy);
       // delete source piece
       this.getTile(sourceCoords).empty();
 

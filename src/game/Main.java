@@ -32,8 +32,8 @@ public class Main {
           board.addPlayerBlack(player2);
 
           board.setDebugMode(true);
-          board.startGame();
-          MainFrame frame = new MainFrame(board);
+          board.initGame();
+          new MainFrame(board);
 
         } catch (Exception e) {
           e.printStackTrace();

@@ -23,7 +23,11 @@ import engine.Board;
 // Ref: https://www.youtube.com/watch?v=KNGbmsq3huQ
 public class MainFrame {
 
+  private Board board;
   private JFrame frame;
+
+  private JButton doneArrangingBtn;
+  private JButton startGameBtn;
 
   private JButton mainMenuStartBtn;
   private JButton mainMenuLoadBtn;
@@ -50,8 +54,8 @@ public class MainFrame {
   private final static Dimension FRAME_DIMENSION = new Dimension(1200, 835);
 
   public MainFrame(Board board) {
+    this.board = board;
     frame = new JFrame();
-
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     contentPane = new JPanel();
@@ -65,7 +69,11 @@ public class MainFrame {
 
     fetchMenuBarButtons(boardPanel);
     fetchMainMenuButtons(mainMenuPanel);
+    fetchDoneArrangingBtn(boardPanel);
+    fetchStartGameBtn(boardPanel);
     addMainMenuButtonsListener();
+    addDoneArrangingButtonListener();
+    addStartGameButtonListener();
 
     layeredPane.add(boardPanel, new Integer(1));
     layeredPane.add(mainMenuPanel, new Integer(2));
@@ -108,7 +116,6 @@ public class MainFrame {
     });
 
     menuBarQuitBtn.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         menuBarQuitPrompt.setVisible(true);
@@ -120,21 +127,53 @@ public class MainFrame {
     });
   }
 
-  private void fetchMainMenuButtons(MainMenuPanel mainMenu) {
-    mainMenuStartBtn = mainMenu.getStartBtn();
-    mainMenuLoadBtn = mainMenu.getLoadBtn();
-    mainMenuHowToPlayBtn = mainMenu.getHowToPlayBtn();
-    mainMenuQuitBtn = mainMenu.getQuitBtn();
+  private void addDoneArrangingButtonListener() {
+    doneArrangingBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        board.playerDoneArranging();
+        boardPanel.refreshBoardPanel();
+      }
+
+    });
   }
 
-  private void fetchMenuBarButtons(BoardPanel board) {
-    menuBarSaveBtn = board.getSaveBtn();
-    menuBarLoadBtn = board.getLoadBtn();
-    menuBarQuitBtn = board.getQuitBtn();
-    menuBarUndoBtn = board.getUndoBtn();
-    menuBarRedoBtn = board.getRedoBtn();
-    menuBarSurrenderBtn = board.getSurrenderBtn();
-    menuBarGameRulesBtn = board.getGameRulesBtn();
+  private void addStartGameButtonListener() {
+    startGameBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        board.startGame();
+        doneArrangingBtn.setVisible(false);
+        startGameBtn.setVisible(false);
+        boardPanel.refreshBoardPanel();
+      }
+
+    });
+  }
+
+  private void fetchMainMenuButtons(MainMenuPanel mainMenuPanel) {
+    mainMenuStartBtn = mainMenuPanel.getStartBtn();
+    mainMenuLoadBtn = mainMenuPanel.getLoadBtn();
+    mainMenuHowToPlayBtn = mainMenuPanel.getHowToPlayBtn();
+    mainMenuQuitBtn = mainMenuPanel.getQuitBtn();
+  }
+
+  private void fetchMenuBarButtons(BoardPanel boardPanel) {
+    menuBarSaveBtn = boardPanel.getSaveBtn();
+    menuBarLoadBtn = boardPanel.getLoadBtn();
+    menuBarQuitBtn = boardPanel.getQuitBtn();
+    menuBarUndoBtn = boardPanel.getUndoBtn();
+    menuBarRedoBtn = boardPanel.getRedoBtn();
+    menuBarSurrenderBtn = boardPanel.getSurrenderBtn();
+    menuBarGameRulesBtn = boardPanel.getGameRulesBtn();
+  }
+
+  private void fetchDoneArrangingBtn(BoardPanel boardPanel) {
+    this.doneArrangingBtn = boardPanel.getDoneArrangingBtn();
+  }
+
+  private void fetchStartGameBtn(BoardPanel boardPanel) {
+    this.startGameBtn = boardPanel.getStartGameBtn();
   }
 
   private void createMainMenuQuitPopupMenu() {
