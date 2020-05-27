@@ -81,7 +81,7 @@ public abstract class Piece {
     // prevent out of bounds and board wrapping moves
 
     final int upAdjacentPieceCoords = this.pieceCoords + mobility.get("u");
-    if (pieceCoords > BoardUtils.SECOND_ROW_INIT)
+    if (pieceCoords >= BoardUtils.SECOND_ROW_INIT)
       moveSet.put("up", new Move(pieceOwner, board, pieceCoords, upAdjacentPieceCoords));
 
     final int downAdjacentPieceCoords = this.pieceCoords + mobility.get("d");
