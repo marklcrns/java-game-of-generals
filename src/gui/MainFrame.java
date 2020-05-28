@@ -133,7 +133,7 @@ public class MainFrame {
     menuBarUndoBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (gameStateBoard.getLastExecutedTurn() != 0) {
+        if (gameStateBoard.getBlackPlayer().getMoveFromHistory(gameStateBoard.getCurrentTurn() - 1) != null) {
           boardPanel.undoMoveHistoryUpdate();
           if (gameStateBoard.getMoveMaker() == Alliance.BLACK)
             gameStateBoard.getBlackPlayer().undoLastMove();
