@@ -38,12 +38,14 @@ public class Board {
   private static Player playerWhite;
   private static int blackPiecesLeft = 0;
   private static int whitePiecesLeft = 0;
+  private List<Tile> initBoardConfig;
   private boolean gameInitialized = false;
   private boolean gameStarted = false;
   private static boolean debugMode;
   private int currentTurn;
   private int lastExecutedTurn;
   private Move lastMove;
+  private Alliance firstMoveMaker;
   private Alliance moveMaker;
   private Alliance endGameWinner;
 
@@ -139,6 +141,10 @@ public class Board {
     this.gameInitialized = false;
     this.currentTurn = 1;
     this.lastExecutedTurn = 0;
+    this.firstMoveMaker = getMoveMaker();
+
+    this.initBoardConfig = new ArrayList<>();
+    this.initBoardConfig.addAll(gameBoard);
 
     if (isDebugMode()) {
       System.out.println(this);
@@ -152,6 +158,10 @@ public class Board {
 
   public boolean isGameStarted() {
     return gameStarted;
+  }
+
+  public List<Tile> getInitBoardConfig() {
+    return this.initBoardConfig;
   }
 
   public void displayBoard() {
@@ -313,6 +323,10 @@ public class Board {
 
   public Player getWhitePlayer() {
     return playerWhite;
+  }
+
+  public Alliance getFirstMoveMaker() {
+    return this.firstMoveMaker;
   }
 
   public Alliance getMoveMaker() {
@@ -516,8 +530,9 @@ public class Board {
           System.out.println("Inserting " + unsetPiece.getPieceAlliance() + " " +
                              unsetPiece.getRank() + "...");
 
-        setAllPieceInstanceRandomly(builder, unsetPiece, blackTerritoryBounds[0],
-                                    blackTerritoryBounds[1], occupiedTiles);
+        setAllPieceInstanceRandomly(
+            builder, unsetPiece, blackTerritoryBounds[0],
+            blackTerritoryBounds[1], occupiedTiles);
       }
 
       // White pieces
@@ -544,13 +559,14 @@ public class Board {
 
       for (Piece unsetPiece : unsetWhitePieces) {
         if (debugMode)
-          System.out.println("Inserting " + unsetPiece.getPieceAlliance() + " " +
-                             unsetPiece.getRank() + "...");
+          System.out.println(
+              "Inserting " + unsetPiece.getPieceAlliance() + " " +
+              unsetPiece.getRank() + "...");
 
-        setAllPieceInstanceRandomly(builder, unsetPiece, whiteTerritoryBounds[0],
-                                    whiteTerritoryBounds[1], occupiedTiles);
+        setAllPieceInstanceRandomly(
+            builder, unsetPiece, whiteTerritoryBounds[0],
+            whiteTerritoryBounds[1], occupiedTiles);
       }
-
       return builder;
     }
 
@@ -563,8 +579,9 @@ public class Board {
         boardConfig.put(piece.getPieceCoords(), piece);
 
         if (isDebugMode())
-          System.out.println(piece.getPieceAlliance() + " piece inserted at " +
-                             piece.getPieceCoords());
+          System.out.println(
+              piece.getPieceAlliance() + " piece inserted at " +
+              piece.getPieceCoords());
 
         if (piece.getPieceAlliance() == Alliance.BLACK)
           this.blackPiecesCount++;
@@ -580,7 +597,8 @@ public class Board {
                                             int from, int to,
                                             int[] occupiedTiles) {
       if (isDebugMode())
-        System.out.println("Placing " + piece.getPieceAlliance() + " " +
+        System.out.println(
+            "Placing " + piece.getPieceAlliance() + " " +
             piece.getRank() + " at " + piece.getPieceCoords() + " randomly...");
 
       Piece pieceCopy = piece.makeCopy();

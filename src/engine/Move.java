@@ -241,6 +241,10 @@ public class Move {
     return true;
   }
 
+  public boolean isMoveExecuted() {
+    return this.isExecuted;
+  }
+
   @Override
   public String toString() {
     String targetPiece = targetPieceCopy == null ? "" : targetPieceCopy.getRank() + " ";
@@ -248,14 +252,14 @@ public class Move {
       String superiorPieceAlliance = "";
       if (this.moveType == "aggressive") {
         superiorPieceAlliance = eliminatedPiece.getPieceAlliance() == Alliance.BLACK ?
-          Alliance.WHITE + " ": Alliance.BLACK + " ";
+          " " + Alliance.WHITE: " " + Alliance.BLACK;
       }
       return "Turn " + this.turnId + ": " +
         sourcePieceCopy.getPieceAlliance() + " " +
         sourcePieceCopy.getRank() + " " +
         sourceTileCoords + " to " +
         targetPiece + targetTileCoords + " " +
-        superiorPieceAlliance + this.moveType +
+        this.moveType + superiorPieceAlliance +
         " EXECUTED";
     } else {
       return "Turn " + this.turnId + ": " +

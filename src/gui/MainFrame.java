@@ -16,6 +16,7 @@ import javax.swing.border.EmptyBorder;
 
 import engine.Alliance;
 import engine.Board;
+import game.Save;
 
 /**
  * Author: Mark Lucernas
@@ -159,6 +160,14 @@ public class MainFrame {
           boardPanel.refreshBoardPanel();
           frame.repaint();
         }
+      }
+    });
+
+    menuBarSaveBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if (gameStateBoard.isGameStarted())
+          new Save(gameStateBoard);
       }
     });
   }

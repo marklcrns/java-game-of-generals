@@ -51,14 +51,14 @@ public class Player {
   public boolean makeMove(int pieceCoords, int destinationCoords) {
     if (this.board.isDebugMode()) {
       Map<String, Move> possiblePieceMoves = this.board.getTile(pieceCoords).getPiece().evaluateMoves(board);
+
       System.out.println(this.board.getTile(pieceCoords).getPiece().getPieceAlliance() +
                          " " + this.board.getTile(pieceCoords).getPiece().getRank());
-      System.out.println("candidateMoves size: " + possiblePieceMoves.size());
+      System.out.println("Candidate moves size: " + possiblePieceMoves.size());
 
       for (Map.Entry<String, Move> entry : possiblePieceMoves.entrySet()) {
-        System.out.println(entry.getKey() + ": " + entry.getValue());
+        System.out.println(entry.getKey().toUpperCase() + ": " + entry.getValue());
       };
-      System.out.println("\n");
     }
 
     if (moveMakerCheck() && pieceOwnerCheck(pieceCoords)) {
@@ -211,6 +211,10 @@ public class Player {
     }
 
     return false;
+  }
+
+  public Map<Integer, Move> getMoveHistory() {
+    return this.moveHistory;
   }
 
   public Move getMoveFromHistory(int turnId) {
