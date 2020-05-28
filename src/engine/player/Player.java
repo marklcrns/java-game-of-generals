@@ -118,14 +118,11 @@ public class Player {
 
   public boolean undoLastMove() {
     int currentTurn = this.board.getCurrentTurn();
-    Player lastMoveMakerPlayer = this.alliance == Alliance.BLACK ?
-      this.board.getWhitePlayer() : this.board.getBlackPlayer();
 
-    if (lastMoveMakerPlayer.getMoveFromHistory(currentTurn - 1) != null) {
+    if (getMoveFromHistory(currentTurn - 1) != null) {
 
-      Move recentMove = lastMoveMakerPlayer.getMoveFromHistory(currentTurn - 1);
+      Move recentMove = getMoveFromHistory(currentTurn - 1);
       Move lastMove = getMoveFromHistory(currentTurn - 2);
-      Move lastLastMove = lastMoveMakerPlayer.getMoveFromHistory(currentTurn - 3);
 
       if (moveMakerCheck()) {
         int recentMoveOrigin = recentMove.getOriginCoords();
@@ -146,20 +143,17 @@ public class Player {
           this.board.movePiece(recentMoveDestination, recentMoveOrigin);
         }
 
-        this.board.setLastMove(lastLastMove);
+        this.board.setLastMove(lastMove);
         recentMove.undoExecution();
         board.switchMoveMakerPlayer();
         board.decrementTurn();
 
         if (this.board.isDebugMode()) {
-          System.out.println("Undo successful. " + lastMove + "\n");
+          System.out.println("Undo successful. " + recentMove + "\n");
           System.out.println("Turn History Stack");
           if (board.getLastExecutedTurn() != 0) {
-            for (int i = this.board.getLastExecutedTurn(); 0 < i; i--) {
-              if (lastMoveMakerPlayer.getMoveFromHistory(i) != null)
-                System.out.println(lastMoveMakerPlayer.getMoveFromHistory(i));
-              else
-                System.out.println(this.getMoveFromHistory(i));
+            for (int i = this.board.getLastExecutedTurn() - 1; 0 < i; i--) {
+              System.out.println(getMoveFromHistory(i));
             }
           }
           System.out.println("\n");
@@ -173,11 +167,8 @@ public class Player {
 
   public boolean redoLastMove() {
     int currentTurn = this.board.getCurrentTurn();
-    Player nextMoveMakerPlayer = this.alliance == Alliance.BLACK ?
-      this.board.getWhitePlayer() : this.board.getBlackPlayer();
 
     if (getMoveFromHistory(currentTurn) != null) {
-      Move recentMove = nextMoveMakerPlayer.getMoveFromHistory(currentTurn - 1);
       Move nextMove = getMoveFromHistory(currentTurn);
 
       if (moveMakerCheck()) {
@@ -199,7 +190,7 @@ public class Player {
           this.board.movePiece(nextMoveOrigin, nextMoveDestination);
         }
 
-        this.board.setLastMove(recentMove);
+        this.board.setLastMove(nextMove);
         nextMove.redoExecution();
         board.switchMoveMakerPlayer();
         board.incrementTurn();
@@ -208,11 +199,8 @@ public class Player {
           System.out.println("Redo successful. " + nextMove + "\n");
           System.out.println("Turn History Stack");
           if (board.getLastExecutedTurn() != 0) {
-            for (int i = this.board.getLastExecutedTurn(); 0 < i; i--) {
-              if (nextMoveMakerPlayer.getMoveFromHistory(i) != null)
-                System.out.println(nextMoveMakerPlayer.getMoveFromHistory(i));
-              else
-                System.out.println(this.getMoveFromHistory(i));
+            for (int i = this.board.getLastExecutedTurn() - 1; 0 < i; i--) {
+              System.out.println(getMoveFromHistory(i));
             }
           }
           System.out.println("\n");
@@ -226,7 +214,13 @@ public class Player {
   }
 
   public Move getMoveFromHistory(int turnId) {
-    return this.moveHistory.get(turnId);
+    Player opposingPlayer = this.alliance == Alliance.BLACK ?
+      this.board.getWhitePlayer() : this.board.getBlackPlayer();
+
+    if (opposingPlayer.moveHistory.get(turnId) != null)
+      return opposingPlayer.getMoveFromHistory(turnId);
+    else
+      return this.moveHistory.get(turnId);
   }
 
   public void clearForwardMoveHistory(int startPointTurn) {

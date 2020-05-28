@@ -133,12 +133,13 @@ public class MainFrame {
     menuBarUndoBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (gameStateBoard.getMoveMaker() == Alliance.BLACK) {
-          gameStateBoard.getBlackPlayer().undoLastMove();
-          boardPanel.refreshBoardPanel();
-          frame.repaint();
-        } else {
-          gameStateBoard.getWhitePlayer().undoLastMove();
+        if (gameStateBoard.getLastExecutedTurn() != 0) {
+          boardPanel.undoMoveHistoryUpdate();
+          if (gameStateBoard.getMoveMaker() == Alliance.BLACK)
+            gameStateBoard.getBlackPlayer().undoLastMove();
+          else
+            gameStateBoard.getWhitePlayer().undoLastMove();
+
           boardPanel.refreshBoardPanel();
           frame.repaint();
         }
@@ -148,12 +149,13 @@ public class MainFrame {
     menuBarRedoBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (gameStateBoard.getMoveMaker() == Alliance.BLACK) {
-          gameStateBoard.getBlackPlayer().redoLastMove();
-          boardPanel.refreshBoardPanel();
-          frame.repaint();
-        } else {
-          gameStateBoard.getWhitePlayer().redoLastMove();
+        if (gameStateBoard.getBlackPlayer().getMoveFromHistory(gameStateBoard.getCurrentTurn()) != null) {
+          if (gameStateBoard.getMoveMaker() == Alliance.BLACK)
+            gameStateBoard.getBlackPlayer().redoLastMove();
+          else
+            gameStateBoard.getWhitePlayer().redoLastMove();
+
+          boardPanel.redoMoveHistoryUpdate();
           boardPanel.refreshBoardPanel();
           frame.repaint();
         }
@@ -166,7 +168,8 @@ public class MainFrame {
       @Override
       public void actionPerformed(ActionEvent e) {
         gameStateBoard.playerDoneArranging();
-        boardPanel.refreshBoardPanel();
+        boardPanel.clearBoardPanel();
+        boardPanel.printOpeningMessage();
       }
 
     });
@@ -179,7 +182,8 @@ public class MainFrame {
         gameStateBoard.startGame();
         doneArrangingBtn.setVisible(false);
         startGameBtn.setVisible(false);
-        boardPanel.refreshBoardPanel();
+        boardPanel.clearBoardPanel();
+        frame.repaint();
       }
 
     });

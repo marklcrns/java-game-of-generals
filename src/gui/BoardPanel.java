@@ -130,7 +130,24 @@ public class BoardPanel extends JPanel {
     boardPanel.setActiveTile(-1);
     boardPanel.refreshInnerBoardPanel();
     boardPanel.refreshInnerBoardPanelBackground();
+  }
+
+  public final void clearBoardPanel() {
+    boardPanel.setActiveTile(-1);
+    boardPanel.refreshInnerBoardPanel();
+    boardPanel.refreshInnerBoardPanelBackground();
     moveHistoryPanel.clearMoveHistory();
+  }
+
+  public final void undoMoveHistoryUpdate() {
+    moveHistoryPanel.removeFromMoveHistory(gameStateBoard.getLastMove());
+  }
+
+  public final void redoMoveHistoryUpdate() {
+    moveHistoryPanel.appendToMoveHistory(gameStateBoard.getLastMove());
+  }
+
+  public final void printOpeningMessage() {
     if (!gameStateBoard.isGameStarted())
       moveHistoryPanel.printOpeningMessage();
   }
@@ -222,24 +239,53 @@ public class BoardPanel extends JPanel {
       printOpeningMessage();
     }
 
-    public void addMoveHistory(String move) {
+    public void appendToMoveHistory(String move) {
       moveHistoryTextArea.append(move);
     }
+
+    public void appendToMoveHistory(Move move) {
+      moveHistoryTextArea.append(convertMoveToString(move));
+    }
+
+    public String convertMoveToString(Move move) {
+      String moveText = "";
+
+      if (move.getMoveType() == "aggressive") {
+        Alliance superiorPieceAlliance =
+          move.getEliminatedPiece().getPieceAlliance() ==
+          Alliance.BLACK ? Alliance.WHITE : Alliance.BLACK;
+
+        moveText = "\nTurn " + move.getTurnId() + ": " + move.getOriginCoords() +
+                   " to " + move.getDestinationCoords() + " " + superiorPieceAlliance;
+      } else if (move.getMoveType() == "draw") {
+        moveText = "\nTurn " + move.getTurnId() + ": " + move.getOriginCoords() +
+                   " to " + move.getDestinationCoords() + " DRAW";
+      } else if (move.getMoveType() == "normal") {
+        moveText = "\nTurn " + move.getTurnId() + ": " + move.getOriginCoords() +
+                   " to " + move.getDestinationCoords();
+      } else {
+        // TODO: Fix invalid move movehistory register
+        moveText = "\nTurn " + move.getTurnId() + ": " + move.getOriginCoords() +
+                   " to " + move.getDestinationCoords() + " INVALID MOVE";
+      }
+
+      return moveText;
+    }
+
+    public void removeFromMoveHistory(Move move) {
+      if (move != null) {
+        String fullMoveHistory = moveHistoryTextArea.getText();
+        String moveToRemove = convertMoveToString(move);
+
+        clearMoveHistory();
+        appendToMoveHistory(fullMoveHistory.replace(moveToRemove, ""));
+      }
+    }
+
 
     public void clearMoveHistory() {
       moveHistoryTextArea.selectAll();
       moveHistoryTextArea.replaceSelection("");
-    }
-
-    public void printOpeningMessage() {
-      clearMoveHistory();
-      openingMessage = "Welcome to the Game of the Generals!\n\n" +
-                       "Please arrange your pieces however\n" +
-                       "you like within your territory (" +
-                       gameStateBoard.getMoveMaker() + ").\n\n" +
-                       "Once you are ready, please click the\n" +
-                       "'Start Game' button below.\n";
-      moveHistoryTextArea.append(openingMessage);
     }
 
     public void setDoneArrangingBtn(JButton doneArranging) {
@@ -248,6 +294,17 @@ public class BoardPanel extends JPanel {
 
     public void setStartGameBtn(JButton startGame) {
       startGameBtn = startGame;
+    }
+
+    public void printOpeningMessage() {
+      clearMoveHistory();
+      openingMessage = "Welcome to the Game of the Generals!\n\n" +
+        "Please arrange your pieces however\n" +
+        "you like within your territory (" +
+        gameStateBoard.getMoveMaker() + ").\n\n" +
+        "Once you are ready, please click the\n" +
+        "'Start Game' button below.\n";
+      moveHistoryTextArea.append(openingMessage);
     }
   }
 
@@ -597,37 +654,39 @@ public class BoardPanel extends JPanel {
                 if (gameStateBoard.getLastMove() != null) {
                   Move lastMove = gameStateBoard.getLastMove();
 
-                  if (lastMove.getMoveType() == "aggressive") {
-                    Alliance superiorPieceAlliance =
-                      lastMove.getEliminatedPiece().getPieceAlliance() ==
-                      Alliance.BLACK ? Alliance.WHITE : Alliance.BLACK;
+                  moveHistoryPanel.appendToMoveHistory(lastMove);
 
-                    moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                        ": " + lastMove.getOriginCoords() +
-                        " to " + lastMove.getDestinationCoords() +
-                        " " + superiorPieceAlliance);
-                  } else if (lastMove.getMoveType() == "draw") {
-                    moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                        ": " + lastMove.getOriginCoords() +
-                        " to " + lastMove.getDestinationCoords() +
-                        " DRAW");
-                  } else if (lastMove.getMoveType() == "normal") {
-                    moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                        ": " + lastMove.getOriginCoords() +
-                        " to " + lastMove.getDestinationCoords());
-                  } else {
-                    // TODO: Fix invalid move movehistory register
-                    moveHistoryPanel.addMoveHistory("\nTurn " + lastMove.getTurnId() +
-                        ": " + lastMove.getOriginCoords() +
-                        " to " + lastMove.getDestinationCoords() + " INVALID MOVE");
-                  }
+                  // if (lastMove.getMoveType() == "aggressive") {
+                  //   Alliance superiorPieceAlliance =
+                  //     lastMove.getEliminatedPiece().getPieceAlliance() ==
+                  //     Alliance.BLACK ? Alliance.WHITE : Alliance.BLACK;
+                  // 
+                  //   moveHistoryPanel.appendToMoveHistory("\nTurn " + lastMove.getTurnId() +
+                  //       ": " + lastMove.getOriginCoords() +
+                  //       " to " + lastMove.getDestinationCoords() +
+                  //       " " + superiorPieceAlliance);
+                  // } else if (lastMove.getMoveType() == "draw") {
+                  //   moveHistoryPanel.appendToMoveHistory("\nTurn " + lastMove.getTurnId() +
+                  //       ": " + lastMove.getOriginCoords() +
+                  //       " to " + lastMove.getDestinationCoords() +
+                  //       " DRAW");
+                  // } else if (lastMove.getMoveType() == "normal") {
+                  //   moveHistoryPanel.appendToMoveHistory("\nTurn " + lastMove.getTurnId() +
+                  //       ": " + lastMove.getOriginCoords() +
+                  //       " to " + lastMove.getDestinationCoords());
+                  // } else {
+                  //   // TODO: Fix invalid move movehistory register
+                  //   moveHistoryPanel.appendToMoveHistory("\nTurn " + lastMove.getTurnId() +
+                  //       ": " + lastMove.getOriginCoords() +
+                  //       " to " + lastMove.getDestinationCoords() + " INVALID MOVE");
+                  // }
                 }
 
                 if (gameStateBoard.isEndGame()) {
                   String endGameMessage = "GAME OVER, " +
                     gameStateBoard.getEndGameWinner() + " PLAYER WON!";
                   String separator = "\n**********************************\n";
-                  moveHistoryPanel.addMoveHistory("\n" + separator +
+                  moveHistoryPanel.appendToMoveHistory("\n" + separator +
                                                   endGameMessage + separator);
                   boardPanel.refreshInnerBoardPanelBackground();
                 }
