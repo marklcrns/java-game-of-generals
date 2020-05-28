@@ -49,25 +49,32 @@ public class Player {
   }
 
   public boolean makeMove(int pieceCoords, int destinationCoords) {
-    ////////// DELETE ME LATER //////////
-    // Map<String, Move> possiblePieceMoves = this.board.getTile(pieceCoords).getPiece().evaluateMoves(board);
-    // System.out.println("\n" + this.board.getTile(pieceCoords).getPiece().getAlliance()
-    //     + " " + this.board.getTile(pieceCoords).getPiece().getRank());
-    // System.out.println("evalMoves size: " + possiblePieceMoves.size());
-    // for (Map.Entry<String, Move> entry : possiblePieceMoves.entrySet()) {
-    //   System.out.println(entry.getKey() + ": " + entry.getValue());
-    // };
+    if (this.board.isDebugMode()) {
+      Map<String, Move> possiblePieceMoves = this.board.getTile(pieceCoords).getPiece().evaluateMoves(board);
+      System.out.println(this.board.getTile(pieceCoords).getPiece().getPieceAlliance() +
+                         " " + this.board.getTile(pieceCoords).getPiece().getRank());
+      System.out.println("candidateMoves size: " + possiblePieceMoves.size());
+
+      for (Map.Entry<String, Move> entry : possiblePieceMoves.entrySet()) {
+        System.out.println(entry.getKey() + ": " + entry.getValue());
+      };
+      System.out.println("\n");
+    }
 
     if (moveMakerCheck() && pieceOwnerCheck(pieceCoords)) {
       Move move = new Move(this, board, pieceCoords, destinationCoords);
 
       if (move.execute()) {
-        if (board.isDebugMode()) {
-          System.out.println("Turn " + move.getTurnId() + ": " + move);
-        }
+        if (board.isDebugMode())
+          System.out.println(move);
+
+        clearForwardMoveHistory(this.board.getCurrentTurn());
         recordMove(move);
         this.board.setLastMove(move);
-        board.switchPlayerTurn();
+        this.board.switchMoveMakerPlayer();
+        this.board.incrementTurn();
+        this.board.updateLastExecutedTurn(this.board.getCurrentTurn());
+
         return true;
       } else {
         this.board.setLastMove(move);
@@ -98,10 +105,10 @@ public class Player {
       return true;
     else
       System.out.println("E: " + alliance +
-          " player DOES NOT own " +
-          board.getTile(pieceCoords).getPiece().getPieceAlliance() + " " +
-          board.getTile(pieceCoords).getPiece().getRank() + " at Tile " +
-          pieceCoords);
+                         " player DOES NOT own " +
+                         board.getTile(pieceCoords).getPiece().getPieceAlliance() + " " +
+                         board.getTile(pieceCoords).getPiece().getRank() + " at Tile " +
+                         pieceCoords);
       return false;
   }
 
@@ -109,14 +116,134 @@ public class Player {
     moveHistory.put(move.getTurnId(), move);
   }
 
-  public Move undoLastMove() {
-    int currentTurn = board.getCurrentTurn();
-    Move lastMove = this.moveHistory.get(currentTurn);
-    this.moveHistory.remove(currentTurn);
-    lastMove.undoExecution();
-    board.setCurrentTurn(currentTurn - 1);
-    return lastMove;
-    // TODO: decide whether to execute automatically
+  public boolean undoLastMove() {
+    int currentTurn = this.board.getCurrentTurn();
+    Player lastMoveMakerPlayer = this.alliance == Alliance.BLACK ?
+      this.board.getWhitePlayer() : this.board.getBlackPlayer();
+
+    if (lastMoveMakerPlayer.getMoveFromHistory(currentTurn - 1) != null) {
+
+      Move recentMove = lastMoveMakerPlayer.getMoveFromHistory(currentTurn - 1);
+      Move lastMove = getMoveFromHistory(currentTurn - 2);
+      Move lastLastMove = lastMoveMakerPlayer.getMoveFromHistory(currentTurn - 3);
+
+      if (moveMakerCheck()) {
+        int recentMoveOrigin = recentMove.getOriginCoords();
+        int recentMoveDestination = recentMove.getDestinationCoords();
+        if (recentMove.getMoveType() == "aggressive") {
+          if (recentMove.getEliminatedPiece() == recentMove.getTargetPiece()) {
+            // if target piece eliminated
+            this.board.movePiece(recentMoveDestination, recentMove.getOriginCoords());
+            this.board.insertPiece(recentMoveDestination, recentMove.getEliminatedPiece());
+          } else {
+            // if source piece eliminated
+            this.board.insertPiece(recentMoveOrigin, recentMove.getEliminatedPiece());
+          }
+        } else if (recentMove.getMoveType() == "draw") {
+          this.board.insertPiece(recentMoveDestination, recentMove.getTargetPiece());
+          this.board.insertPiece(recentMoveOrigin, recentMove.getSourcePiece());
+        } else {
+          this.board.movePiece(recentMoveDestination, recentMoveOrigin);
+        }
+
+        this.board.setLastMove(lastLastMove);
+        recentMove.undoExecution();
+        board.switchMoveMakerPlayer();
+        board.decrementTurn();
+
+        if (this.board.isDebugMode()) {
+          System.out.println("Undo successful. " + lastMove + "\n");
+          System.out.println("Turn History Stack");
+          if (board.getLastExecutedTurn() != 0) {
+            for (int i = this.board.getLastExecutedTurn(); 0 < i; i--) {
+              if (lastMoveMakerPlayer.getMoveFromHistory(i) != null)
+                System.out.println(lastMoveMakerPlayer.getMoveFromHistory(i));
+              else
+                System.out.println(this.getMoveFromHistory(i));
+            }
+          }
+          System.out.println("\n");
+        }
+
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean redoLastMove() {
+    int currentTurn = this.board.getCurrentTurn();
+    Player nextMoveMakerPlayer = this.alliance == Alliance.BLACK ?
+      this.board.getWhitePlayer() : this.board.getBlackPlayer();
+
+    if (getMoveFromHistory(currentTurn) != null) {
+      Move recentMove = nextMoveMakerPlayer.getMoveFromHistory(currentTurn - 1);
+      Move nextMove = getMoveFromHistory(currentTurn);
+
+      if (moveMakerCheck()) {
+        int nextMoveOrigin = nextMove.getOriginCoords();
+        int nextMoveDestination = nextMove.getDestinationCoords();
+        if (nextMove.getMoveType() == "aggressive") {
+          if (nextMove.getEliminatedPiece() == nextMove.getTargetPiece()) {
+            // if target piece eliminated
+            this.board.replacePiece(nextMoveDestination, nextMove.getSourcePiece());
+            this.board.deletePiece(nextMoveOrigin);
+          } else {
+            // if source piece eliminated
+            this.board.deletePiece(nextMoveOrigin);
+          }
+        } else if (nextMove.getMoveType() == "draw") {
+          this.board.deletePiece(nextMoveOrigin);
+          this.board.deletePiece(nextMoveDestination);
+        } else {
+          this.board.movePiece(nextMoveOrigin, nextMoveDestination);
+        }
+
+        this.board.setLastMove(recentMove);
+        nextMove.redoExecution();
+        board.switchMoveMakerPlayer();
+        board.incrementTurn();
+
+        if (this.board.isDebugMode()) {
+          System.out.println("Redo successful. " + nextMove + "\n");
+          System.out.println("Turn History Stack");
+          if (board.getLastExecutedTurn() != 0) {
+            for (int i = this.board.getLastExecutedTurn(); 0 < i; i--) {
+              if (nextMoveMakerPlayer.getMoveFromHistory(i) != null)
+                System.out.println(nextMoveMakerPlayer.getMoveFromHistory(i));
+              else
+                System.out.println(this.getMoveFromHistory(i));
+            }
+          }
+          System.out.println("\n");
+        }
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public Move getMoveFromHistory(int turnId) {
+    return this.moveHistory.get(turnId);
+  }
+
+  public void clearForwardMoveHistory(int startPointTurn) {
+    Player lastMoveMakerPlayer = this.alliance == Alliance.BLACK ?
+      this.board.getWhitePlayer() : this.board.getBlackPlayer();
+
+    int moveHistorySize = this.moveHistory.size() + lastMoveMakerPlayer.moveHistory.size();
+    for (int i = startPointTurn; i < moveHistorySize; i++) {
+
+      if (lastMoveMakerPlayer.getMoveFromHistory(i) != null) {
+        System.out.println(lastMoveMakerPlayer.getMoveFromHistory(i) + " REMOVING...");
+        lastMoveMakerPlayer.moveHistory.remove(i);
+      } else {
+        System.out.println(this.getMoveFromHistory(i) + " REMOVING...");
+        this.moveHistory.remove(i);
+      }
+    }
   }
 
   @Override

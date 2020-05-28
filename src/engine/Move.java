@@ -206,13 +206,23 @@ public class Move {
   }
 
   public Piece getEliminatedPiece() {
-    if (isExecuted && eliminatedPiece != null) {
+    if (eliminatedPiece != null) {
       return this.eliminatedPiece;
     }
     return null;
   }
 
-  // TODO: implement
+  public Piece getSourcePiece() {
+    return this.sourcePieceCopy;
+  }
+
+  public Piece getTargetPiece() {
+    if (this.targetPieceCopy != null)
+      return this.targetPieceCopy;
+
+    return null;
+  }
+
   public boolean undoExecution() {
     if (!this.isExecuted) {
       return false;
@@ -222,8 +232,12 @@ public class Move {
     return true;
   }
 
-  // TODO: implement
   public boolean redoExecution() {
+    if (this.isExecuted) {
+      return false;
+    } else {
+      this.isExecuted = true;
+    }
     return true;
   }
 
@@ -236,14 +250,16 @@ public class Move {
         superiorPieceAlliance = eliminatedPiece.getPieceAlliance() == Alliance.BLACK ?
           Alliance.WHITE + " ": Alliance.BLACK + " ";
       }
-      return sourcePieceCopy.getPieceAlliance() + " " +
+      return "Turn " + this.turnId + ": " +
+        sourcePieceCopy.getPieceAlliance() + " " +
         sourcePieceCopy.getRank() + " " +
         sourceTileCoords + " to " +
         targetPiece + targetTileCoords + " " +
         superiorPieceAlliance + this.moveType +
         " EXECUTED";
     } else {
-      return sourcePieceCopy.getPieceAlliance() + " " +
+      return "Turn " + this.turnId + ": " +
+        sourcePieceCopy.getPieceAlliance() + " " +
         sourcePieceCopy.getRank() + " " +
         sourceTileCoords + " to " +
         targetPiece + targetTileCoords + " ";

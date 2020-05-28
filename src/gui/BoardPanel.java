@@ -647,11 +647,11 @@ public class BoardPanel extends JPanel {
               int activeTileId = boardPanel.getActiveTileId();
 
               if (gameStateBoard.isDebugMode()) {
-                System.out.println("hoveredTileId: " + hoveredTileId);
-                System.out.println("activeTileId: " + activeTileId);
-                System.out.println("Current tileId: " + tileId);
-                System.out.println("\n");
+                System.out.println("hoveredTileId=" + hoveredTileId +
+                                   ";activeTileId=" + activeTileId +
+                                   ";currenttileId=" + tileId);
               }
+
               if (hoveredTileId == tileId && hoveredTileId != activeTileId &&
                   activeTileId != -1) {
 
@@ -660,7 +660,7 @@ public class BoardPanel extends JPanel {
 
                   if (gameStateBoard.isDebugMode())
                     System.out.println(gameStateBoard.getTile(tileId).getPiece().getRank() +
-                        " at " + activeTileId + " moved to " + tileId);
+                        " at " + activeTileId + " moved to " + tileId + "\n");
                 } else {
                   gameStateBoard.swapPiece(activeTileId, tileId);
 
@@ -668,7 +668,7 @@ public class BoardPanel extends JPanel {
                     System.out.println(gameStateBoard.getTile(tileId).getPiece().getRank() +
                         " at " + activeTileId + " swapped with " +
                         gameStateBoard.getTile(activeTileId).getPiece().getRank() +
-                        " at " + tileId);
+                        " at " + tileId + "\n");
                 }
 
 

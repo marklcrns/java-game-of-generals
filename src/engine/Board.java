@@ -42,6 +42,7 @@ public class Board {
   private boolean gameStarted = false;
   private static boolean debugMode;
   private int currentTurn;
+  private int lastExecutedTurn;
   private Move lastMove;
   private Alliance moveMaker;
   private Alliance endGameWinner;
@@ -118,7 +119,6 @@ public class Board {
     }
 
     this.gameInitialized = true;
-    this.currentTurn = 1;
     setMoveMaker(playerWhite);
 
     displayBoard();
@@ -137,6 +137,8 @@ public class Board {
   public void startGame() {
     this.gameStarted = true;
     this.gameInitialized = false;
+    this.currentTurn = 1;
+    this.lastExecutedTurn = 0;
 
     if (isDebugMode()) {
       System.out.println(this);
@@ -213,6 +215,16 @@ public class Board {
     return false;
   }
 
+  public boolean insertPiece(int sourceCoords, Piece piece) {
+    if (this.getTile(sourceCoords).isTileEmpty()) {
+      piece.updateCoords(sourceCoords);
+      this.getBoard().get(sourceCoords).insert(piece);
+      this.getTile(sourceCoords).insert(piece);
+      return true;
+    }
+    return false;
+  }
+
   public boolean deletePiece(int pieceCoords) {
     if (this.getTile(pieceCoords).isTileOccupied()) {
       this.getTile(pieceCoords).empty();
@@ -229,18 +241,39 @@ public class Board {
     gameBoard.add(new Tile(tileId, territory, occupied));
   }
 
-  public void switchPlayerTurn() {
+  public void switchMoveMakerPlayer() {
     if (this.getBlackPlayer().isMoveMaker()) {
       setMoveMaker(playerWhite);
     } else {
       setMoveMaker(playerBlack);
     }
-    this.currentTurn++;
 
+    if (isDebugMode())
+      System.out.println(this.getMoveMaker());
+  }
+
+  public void updateLastExecutedTurn(int turn) {
+    this.lastExecutedTurn = turn;
+  }
+
+  public void incrementTurn() {
+    this.currentTurn++;
     if (isDebugMode()) {
       System.out.println(this);
       System.out.println("Current Turn: " + currentTurn + "\n");
     }
+  }
+
+  public void decrementTurn() {
+    this.currentTurn--;
+    if (isDebugMode()) {
+      System.out.println(this);
+      System.out.println("Current Turn: " + currentTurn + "\n");
+    }
+  }
+
+  public int getLastExecutedTurn() {
+    return this.lastExecutedTurn;
   }
 
   public int getCurrentTurn() {

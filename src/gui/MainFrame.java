@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.border.EmptyBorder;
 
+import engine.Alliance;
 import engine.Board;
 
 /**
@@ -23,7 +24,7 @@ import engine.Board;
 // Ref: https://www.youtube.com/watch?v=KNGbmsq3huQ
 public class MainFrame {
 
-  private Board board;
+  private Board gameStateBoard;
   private JFrame frame;
 
   private JButton doneArrangingBtn;
@@ -54,7 +55,7 @@ public class MainFrame {
   private final static Dimension FRAME_DIMENSION = new Dimension(1200, 835);
 
   public MainFrame(Board board) {
-    this.board = board;
+    this.gameStateBoard = board;
     frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -71,7 +72,8 @@ public class MainFrame {
     fetchMainMenuButtons(mainMenuPanel);
     fetchDoneArrangingBtn(boardPanel);
     fetchStartGameBtn(boardPanel);
-    addMainMenuButtonsListener();
+    addMainMenuButtonsListeners();
+    addMenuBarButtonsListeners();
     addDoneArrangingButtonListener();
     addStartGameButtonListener();
 
@@ -91,7 +93,7 @@ public class MainFrame {
     frame.setVisible(true);
   }
 
-  private void addMainMenuButtonsListener() {
+  private void addMainMenuButtonsListeners() {
     mainMenuStartBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -114,7 +116,9 @@ public class MainFrame {
                                (FRAME_DIMENSION.height / 2) - quitPromptHeight);
       }
     });
+  }
 
+  private void addMenuBarButtonsListeners() {
     menuBarQuitBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -125,13 +129,43 @@ public class MainFrame {
             (FRAME_DIMENSION.height / 2) - quitPromptHeight);
       }
     });
+
+    menuBarUndoBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if (gameStateBoard.getMoveMaker() == Alliance.BLACK) {
+          gameStateBoard.getBlackPlayer().undoLastMove();
+          boardPanel.refreshBoardPanel();
+          frame.repaint();
+        } else {
+          gameStateBoard.getWhitePlayer().undoLastMove();
+          boardPanel.refreshBoardPanel();
+          frame.repaint();
+        }
+      }
+    });
+
+    menuBarRedoBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if (gameStateBoard.getMoveMaker() == Alliance.BLACK) {
+          gameStateBoard.getBlackPlayer().redoLastMove();
+          boardPanel.refreshBoardPanel();
+          frame.repaint();
+        } else {
+          gameStateBoard.getWhitePlayer().redoLastMove();
+          boardPanel.refreshBoardPanel();
+          frame.repaint();
+        }
+      }
+    });
   }
 
   private void addDoneArrangingButtonListener() {
     doneArrangingBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        board.playerDoneArranging();
+        gameStateBoard.playerDoneArranging();
         boardPanel.refreshBoardPanel();
       }
 
@@ -142,7 +176,7 @@ public class MainFrame {
     startGameBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        board.startGame();
+        gameStateBoard.startGame();
         doneArrangingBtn.setVisible(false);
         startGameBtn.setVisible(false);
         boardPanel.refreshBoardPanel();
