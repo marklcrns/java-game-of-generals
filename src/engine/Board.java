@@ -54,6 +54,8 @@ public class Board {
   public Board() {}
 
   public Board(final Player playerBlack, final Player playerWhite) {
+    playerBlack.setBoard(this);
+    playerWhite.setBoard(this);
     this.playerBlack = playerBlack;
     this.playerWhite = playerWhite;
   }
@@ -299,11 +301,13 @@ public class Board {
   }
 
   public void addPlayerBlack(Player player) {
-    playerBlack = player;
+    player.setBoard(this);
+    this.playerBlack = player;
   }
 
   public void addPlayerWhite(Player player) {
-    playerWhite = player;
+    player.setBoard(this);
+    this.playerWhite = player;
   }
 
   public Player getPlayer(Alliance alliance) {
@@ -504,7 +508,6 @@ public class Board {
       int[] blackTerritoryBounds = {0, (BoardUtils.ALL_TILES_COUNT / 2) - 1};
 
       List<Piece> unsetBlackPieces = new ArrayList<>();
-
       unsetBlackPieces.add(new GeneralFive(playerBlack, Alliance.BLACK));
       unsetBlackPieces.add(new GeneralFour(playerBlack, Alliance.BLACK));
       unsetBlackPieces.add(new GeneralThree(playerBlack, Alliance.BLACK));
@@ -525,7 +528,6 @@ public class Board {
         if (debugMode)
           System.out.println("Inserting " + unsetPiece.getPieceAlliance() + " " +
                              unsetPiece.getRank() + "...");
-
         setAllPieceInstanceRandomly(
             builder, unsetPiece, blackTerritoryBounds[0],
             blackTerritoryBounds[1], occupiedTiles);
@@ -536,7 +538,6 @@ public class Board {
         (BoardUtils.ALL_TILES_COUNT) - 1};
 
       List<Piece> unsetWhitePieces = new ArrayList<>();
-
       unsetWhitePieces.add(new GeneralFive(playerWhite, Alliance.WHITE));
       unsetWhitePieces.add(new GeneralFour(playerWhite, Alliance.WHITE));
       unsetWhitePieces.add(new GeneralThree(playerWhite, Alliance.WHITE));
@@ -554,11 +555,6 @@ public class Board {
       unsetWhitePieces.add(new Spy(playerWhite, Alliance.WHITE));
 
       for (Piece unsetPiece : unsetWhitePieces) {
-        if (debugMode)
-          System.out.println(
-              "Inserting " + unsetPiece.getPieceAlliance() + " " +
-              unsetPiece.getRank() + "...");
-
         setAllPieceInstanceRandomly(
             builder, unsetPiece, whiteTerritoryBounds[0],
             whiteTerritoryBounds[1], occupiedTiles);
@@ -574,15 +570,16 @@ public class Board {
           isTileEmpty(piece.getPieceCoords())) {
         boardConfig.put(piece.getPieceCoords(), piece);
 
-        if (isDebugMode())
-          System.out.println(
-              piece.getPieceAlliance() + " piece inserted at " +
-              piece.getPieceCoords());
-
         if (piece.getPieceAlliance() == Alliance.BLACK)
           this.blackPiecesCount++;
         else
           this.whitePiecesCount++;
+
+        if (isDebugMode())
+          System.out.println(
+              piece.getPieceAlliance() + " " +
+              piece.getRank() + " piece inserted at " +
+              piece.getPieceCoords());
 
         return true;
       }
@@ -592,11 +589,6 @@ public class Board {
     public void setAllPieceInstanceRandomly(BoardBuilder builder, Piece piece,
                                             int from, int to,
                                             int[] occupiedTiles) {
-      if (isDebugMode())
-        System.out.println(
-            "Placing " + piece.getPieceAlliance() + " " +
-            piece.getRank() + " at " + piece.getPieceCoords() + " randomly...");
-
       Piece pieceCopy = piece.makeCopy();
       int pieceInstanceCounter = countPieceInstances(piece.getRank(),
                                                      piece.getPieceAlliance());
@@ -605,14 +597,11 @@ public class Board {
       while (pieceInstanceCounter < piece.getLegalPieceInstanceCount()) {
         randomEmptyTile = Utils.getRandomWithExclusion(new Random(), from, to, occupiedTiles);
         pieceCopy.setPieceCoords(randomEmptyTile);
+        // TODO: Fix to check if randomEmptyTile is empty
         if (builder.setPiece(pieceCopy)) {
           pieceCopy = piece.makeCopy();
           Utils.appendToIntArray(occupiedTiles, randomEmptyTile);
           pieceInstanceCounter++;
-
-          if (isDebugMode())
-            System.out.println(piece.getPieceAlliance() + " " + piece.getRank() +
-                " at " + piece.getPieceCoords() + " inserted");
         }
       }
     }

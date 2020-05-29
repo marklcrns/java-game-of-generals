@@ -16,16 +16,19 @@ import engine.Move;
  * Date: 2020-05-20
  */
 public class Player {
-  private final Board board;
-  private final Alliance alliance;
+  private Board board;
+  private Alliance alliance;
   private Map<Integer, Move> moveHistory;
   private List<Piece> ownedPieces;
   private boolean isMoveMaker = false;
   // TODO calculate total activate pieces left
 
-  public Player(Board board, Alliance alliance) {
-    this.board = board;
+  public Player(Alliance alliance) {
     this.alliance = alliance;
+  }
+
+  public void setBoard(Board board) {
+    this.board = board;
   }
 
   public void initPlayer() {

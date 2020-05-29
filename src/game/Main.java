@@ -21,8 +21,8 @@ public class Main {
         try {
 
           Board board = new Board();
-          Player player1 = new Player(board, Alliance.WHITE);
-          Player player2 = new Player(board, Alliance.BLACK);
+          Player player1 = new Player(Alliance.WHITE);
+          Player player2 = new Player(Alliance.BLACK);
           board.addPlayerWhite(player1);
           board.addPlayerBlack(player2);
 
