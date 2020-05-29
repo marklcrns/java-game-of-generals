@@ -26,7 +26,6 @@ public class Save {
   private final String DATA_PATH = "data/save/";
 
   // ref: Timstammp = https://tecadmin.net/get-current-timestamp-in-java/
-
   public Save(Board board) {
     this.board = board;
     this.boardConfig = board.getInitBoardConfig();
@@ -35,31 +34,37 @@ public class Save {
     long time = date.getTime();
     Timestamp ts = new Timestamp(time);
 
+    String filePath = DATA_PATH + (ts + "").replace(" ", "_") + ".txt";
     try {
-      File outFile = new File(DATA_PATH, (ts + "").replace(" ", "_") + ".txt");
+      File outFile = new File(filePath);
       FileWriter fWriter = new FileWriter(outFile);
       PrintWriter pWriter = new PrintWriter (fWriter);
       pWriter.println(getBoardConfigData());
+      pWriter.println(getFirstMoveMaker());
       pWriter.println(getBoardExecutions());
       pWriter.close();
       System.out.println("File saved: " + outFile.getPath());
 
       if (this.board.isDebugMode()) {
         System.out.println(getBoardConfigData());
+        System.out.println(getFirstMoveMaker());
         System.out.println(getBoardExecutions());
       }
     } catch (IOException e) {
-      System.out.println(e);
+      System.out.println("Save error: save unsuccessful.\npath: " + filePath);
     }
   }
 
   public String getBoardConfigData() {
-    String boardConfigData = "BoardConfig\n";
-    return boardConfigData + convertBoardConfigToData(this.boardConfig) + "\n";
+    String boardConfigData = "BoardConfig=" + this.boardConfig.size() + ";\n";
+    return boardConfigData + convertBoardConfigToData(this.boardConfig);
+  }
+
+  public String getFirstMoveMaker() {
+    return "FirstMoveMaker=" + this.board.getFirstMoveMaker() + "\n";
   }
 
   public String getBoardExecutions() {
-    String data = "BoardExecutions:\n";
 
     Player playerBlack = this.board.getBlackPlayer();
     Player playerWhite = this.board.getWhitePlayer();
@@ -69,6 +74,8 @@ public class Save {
     Map<Integer, Move> whiteMoveHistory = playerWhite.getMoveHistory();
 
     int moveHistorySize = blackMoveHistory.size() + whiteMoveHistory.size();
+
+    String data = "BoardExecutions=" + moveHistorySize + ";\n";
 
     for (int i = 1; i < moveHistorySize + 1; i++) {
       if (firstMoveMaker == Alliance.BLACK) {
@@ -84,7 +91,7 @@ public class Save {
       }
     }
 
-    return data + "\n";
+    return data;
   }
 
   public String convertBoardConfigToData(List<Tile> boardConfig) {

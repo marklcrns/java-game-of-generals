@@ -41,6 +41,7 @@ public class Board {
   private BoardPanel boardPanel;
   private BoardBuilder customBuilder;
   private List<Tile> initBoardConfig;
+  private Map<Integer, Piece> initBoardBuilderConfig;
   private boolean gameInitialized = false;
   private boolean gameStarted = false;
   private static boolean debugMode;
@@ -85,6 +86,8 @@ public class Board {
     };
     blackPiecesLeft = builder.getBlackPiecesCount();
     whitePiecesLeft = builder.getWhitePiecesCount();
+
+    this.initBoardBuilderConfig = builder.getBoardConfig();
   }
 
   public void setBoardBuilder(BoardBuilder builder) {
@@ -156,6 +159,15 @@ public class Board {
 
   public List<Tile> getInitBoardConfig() {
     return this.initBoardConfig;
+  }
+
+  public Map<Integer, Piece> getBoardBuilderConfig() {
+    try {
+      return this.initBoardBuilderConfig;
+    } catch(NullPointerException e) {
+      System.out.println("Board error: initBoardBuilder was not initialized");
+      return null;
+    }
   }
 
   public void displayBoard() {
@@ -434,71 +446,69 @@ public class Board {
     }
 
     public BoardBuilder createDemoBoardBuild() {
-      BoardBuilder builder = new BoardBuilder();
       int[] row = {0, 8, 17, 26};
       // Black territory
       int boardOffset = 0;
       // row 0
-      builder.setPiece(new GeneralTwo(playerBlack, Alliance.BLACK, boardOffset + row[0] + 9));
-      builder.setPiece(new Major(playerBlack, Alliance.BLACK, boardOffset + row[0] + 8));
-      builder.setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[0] + 7));
-      builder.setPiece(new Sergeant(playerBlack, Alliance.BLACK, boardOffset + row[0] + 6));
-      builder.setPiece(new LtOne(playerBlack, Alliance.BLACK, boardOffset + row[0] + 5));
-      builder.setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[0] + 4));
-      builder.setPiece(new Flag(playerBlack, Alliance.BLACK, boardOffset + row[0] + 3));
-      builder.setPiece(new LtTwo(playerBlack, Alliance.BLACK, boardOffset + row[0] + 2));
-      builder.setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[0] + 1));
+      setPiece(new GeneralTwo(playerBlack, Alliance.BLACK, boardOffset + row[0] + 9));
+      setPiece(new Major(playerBlack, Alliance.BLACK, boardOffset + row[0] + 8));
+      setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[0] + 7));
+      setPiece(new Sergeant(playerBlack, Alliance.BLACK, boardOffset + row[0] + 6));
+      setPiece(new LtOne(playerBlack, Alliance.BLACK, boardOffset + row[0] + 5));
+      setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[0] + 4));
+      setPiece(new Flag(playerBlack, Alliance.BLACK, boardOffset + row[0] + 3));
+      setPiece(new LtTwo(playerBlack, Alliance.BLACK, boardOffset + row[0] + 2));
+      setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[0] + 1));
       // row 1
-      builder.setPiece(new Spy(playerBlack, Alliance.BLACK, boardOffset + row[1] + 8));
-      builder.setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[1] + 7));
-      builder.setPiece(new Captain(playerBlack, Alliance.BLACK, boardOffset + row[1] + 5));
-      builder.setPiece(new Spy(playerBlack, Alliance.BLACK, boardOffset + row[1] + 4));
-      builder.setPiece(new Colonel(playerBlack, Alliance.BLACK, boardOffset + row[1] + 3));
-      builder.setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[1] + 2));
-      builder.setPiece(new LtCol(playerBlack, Alliance.BLACK, boardOffset + row[1] + 1));
+      setPiece(new Spy(playerBlack, Alliance.BLACK, boardOffset + row[1] + 8));
+      setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[1] + 7));
+      setPiece(new Captain(playerBlack, Alliance.BLACK, boardOffset + row[1] + 5));
+      setPiece(new Spy(playerBlack, Alliance.BLACK, boardOffset + row[1] + 4));
+      setPiece(new Colonel(playerBlack, Alliance.BLACK, boardOffset + row[1] + 3));
+      setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[1] + 2));
+      setPiece(new LtCol(playerBlack, Alliance.BLACK, boardOffset + row[1] + 1));
       // row 2
-      builder.setPiece(new GeneralThree(playerBlack, Alliance.BLACK, boardOffset + row[2] + 9));
-      builder.setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[2] + 6));
-      builder.setPiece(new GeneralFour(playerBlack, Alliance.BLACK, boardOffset + row[2] + 5));
+      setPiece(new GeneralThree(playerBlack, Alliance.BLACK, boardOffset + row[2] + 9));
+      setPiece(new Private(playerBlack, Alliance.BLACK, boardOffset + row[2] + 6));
+      setPiece(new GeneralFour(playerBlack, Alliance.BLACK, boardOffset + row[2] + 5));
       // row 3
-      builder.setPiece(new GeneralOne(playerBlack, Alliance.BLACK, boardOffset + row[3] + 3));
-      builder.setPiece(new GeneralFive(playerBlack, Alliance.BLACK, boardOffset + row[3] + 2));
-      builder.setPiece(new GeneralFive(playerWhite, Alliance.WHITE, boardOffset + row[3] + 1));
+      setPiece(new GeneralOne(playerBlack, Alliance.BLACK, boardOffset + row[3] + 3));
+      setPiece(new GeneralFive(playerBlack, Alliance.BLACK, boardOffset + row[3] + 2));
+      setPiece(new GeneralFive(playerWhite, Alliance.WHITE, boardOffset + row[3] + 1));
 
       // White territory
       boardOffset = BoardUtils.ALL_TILES_COUNT / 2;
 
       // row 0
-      builder.setPiece(new GeneralFive(playerWhite, Alliance.BLACK, boardOffset + row[0] + 1));
-      builder.setPiece(new GeneralFive(playerWhite, Alliance.WHITE, boardOffset + row[0] + 2));
-      builder.setPiece(new GeneralOne(playerWhite, Alliance.WHITE, boardOffset + row[0] + 3));
+      setPiece(new GeneralFive(playerWhite, Alliance.BLACK, boardOffset + row[0] + 1));
+      setPiece(new GeneralFive(playerWhite, Alliance.WHITE, boardOffset + row[0] + 2));
+      setPiece(new GeneralOne(playerWhite, Alliance.WHITE, boardOffset + row[0] + 3));
       // row 1
-      builder.setPiece(new GeneralFour(playerWhite, Alliance.WHITE, boardOffset + row[1] + 5));
-      builder.setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[1] + 6));
-      builder.setPiece(new GeneralThree(playerWhite, Alliance.WHITE, boardOffset + row[1] + 9));
+      setPiece(new GeneralFour(playerWhite, Alliance.WHITE, boardOffset + row[1] + 5));
+      setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[1] + 6));
+      setPiece(new GeneralThree(playerWhite, Alliance.WHITE, boardOffset + row[1] + 9));
       // row 2
-      builder.setPiece(new LtCol(playerWhite, Alliance.WHITE, boardOffset + row[2] + 1));
-      builder.setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[2] + 2));
-      builder.setPiece(new Colonel(playerWhite, Alliance.WHITE, boardOffset + row[2] + 3));
-      builder.setPiece(new Spy(playerWhite, Alliance.WHITE, boardOffset + row[2] + 4));
-      builder.setPiece(new Captain(playerWhite, Alliance.WHITE, boardOffset + row[2] + 5));
-      builder.setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[2] + 7));
-      builder.setPiece(new Spy(playerWhite, Alliance.WHITE, boardOffset + row[2] + 8));
+      setPiece(new LtCol(playerWhite, Alliance.WHITE, boardOffset + row[2] + 1));
+      setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[2] + 2));
+      setPiece(new Colonel(playerWhite, Alliance.WHITE, boardOffset + row[2] + 3));
+      setPiece(new Spy(playerWhite, Alliance.WHITE, boardOffset + row[2] + 4));
+      setPiece(new Captain(playerWhite, Alliance.WHITE, boardOffset + row[2] + 5));
+      setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[2] + 7));
+      setPiece(new Spy(playerWhite, Alliance.WHITE, boardOffset + row[2] + 8));
       // row 3
-      builder.setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[3] + 1));
-      builder.setPiece(new LtTwo(playerWhite, Alliance.WHITE, boardOffset + row[3] + 2));
-      builder.setPiece(new Flag(playerWhite, Alliance.WHITE, boardOffset + row[3] + 3));
-      builder.setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[3] + 4));
-      builder.setPiece(new LtOne(playerWhite, Alliance.WHITE, boardOffset + row[3] + 5));
-      builder.setPiece(new Sergeant(playerWhite, Alliance.WHITE, boardOffset + row[3] + 6));
-      builder.setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[3] + 7));
-      builder.setPiece(new Major(playerWhite, Alliance.WHITE, boardOffset + row[3] + 8));
-      builder.setPiece(new Major(playerWhite, Alliance.WHITE, boardOffset + row[3] + 9));
-      return builder;
+      setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[3] + 1));
+      setPiece(new LtTwo(playerWhite, Alliance.WHITE, boardOffset + row[3] + 2));
+      setPiece(new Flag(playerWhite, Alliance.WHITE, boardOffset + row[3] + 3));
+      setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[3] + 4));
+      setPiece(new LtOne(playerWhite, Alliance.WHITE, boardOffset + row[3] + 5));
+      setPiece(new Sergeant(playerWhite, Alliance.WHITE, boardOffset + row[3] + 6));
+      setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[3] + 7));
+      setPiece(new Major(playerWhite, Alliance.WHITE, boardOffset + row[3] + 8));
+      setPiece(new Major(playerWhite, Alliance.WHITE, boardOffset + row[3] + 9));
+      return this;
     }
 
     public BoardBuilder createRandomBuild() {
-      BoardBuilder builder = new BoardBuilder();
       int[] occupiedTiles = {};
 
       if (isDebugMode())
@@ -529,7 +539,7 @@ public class Board {
           System.out.println("Inserting " + unsetPiece.getPieceAlliance() + " " +
                              unsetPiece.getRank() + "...");
         setAllPieceInstanceRandomly(
-            builder, unsetPiece, blackTerritoryBounds[0],
+            this, unsetPiece, blackTerritoryBounds[0],
             blackTerritoryBounds[1], occupiedTiles);
       }
 
@@ -556,10 +566,10 @@ public class Board {
 
       for (Piece unsetPiece : unsetWhitePieces) {
         setAllPieceInstanceRandomly(
-            builder, unsetPiece, whiteTerritoryBounds[0],
+            this, unsetPiece, whiteTerritoryBounds[0],
             whiteTerritoryBounds[1], occupiedTiles);
       }
-      return builder;
+      return this;
     }
 
     public boolean setPiece(final Piece piece) {
@@ -672,6 +682,16 @@ public class Board {
       if (isDebugMode())
         System.out.println("E: TIle " + coords + " is occupied");
       return false;
+    }
+
+    public Map<Integer, Piece> getBoardConfig() {
+      try {
+        return this.boardConfig;
+      } catch(NullPointerException e) {
+        System.out.println("BuilderBoard Error: Board config does not exist");
+        return null;
+      }
+
     }
 
   } // BoardBuilder

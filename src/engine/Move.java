@@ -149,9 +149,9 @@ public class Move {
   private boolean isTargetPieceEliminated() {
     if (isSourcePieceFlag() && isTargetPieceFlag())
       return true;
-    else if (sourcePieceCopy.getRank() == "P" && targetPieceCopy.getRank() == "S")
+    else if (sourcePieceCopy.getRank() == "Private" && targetPieceCopy.getRank() == "Spy")
       return true;
-    else if (sourcePieceCopy.getRank() == "S" && targetPieceCopy.getRank() == "P")
+    else if (sourcePieceCopy.getRank() == "Spy" && targetPieceCopy.getRank() == "Private")
       return false;
     else if (sourcePieceCopy.getPowerLevel() > targetPieceCopy.getPowerLevel())
       return true;
@@ -160,21 +160,21 @@ public class Move {
   }
 
   private boolean isTargetPieceFlag() {
-    if (targetPieceCopy.getRank() == "F")
+    if (targetPieceCopy.getRank() == "Flag")
       return true;
     else
       return false;
   }
 
   private boolean isSourcePieceFlag() {
-    if (sourcePieceCopy.getRank() == "F")
+    if (sourcePieceCopy.getRank() == "Flag")
       return true;
     else
       return false;
   }
 
   private boolean isFlagSucceeded() {
-    if (sourcePieceCopy.getRank() == "F" &&
+    if (sourcePieceCopy.getRank() == "Flag" &&
         board.getTile(targetTileCoords).isTileEmpty())
       if ((sourcePieceCopy.getPieceAlliance() == Alliance.BLACK &&
           targetTileCoords >= BoardUtils.LAST_ROW_INIT) ||

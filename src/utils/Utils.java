@@ -10,6 +10,7 @@ import java.util.Random;
  * Date: 2020-05-25
  */
 public class Utils {
+
   private Utils() {
     throw new RuntimeException("You cannot instantiate Utils class");
   }
@@ -27,13 +28,23 @@ public class Utils {
 
   // ref: https://stackoverflow.com/a/29172210/11850077
   public static int[] appendToIntArray(int[] arr, int num) {
-
     int[] newArr = new int[arr.length + 1];
 
     for (int i = 0; i < arr.length; i++) {
       newArr[i] = arr[i];
     }
     newArr[arr.length] = num;
+
+    return newArr;
+  }
+
+  public static String[] appendToStringArray(String[] arr, String text) {
+    String[] newArr = new String[arr.length + 1];
+
+    for (int i = 0; i < arr.length; i++) {
+      newArr[i] = arr[i];
+    }
+    newArr[arr.length] = text;
 
     return newArr;
   }

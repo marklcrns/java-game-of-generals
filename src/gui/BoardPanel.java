@@ -721,10 +721,10 @@ public class BoardPanel extends JPanel {
 
         if (pieceAlliance == Alliance.BLACK) {
           this.iconNormal = boardPanel.getBlackPieceIcons().get(pieceRank);
-          this.iconHidden = boardPanel.getBlackPieceIcons().get("HIDDEN");
+          this.iconHidden = boardPanel.getBlackPieceIcons().get("Hidden");
         } else {
           this.iconNormal = boardPanel.getWhitePieceIcons().get(pieceRank);
-          this.iconHidden = boardPanel.getWhitePieceIcons().get("HIDDEN");
+          this.iconHidden = boardPanel.getWhitePieceIcons().get("Hidden");
         }
 
         if (gameStateBoard.isDebugMode() && gameStateBoard.isGameInitialized())

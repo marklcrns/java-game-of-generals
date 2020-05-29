@@ -7,15 +7,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.border.EmptyBorder;
 
 import engine.Alliance;
 import engine.Board;
+import game.Load;
 import game.Save;
 
 /**
@@ -45,8 +49,11 @@ public class MainFrame {
   private JButton menuBarSurrenderBtn;
   private JButton menuBarGameRulesBtn;
 
-  private JPopupMenu mainMenuQuitPrompt;
-  private JPopupMenu menuBarQuitPrompt;
+  private JDialog mainMenuLoadDialog;
+  private JDialog menuBarLoadDialog;
+  private JPopupMenu mainMenuQuitPopup;
+  private JPopupMenu menuBarQuitPopup;
+
 
   private BoardPanel boardPanel;
   private MainMenuPanel mainMenuPanel;
@@ -70,14 +77,13 @@ public class MainFrame {
     mainMenuPanel = new MainMenuPanel();
 
     fetchMainMenuButtons(mainMenuPanel);
-
     addMainMenuButtonsListeners();
+    createMainMenuQuitPopupMenu();
+    createMainMenuLoadPopupMenu();
 
     layeredPane.add(mainMenuPanel, new Integer(2));
-
     mainMenuPanel.setBounds(0, 0, FRAME_DIMENSION.width, FRAME_DIMENSION.height);
 
-    createMainMenuQuitPopupMenu();
 
     contentPane.add(layeredPane);
     frame.add(contentPane);
@@ -94,9 +100,6 @@ public class MainFrame {
         boardPanel = gameStateBoard.getBoardPanel();
         boardPanel.initBoardPanel();
 
-        layeredPane.add(boardPanel, new Integer(1));
-        boardPanel.setBounds(0, 0, FRAME_DIMENSION.width, FRAME_DIMENSION.height);
-
         fetchMenuBarButtons(boardPanel);
         fetchDoneArrangingBtn(boardPanel);
         fetchStartGameBtn(boardPanel);
@@ -107,19 +110,29 @@ public class MainFrame {
 
         createMenuBarQuitPopupMenu();
 
+        layeredPane.add(boardPanel, new Integer(1));
+        boardPanel.setBounds(0, 0, FRAME_DIMENSION.width, FRAME_DIMENSION.height);
+
         boardPanel.setVisible(true);
         mainMenuPanel.setVisible(false);
+      }
+    });
+
+    mainMenuLoadBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        mainMenuLoadDialog.setVisible(true);
       }
     });
 
     mainMenuQuitBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        mainMenuQuitPrompt.setVisible(true);
-        int quitPromptWidth = mainMenuQuitPrompt.getWidth() / 2;
-        int quitPromptHeight = mainMenuQuitPrompt.getHeight() / 2;
-        mainMenuQuitPrompt.show(frame, (FRAME_DIMENSION.width / 2) - quitPromptWidth,
-                               (FRAME_DIMENSION.height / 2) - quitPromptHeight);
+        mainMenuQuitPopup.setVisible(true);
+        int quitPopupWidth = mainMenuQuitPopup.getWidth() / 2;
+        int quitPopupHeight = mainMenuQuitPopup.getHeight() / 2;
+        mainMenuQuitPopup.show(frame, (FRAME_DIMENSION.width / 2) - quitPopupWidth,
+                               (FRAME_DIMENSION.height / 2) - quitPopupHeight);
       }
     });
   }
@@ -147,11 +160,11 @@ public class MainFrame {
     menuBarQuitBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        menuBarQuitPrompt.setVisible(true);
-        int quitPromptWidth = menuBarQuitPrompt.getWidth() / 2;
-        int quitPromptHeight = menuBarQuitPrompt.getHeight() / 2;
-        menuBarQuitPrompt.show(frame, (FRAME_DIMENSION.width / 2) - quitPromptWidth,
-            (FRAME_DIMENSION.height / 2) - quitPromptHeight);
+        menuBarQuitPopup.setVisible(true);
+        int quitPopupWidth = menuBarQuitPopup.getWidth() / 2;
+        int quitPopupHeight = menuBarQuitPopup.getHeight() / 2;
+        menuBarQuitPopup.show(frame, (FRAME_DIMENSION.width / 2) - quitPopupWidth,
+            (FRAME_DIMENSION.height / 2) - quitPopupHeight);
       }
     });
 
@@ -254,22 +267,86 @@ public class MainFrame {
     this.startGameBtn = boardPanel.getStartGameBtn();
   }
 
+  private void createMainMenuLoadPopupMenu() {
+    JLabel loadMessageLbl = new JLabel("Load saved game");
+    loadMessageLbl.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+
+    String[] saveList  = Load.getSaveList();
+
+    JComboBox<String> loadComboBox = new JComboBox<>(saveList);
+    loadComboBox.setSelectedIndex(saveList.length - 1);
+    loadComboBox.setEditable(true);
+
+    JPanel loadActionsPanel = new JPanel();
+    JButton loadConfirmBtn = new JButton("Load");
+    JButton loadAbortBtn = new JButton("Abort");
+    loadActionsPanel.add(loadConfirmBtn);
+    loadActionsPanel.add(loadAbortBtn);
+
+    // options pane
+    // Ref: https://stackoverflow.com/a/40200144/11850077
+    Object[] options = new Object[] {};
+    JOptionPane loadOptionsPane = new JOptionPane("Load Saved Game",
+                                      JOptionPane.PLAIN_MESSAGE,
+                                      JOptionPane.DEFAULT_OPTION,
+                                      null, options, null);
+
+    loadOptionsPane.add(loadComboBox);
+    loadOptionsPane.add(loadActionsPanel);
+
+    mainMenuLoadDialog = new JDialog();
+    mainMenuLoadDialog.getContentPane().add(loadOptionsPane);
+    mainMenuLoadDialog.pack();
+    mainMenuLoadDialog.setVisible(false);
+
+
+    loadComboBox.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        // JComboBox<String> cb = (JComboBox<String>) e.getSource();
+        // String loadSelected = (String) cb.getSelectedItem();
+
+        // System.out.println(loadSelected);
+      }
+    });
+
+    loadConfirmBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        String loadSelected = (String) loadComboBox.getSelectedItem();
+
+        if (gameStateBoard.isDebugMode())
+          System.out.println("Loading " + loadSelected.replace(".txt", "..."));
+
+        Load.loadSaveGame(loadSelected);
+
+        mainMenuLoadDialog.setVisible(false);
+      }
+    });
+
+    loadAbortBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+      }
+    });
+  }
+
   private void createMainMenuQuitPopupMenu() {
-    mainMenuQuitPrompt = new JPopupMenu();
-    mainMenuQuitPrompt.setLayout(new BorderLayout());
-    mainMenuQuitPrompt.setBorder(new EmptyBorder(10, 10, 10, 10));
+    mainMenuQuitPopup = new JPopupMenu();
+    mainMenuQuitPopup.setLayout(new BorderLayout());
+    mainMenuQuitPopup.setBorder(new EmptyBorder(10, 10, 10, 10));
 
     JLabel quitMessageLbl = new JLabel("Are you sure you want to quit?");
     quitMessageLbl.setFont(new Font("TimesRoman", Font.PLAIN, 20));
-    JPanel quitPromptOptionsPanel = new JPanel();
+    JPanel quitPopupOptionsPanel = new JPanel();
     JButton quitConfirmBtn = new JButton("Yes");
     JButton quitAbortBtn = new JButton("No");
 
-    quitPromptOptionsPanel.add(quitConfirmBtn);
-    quitPromptOptionsPanel.add(quitAbortBtn);
+    quitPopupOptionsPanel.add(quitConfirmBtn);
+    quitPopupOptionsPanel.add(quitAbortBtn);
 
-    mainMenuQuitPrompt.add(quitMessageLbl, BorderLayout.NORTH);
-    mainMenuQuitPrompt.add(quitPromptOptionsPanel, BorderLayout.CENTER);
+    mainMenuQuitPopup.add(quitMessageLbl, BorderLayout.NORTH);
+    mainMenuQuitPopup.add(quitPopupOptionsPanel, BorderLayout.CENTER);
 
     quitConfirmBtn.addActionListener(new ActionListener() {
       @Override
@@ -281,27 +358,27 @@ public class MainFrame {
     quitAbortBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        mainMenuQuitPrompt.setVisible(false);
+        mainMenuQuitPopup.setVisible(false);
       }
     });
   }
 
   private void createMenuBarQuitPopupMenu() {
-    menuBarQuitPrompt = new JPopupMenu();
-    menuBarQuitPrompt.setLayout(new BorderLayout());
-    menuBarQuitPrompt.setBorder(new EmptyBorder(10, 10, 10, 10));
+    menuBarQuitPopup = new JPopupMenu();
+    menuBarQuitPopup.setLayout(new BorderLayout());
+    menuBarQuitPopup.setBorder(new EmptyBorder(10, 10, 10, 10));
 
     JLabel quitMessageLbl = new JLabel("Back to main menu?");
     quitMessageLbl.setFont(new Font("TimesRoman", Font.PLAIN, 20));
-    JPanel menuBarQuitPromptOptionsPanel = new JPanel();
+    JPanel menuBarQuitPopuptOptionsPanel = new JPanel();
     JButton quitBackToMain = new JButton("Back to main");
     JButton quitConfirmBtn = new JButton("Quit");
 
-    menuBarQuitPromptOptionsPanel.add(quitBackToMain);
-    menuBarQuitPromptOptionsPanel.add(quitConfirmBtn);
+    menuBarQuitPopuptOptionsPanel.add(quitBackToMain);
+    menuBarQuitPopuptOptionsPanel.add(quitConfirmBtn);
 
-    menuBarQuitPrompt.add(quitMessageLbl, BorderLayout.NORTH);
-    menuBarQuitPrompt.add(menuBarQuitPromptOptionsPanel, BorderLayout.CENTER);
+    menuBarQuitPopup.add(quitMessageLbl, BorderLayout.NORTH);
+    menuBarQuitPopup.add(menuBarQuitPopuptOptionsPanel, BorderLayout.CENTER);
 
     quitConfirmBtn.addActionListener(new ActionListener() {
       @Override
@@ -313,7 +390,7 @@ public class MainFrame {
     quitBackToMain.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        menuBarQuitPrompt.setVisible(false);
+        menuBarQuitPopup.setVisible(false);
         boardPanel.setVisible(false);
         mainMenuPanel.setVisible(true);
       }
