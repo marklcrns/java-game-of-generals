@@ -39,7 +39,7 @@ public class Board {
   private static int blackPiecesLeft = 0;
   private static int whitePiecesLeft = 0;
   private BoardPanel boardPanel;
-  private BoardBuilder builder;
+  private BoardBuilder customBuilder;
   private List<Tile> initBoardConfig;
   private boolean gameInitialized = false;
   private boolean gameStarted = false;
@@ -53,20 +53,9 @@ public class Board {
 
   public Board() {}
 
-  public Board(final BoardBuilder builder) {
-    this.builder = builder;
-  }
-
   public Board(final Player playerBlack, final Player playerWhite) {
     this.playerBlack = playerBlack;
     this.playerWhite = playerWhite;
-  }
-
-  public Board(final Player playerBlack, final Player playerWhite,
-               BoardBuilder builder) {
-    this.playerBlack = playerBlack;
-    this.playerWhite = playerWhite;
-    this.builder = builder;
   }
 
   private void emptyBoard() {
@@ -81,38 +70,23 @@ public class Board {
     }
   }
 
-  public void setBoardBuilder(BoardBuilder builder) {
-    this.builder = builder;
-  }
-
   public void buildBoard() {
     this.emptyBoard();
-    for (Map.Entry<Integer, Piece> entry : this.builder.boardConfig.entrySet()) {
-      if (gameBoard.get(entry.getKey()).isTileEmpty()) {
-        // insert piece to tile
-        gameBoard.get(entry.getKey()).insert(entry.getValue());
-        // change tile state
-        // TODO: make setOccupied(true) built into the insertPiece method
-        gameBoard.get(entry.getKey()).setOccupied(true);
-      }
-    };
-    blackPiecesLeft = this.builder.getBlackPiecesCount();
-    whitePiecesLeft = this.builder.getWhitePiecesCount();
-  }
+    BoardBuilder builder = this.customBuilder == null ?
+      new BoardBuilder().createRandomBuild() : this.customBuilder;
 
-  public void buildBoard(BoardBuilder builder) {
-    this.emptyBoard();
     for (Map.Entry<Integer, Piece> entry : builder.boardConfig.entrySet()) {
       if (gameBoard.get(entry.getKey()).isTileEmpty()) {
         // insert piece to tile
         gameBoard.get(entry.getKey()).insert(entry.getValue());
-        // change tile state
-        // TODO: make setOccupied(true) built into the insertPiece method
-        gameBoard.get(entry.getKey()).setOccupied(true);
       }
     };
     blackPiecesLeft = builder.getBlackPiecesCount();
     whitePiecesLeft = builder.getWhitePiecesCount();
+  }
+
+  public void setBoardBuilder(BoardBuilder builder) {
+    this.customBuilder = builder;
   }
 
   public void initGame() {
@@ -163,8 +137,7 @@ public class Board {
   }
 
   public void restartGame() {
-    this.emptyBoard();
-    buildBoard(new BoardBuilder().createRandomBuild());
+    buildBoard();
     this.gameStarted = false;
     this.gameInitialized = true;
     this.endGameWinner = null;
@@ -739,10 +712,6 @@ public class Board {
         return true;
       }
       return false;
-    }
-
-    public void setOccupied(boolean occupied) {
-      this.occupied = occupied;
     }
 
     public int getTileId() {
