@@ -48,8 +48,8 @@ public class BoardPanel extends JPanel {
   public int my = 0;
 
   private static Board gameStateBoard;
-  private static JButton saveBtn, loadBtn, quitBtn, undoBtn,
-                         redoBtn, surrenderBtn, rulesBtn,
+  private static JButton restartBtn, loadBtn, quitBtn, undoBtn,
+                         redoBtn, saveBtn, surrenderBtn, rulesBtn,
                          doneArrangingBtn, startGameBtn;
 
   private static MenuBarPanel menuBarPanel;
@@ -77,21 +77,26 @@ public class BoardPanel extends JPanel {
       (int) (FRAME_DIMENSION.getHeight() - MENU_BAR_PANEL_DIMENSION.getHeight()));
 
   public BoardPanel(Board board) {
-    gameStateBoard = board;
+    this.gameStateBoard = board;
     this.setLayout(new BorderLayout());
-    this.setVisible(true);
+    this.setVisible(false);
 
+    boardPanel = new InnerBoardPanel();
     menuBarPanel = new MenuBarPanel();
     moveHistoryPanel = new MoveHistoryPanel();
-    boardPanel = new InnerBoardPanel();
 
+    this.add(boardPanel, BorderLayout.CENTER);
     this.add(menuBarPanel, BorderLayout.NORTH);
     this.add(moveHistoryPanel, BorderLayout.WEST);
-    this.add(boardPanel, BorderLayout.CENTER);
   }
 
-  public final JButton getSaveBtn() {
-    return saveBtn;
+  public void initBoardPanel() {
+    System.out.println("BoardPanel gameStateBoard:\n" + gameStateBoard);
+    boardPanel.initInnerBoardPanel();
+  }
+
+  public final JButton getRestartBtn() {
+    return restartBtn;
   }
 
   public final JButton getLoadBtn() {
@@ -108,6 +113,10 @@ public class BoardPanel extends JPanel {
 
   public final JButton getRedoBtn() {
     return redoBtn;
+  }
+
+  public final JButton getSaveBtn() {
+    return saveBtn;
   }
 
   public final JButton getSurrenderBtn() {
@@ -154,14 +163,14 @@ public class BoardPanel extends JPanel {
 
   private class MenuBarPanel extends JPanel {
 
-    private JButton save, load, quit, undo, redo, surrender, rules;
+    private JButton restart, load, quit, undo, redo, save, surrender, rules;
 
     public MenuBarPanel() {
       this.setLayout(new FlowLayout());
       this.setPreferredSize(MENU_BAR_PANEL_DIMENSION);
 
-      save = new JButton("Save");
-      this.add(save);
+      restart = new JButton("Restart");
+      this.add(restart);
       load = new JButton("Load");
       this.add(load);
       quit = new JButton("Quit");
@@ -173,27 +182,35 @@ public class BoardPanel extends JPanel {
 
       undo = new JButton("Undo");
       this.add(undo);
+      undo.setVisible(false);
       redo = new JButton("Redo");
       this.add(redo);
+      redo.setVisible(false);
 
       this.add(new JSeparator(SwingConstants.HORIZONTAL));
       this.add(new JSeparator(SwingConstants.HORIZONTAL));
       this.add(new JSeparator(SwingConstants.HORIZONTAL));
 
+      save = new JButton("Save");
+      this.add(save);
+      save.setVisible(false);
       surrender = new JButton("Surrender");
       this.add(surrender);
+      surrender.setVisible(false);
       rules = new JButton("Game Rules");
       this.add(rules);
+      rules.setVisible(false);
 
       setAllButtons();
     }
 
     public void setAllButtons() {
-      saveBtn = save;
+      restartBtn = restart;
       loadBtn = load;
       quitBtn = quit;
       undoBtn = undo;
       redoBtn = redo;
+      saveBtn = save;
       surrenderBtn = surrender;
       rulesBtn = rules;
     }
@@ -282,7 +299,6 @@ public class BoardPanel extends JPanel {
       }
     }
 
-
     public void clearMoveHistory() {
       moveHistoryTextArea.selectAll();
       moveHistoryTextArea.replaceSelection("");
@@ -323,45 +339,26 @@ public class BoardPanel extends JPanel {
       super(new GridLayout(BoardUtils.TILE_ROW_COUNT, BoardUtils.TILE_COLUMN_COUNT));
       this.boardTiles = new ArrayList<>();
       this.candidateMoveTiles = new ArrayList<>();
-      preLoadImages();
 
-      for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
-        final TilePanel tilePanel = new TilePanel(this, i);
-        this.boardTiles.add(tilePanel);
-        add(tilePanel);
-      }
+      preLoadImages();
+      createTilePanels();
 
       setPreferredSize(BOARD_PANEL_DIMENSION);
       validate();
+    }
 
-      // this.addMouseMotionListener(new MouseMotionListener() {
-      //
-      //   @Override
-      //   public void mouseDragged(MouseEvent e) {}
-      //
-      //   @Override
-      //   public void mouseMoved(MouseEvent e) {
-      //     if (enableHoverHighlight) {
-      //       mx = e.getX();
-      //       my = e.getY();
-      //
-      //       clearHighlights();
-      //       for (int y = 0; y < BoardUtils.TILE_ROW_COUNT; y++) {
-      //         for (int x = 0; x < BoardUtils.TILE_COLUMN_COUNT; x++) {
-      //           if (mx > x * TILE_PANEL_DIMENSION.getWidth() &&
-      //               mx < (x + 1) * TILE_PANEL_DIMENSION.getWidth() &&
-      //               my > y * TILE_PANEL_DIMENSION.getHeight() &&
-      //               my < (y + 1) * TILE_PANEL_DIMENSION.getHeight()) {
-      //
-      //             highlightPieceMoves(y * 9 + x);
-      //           }
-      //         }
-      //       }
-      //
-      //       frame.repaint();
-      //     }
-      //   }
-      // });
+    public void createTilePanels() {
+      for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
+        final TilePanel tilePanel = new TilePanel(i);
+        this.boardTiles.add(tilePanel);
+        add(tilePanel);
+      }
+    }
+
+    public void initInnerBoardPanel() {
+      for (int i = 0; i < boardTiles.size(); i++) {
+        this.boardTiles.get(i).initTilePanel();
+      }
     }
 
     // TODO: add tileId on top left of tile panel
@@ -529,32 +526,32 @@ public class BoardPanel extends JPanel {
     private void setHoveredTileId(int tileId) {
       this.hoveredTileId = tileId;
     }
-
   }
 
   private class TilePanel extends JPanel {
 
     private final int tileId;
-    private final InnerBoardPanel boardPanel;
     private boolean isTileActive = false;
     private boolean isCandidateMoveTile = false;
     private Image iconHidden;
     private Image iconNormal;
 
-    TilePanel(final InnerBoardPanel boardPanel,
-              final int tileId) {
+    TilePanel(final int tileId) {
       super(new GridBagLayout());
       this.tileId = tileId;
-      this.boardPanel = boardPanel;
       setPreferredSize(TILE_PANEL_DIMENSION);
       setBorder(BorderFactory.createLineBorder(Color.GRAY, 3));
+    }
 
+    public void initTilePanel() {
       loadPieceIcons();
       assignTilePieceIcon();
-
       assignTileColor();
+      addTilePanelListener();
       validate();
+    }
 
+    private void addTilePanelListener() {
       // TODO: improve READABILITY
       this.addMouseListener(new MouseListener() {
 
@@ -655,31 +652,6 @@ public class BoardPanel extends JPanel {
                   Move lastMove = gameStateBoard.getLastMove();
 
                   moveHistoryPanel.appendToMoveHistory(lastMove);
-
-                  // if (lastMove.getMoveType() == "aggressive") {
-                  //   Alliance superiorPieceAlliance =
-                  //     lastMove.getEliminatedPiece().getPieceAlliance() ==
-                  //     Alliance.BLACK ? Alliance.WHITE : Alliance.BLACK;
-                  // 
-                  //   moveHistoryPanel.appendToMoveHistory("\nTurn " + lastMove.getTurnId() +
-                  //       ": " + lastMove.getOriginCoords() +
-                  //       " to " + lastMove.getDestinationCoords() +
-                  //       " " + superiorPieceAlliance);
-                  // } else if (lastMove.getMoveType() == "draw") {
-                  //   moveHistoryPanel.appendToMoveHistory("\nTurn " + lastMove.getTurnId() +
-                  //       ": " + lastMove.getOriginCoords() +
-                  //       " to " + lastMove.getDestinationCoords() +
-                  //       " DRAW");
-                  // } else if (lastMove.getMoveType() == "normal") {
-                  //   moveHistoryPanel.appendToMoveHistory("\nTurn " + lastMove.getTurnId() +
-                  //       ": " + lastMove.getOriginCoords() +
-                  //       " to " + lastMove.getDestinationCoords());
-                  // } else {
-                  //   // TODO: Fix invalid move movehistory register
-                  //   moveHistoryPanel.appendToMoveHistory("\nTurn " + lastMove.getTurnId() +
-                  //       ": " + lastMove.getOriginCoords() +
-                  //       " to " + lastMove.getDestinationCoords() + " INVALID MOVE");
-                  // }
                 }
 
                 if (gameStateBoard.isEndGame()) {
@@ -754,6 +726,12 @@ public class BoardPanel extends JPanel {
           this.iconNormal = boardPanel.getWhitePieceIcons().get(pieceRank);
           this.iconHidden = boardPanel.getWhitePieceIcons().get("HIDDEN");
         }
+
+        if (gameStateBoard.isDebugMode() && gameStateBoard.isGameInitialized())
+          System.out.println("Tile " + tileId + " icons loaded");
+      } else {
+        if (gameStateBoard.isDebugMode() && gameStateBoard.isGameInitialized())
+          System.out.println("Tile " + tileId + " icons empty");
       }
     }
 
@@ -782,6 +760,11 @@ public class BoardPanel extends JPanel {
         } else {
           add(new JLabel(new ImageIcon(iconNormal)));
         }
+        if (gameStateBoard.isDebugMode() && gameStateBoard.isGameInitialized())
+          System.out.println("Tile " + tileId + " piece icon assigned");
+      } else {
+        if (gameStateBoard.isDebugMode() && gameStateBoard.isGameInitialized())
+          System.out.println("Tile " + tileId + " piece icon NOT assigned");
       }
     }
 
@@ -811,42 +794,17 @@ public class BoardPanel extends JPanel {
           setBackground(DARK_TILE_COLOR);
         else
           setBackground(LIGHT_TILE_COLOR);
+
+        if (gameStateBoard.isDebugMode() && gameStateBoard.isGameInitialized())
+          System.out.println("Tile " + tileId + " color assigned");
+
       } else {
-        setBackground(
-            gameStateBoard.getEndGameWinner() == Alliance.BLACK ?
+        setBackground(gameStateBoard.getEndGameWinner() == Alliance.BLACK ?
             DARK_TILE_COLOR : LIGHT_TILE_COLOR);
+
+        if (gameStateBoard.isDebugMode())
+          System.out.println("Tile " + tileId + " color assigned");
       }
     }
   } // TilePanel
-
-  //////////////// SCRAP CODES ////////////////////
-  // public class Board extends JPanel {
-  //
-  //   private static final int TILE_SPACING = 3;
-  //   private static final int TILE_SIZE = 80;
-  //   private static final int TILE_COUNT_ROW = 9;
-  //   private static final int TILE_COUNT_COL = 8;
-  //   private static final int BOARD_WIDTH = TILE_SIZE * TILE_COUNT_ROW;
-  //   private static final int BOARD_HEIGHT = TILE_SIZE * TILE_COUNT_COL;
-  //   private final Color BOARD_COLOR = new Color(187, 159, 72);
-  //   private final Color TILE_COLOR = new Color(204, 184, 114);
-  //
-  //   @Override
-  //   public void paintComponent(Graphics g) {
-  //     g.setColor(BOARD_COLOR);
-  //     g.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
-  //     g.setColor(TILE_COLOR);
-  //     for (int x = 0; x < 9; x++) {
-  //       for (int y = 0; y < 8; y++) {
-  //         if (mx >= TILE_SPACING + x * TILE_SIZE && my < TILE_SPACING + y * TILE_SIZE - TILE_SPACING)
-  //           g.setColor(Color.RED);
-  //         g.fillRect(TILE_SPACING + x * TILE_SIZE,  // x-coord
-  //                    TILE_SPACING + y * TILE_SIZE,  // y-coord
-  //                    TILE_SIZE - 2 * TILE_SPACING,  // horizontal size
-  //                    TILE_SIZE - 2 * TILE_SPACING); // vertical size
-  //       }
-  //     }
-  //   }
-  // } // Board
-
 } // GUI

@@ -57,8 +57,9 @@ public class Player {
       System.out.println("Candidate moves size: " + possiblePieceMoves.size());
 
       for (Map.Entry<String, Move> entry : possiblePieceMoves.entrySet()) {
-        System.out.println(entry.getKey().toUpperCase() + ": " + entry.getValue());
+        System.out.println(entry.getKey() + "=" + entry.getValue() + ";");
       };
+      System.out.println("\n");
     }
 
     if (moveMakerCheck() && pieceOwnerCheck(pieceCoords)) {

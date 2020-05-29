@@ -38,6 +38,8 @@ public class Board {
   private static Player playerWhite;
   private static int blackPiecesLeft = 0;
   private static int whitePiecesLeft = 0;
+  private BoardPanel boardPanel;
+  private BoardBuilder builder;
   private List<Tile> initBoardConfig;
   private boolean gameInitialized = false;
   private boolean gameStarted = false;
@@ -49,21 +51,25 @@ public class Board {
   private Alliance moveMaker;
   private Alliance endGameWinner;
 
-  public Board() {
-    initBoard();
-  }
+  public Board() {}
 
   public Board(final BoardBuilder builder) {
-    this.buildBoard(builder);
+    this.builder = builder;
   }
 
   public Board(final Player playerBlack, final Player playerWhite) {
     this.playerBlack = playerBlack;
     this.playerWhite = playerWhite;
-    initBoard();
   }
 
-  private void initBoard() {
+  public Board(final Player playerBlack, final Player playerWhite,
+               BoardBuilder builder) {
+    this.playerBlack = playerBlack;
+    this.playerWhite = playerWhite;
+    this.builder = builder;
+  }
+
+  private void emptyBoard() {
     gameBoard = new ArrayList<>();
     // Add new empty Tiles in board
     for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
@@ -75,21 +81,27 @@ public class Board {
     }
   }
 
-  public void emptyBoard() {
-    gameBoard = new ArrayList<>();
-    // Add new Tiles in board
-    for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
-      // set territory
-      if (i < BoardUtils.ALL_TILES_COUNT / 2)
-        this.addTile(i, Alliance.BLACK , false);
-      else
-        this.addTile(i, Alliance.WHITE , false);
-    }
+  public void setBoardBuilder(BoardBuilder builder) {
+    this.builder = builder;
+  }
+
+  public void buildBoard() {
+    this.emptyBoard();
+    for (Map.Entry<Integer, Piece> entry : this.builder.boardConfig.entrySet()) {
+      if (gameBoard.get(entry.getKey()).isTileEmpty()) {
+        // insert piece to tile
+        gameBoard.get(entry.getKey()).insert(entry.getValue());
+        // change tile state
+        // TODO: make setOccupied(true) built into the insertPiece method
+        gameBoard.get(entry.getKey()).setOccupied(true);
+      }
+    };
+    blackPiecesLeft = this.builder.getBlackPiecesCount();
+    whitePiecesLeft = this.builder.getWhitePiecesCount();
   }
 
   public void buildBoard(BoardBuilder builder) {
     this.emptyBoard();
-
     for (Map.Entry<Integer, Piece> entry : builder.boardConfig.entrySet()) {
       if (gameBoard.get(entry.getKey()).isTileEmpty()) {
         // insert piece to tile
@@ -99,25 +111,22 @@ public class Board {
         gameBoard.get(entry.getKey()).setOccupied(true);
       }
     };
-
     blackPiecesLeft = builder.getBlackPiecesCount();
     whitePiecesLeft = builder.getWhitePiecesCount();
   }
 
-  public boolean initGame() {
-    // TODO throw appropriate exception
-    if (playerBlack != null) {
+  public void initGame() {
+    this.buildBoard();
+    try {
       playerBlack.initPlayer();
-    } else {
+    } catch(NullPointerException e) {
       System.out.println("E: BLACK player has not been assigned");
-      return false;
     }
 
-    if (playerWhite != null) {
+    try {
       playerWhite.initPlayer();
-    } else {
+    } catch(NullPointerException e) {
       System.out.println("E: WHITE player has not been assigned");
-      return false;
     }
 
     this.gameInitialized = true;
@@ -125,7 +134,8 @@ public class Board {
 
     displayBoard();
 
-    return true;
+    if (isDebugMode())
+      System.out.println("Board:\n" + this);
   }
 
   public void playerDoneArranging() {
@@ -152,6 +162,15 @@ public class Board {
     }
   }
 
+  public void restartGame() {
+    this.emptyBoard();
+    buildBoard(new BoardBuilder().createRandomBuild());
+    this.gameStarted = false;
+    this.gameInitialized = true;
+    this.endGameWinner = null;
+    setMoveMaker(playerWhite);
+  }
+
   public boolean isGameInitialized() {
     return gameInitialized;
   }
@@ -165,7 +184,11 @@ public class Board {
   }
 
   public void displayBoard() {
-    new BoardPanel(this);
+    this.boardPanel = new BoardPanel(this);
+  }
+
+  public BoardPanel getBoardPanel() {
+    return this.boardPanel;
   }
 
   public void setDebugMode(boolean debug) {

@@ -36,11 +36,12 @@ public class MainFrame {
   private JButton mainMenuHowToPlayBtn;
   private JButton mainMenuQuitBtn;
 
-  private JButton menuBarSaveBtn;
+  private JButton menuBarRestartBtn;
   private JButton menuBarLoadBtn;
   private JButton menuBarQuitBtn;
   private JButton menuBarUndoBtn;
   private JButton menuBarRedoBtn;
+  private JButton menuBarSaveBtn;
   private JButton menuBarSurrenderBtn;
   private JButton menuBarGameRulesBtn;
 
@@ -66,26 +67,17 @@ public class MainFrame {
     layeredPane = new JLayeredPane();
     layeredPane.setPreferredSize(FRAME_DIMENSION);
 
-    boardPanel = new BoardPanel(board);
     mainMenuPanel = new MainMenuPanel();
 
-    fetchMenuBarButtons(boardPanel);
     fetchMainMenuButtons(mainMenuPanel);
-    fetchDoneArrangingBtn(boardPanel);
-    fetchStartGameBtn(boardPanel);
-    addMainMenuButtonsListeners();
-    addMenuBarButtonsListeners();
-    addDoneArrangingButtonListener();
-    addStartGameButtonListener();
 
-    layeredPane.add(boardPanel, new Integer(1));
+    addMainMenuButtonsListeners();
+
     layeredPane.add(mainMenuPanel, new Integer(2));
 
-    boardPanel.setBounds(0, 0, FRAME_DIMENSION.width, FRAME_DIMENSION.height);
     mainMenuPanel.setBounds(0, 0, FRAME_DIMENSION.width, FRAME_DIMENSION.height);
 
     createMainMenuQuitPopupMenu();
-    createMenuBarQuitPopupMenu();
 
     contentPane.add(layeredPane);
     frame.add(contentPane);
@@ -98,12 +90,25 @@ public class MainFrame {
     mainMenuStartBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        gameStateBoard.initGame();
+        boardPanel = gameStateBoard.getBoardPanel();
+        boardPanel.initBoardPanel();
+
+        layeredPane.add(boardPanel, new Integer(1));
+        boardPanel.setBounds(0, 0, FRAME_DIMENSION.width, FRAME_DIMENSION.height);
+
+        fetchMenuBarButtons(boardPanel);
+        fetchDoneArrangingBtn(boardPanel);
+        fetchStartGameBtn(boardPanel);
+
+        addMenuBarButtonsListeners();
+        addDoneArrangingButtonListener();
+        addStartGameButtonListener();
+
+        createMenuBarQuitPopupMenu();
+
         boardPanel.setVisible(true);
         mainMenuPanel.setVisible(false);
-
-        // or
-        // layeredPane.removeAll();
-        // layeredPane.add(boardPanel);
       }
     });
 
@@ -120,6 +125,25 @@ public class MainFrame {
   }
 
   private void addMenuBarButtonsListeners() {
+    menuBarRestartBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent arg0) {
+        gameStateBoard.restartGame();
+        boardPanel.clearBoardPanel();
+        boardPanel.printOpeningMessage();
+
+        menuBarUndoBtn.setVisible(false);
+        menuBarRedoBtn.setVisible(false);
+        menuBarSaveBtn.setVisible(false);
+        menuBarSurrenderBtn.setVisible(false);
+        menuBarGameRulesBtn.setVisible(false);
+
+        doneArrangingBtn.setVisible(true);
+        startGameBtn.setVisible(true);
+        frame.repaint();
+      }
+    });
+
     menuBarQuitBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -188,6 +212,12 @@ public class MainFrame {
     startGameBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        menuBarUndoBtn.setVisible(true);
+        menuBarRedoBtn.setVisible(true);
+        menuBarSaveBtn.setVisible(true);
+        menuBarSurrenderBtn.setVisible(true);
+        menuBarGameRulesBtn.setVisible(true);
+
         gameStateBoard.startGame();
         doneArrangingBtn.setVisible(false);
         startGameBtn.setVisible(false);
@@ -206,11 +236,12 @@ public class MainFrame {
   }
 
   private void fetchMenuBarButtons(BoardPanel boardPanel) {
-    menuBarSaveBtn = boardPanel.getSaveBtn();
+    menuBarRestartBtn = boardPanel.getRestartBtn();
     menuBarLoadBtn = boardPanel.getLoadBtn();
     menuBarQuitBtn = boardPanel.getQuitBtn();
     menuBarUndoBtn = boardPanel.getUndoBtn();
     menuBarRedoBtn = boardPanel.getRedoBtn();
+    menuBarSaveBtn = boardPanel.getSaveBtn();
     menuBarSurrenderBtn = boardPanel.getSurrenderBtn();
     menuBarGameRulesBtn = boardPanel.getGameRulesBtn();
   }
@@ -285,7 +316,6 @@ public class MainFrame {
         menuBarQuitPrompt.setVisible(false);
         boardPanel.setVisible(false);
         mainMenuPanel.setVisible(true);
-        mainMenuPanel.getStartBtn().setText("Continue Game");
       }
     });
   }
