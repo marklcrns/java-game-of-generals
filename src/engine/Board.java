@@ -137,6 +137,20 @@ public class Board {
 
     if (isDebugMode()) {
       System.out.println(this);
+      System.out.println("CurrentTurn: " + currentTurn + "\n" +
+                         "TotalPieces: " + (blackPiecesLeft + whitePiecesLeft) + "\n");
+    }
+  }
+
+  public void resumeGame() {
+    this.gameStarted = true;
+    this.gameInitialized = false;
+    this.currentTurn = 1;
+    this.lastExecutedTurn = 0;
+    this.firstMoveMaker = getMoveMaker();
+
+    if (isDebugMode()) {
+      System.out.println(this);
       System.out.println("CurrentTurn: " + currentTurn + "\n");
     }
   }
@@ -292,12 +306,24 @@ public class Board {
     }
   }
 
+  public Alliance getFirstMoveMaker() {
+    return this.firstMoveMaker;
+  }
+
   public int getLastExecutedTurn() {
     return this.lastExecutedTurn;
   }
 
   public int getCurrentTurn() {
     return this.currentTurn;
+  }
+
+  public void setFirstMoveMaker(Alliance firstMoveMaker) {
+    this.firstMoveMaker = firstMoveMaker;
+  }
+
+  public void setLastExecutedTurn(int lastExecutedTurn) {
+    this.lastExecutedTurn = lastExecutedTurn;
   }
 
   public void setCurrentTurn(int turn) {
@@ -335,10 +361,6 @@ public class Board {
 
   public Player getWhitePlayer() {
     return playerWhite;
-  }
-
-  public Alliance getFirstMoveMaker() {
-    return this.firstMoveMaker;
   }
 
   public Alliance getMoveMaker() {
@@ -692,6 +714,20 @@ public class Board {
         return null;
       }
 
+    }
+
+    @Override
+    public String toString() {
+      String builder = "BoardBuilder boardConfig=" + boardConfig.size() + "\n";
+
+      for (Map.Entry<Integer, Piece> entry : boardConfig.entrySet()) {
+        builder += "tileId=" + entry.getKey() +
+                   ";piece=" + entry.getValue().getRank() +
+                   ";pieceAlliance=" + entry.getValue().getPieceAlliance() +
+                   "\n";
+      }
+
+      return builder;
     }
 
   } // BoardBuilder

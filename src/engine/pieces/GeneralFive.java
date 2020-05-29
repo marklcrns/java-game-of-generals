@@ -46,5 +46,14 @@ public class GeneralFive extends Piece {
     GeneralFive copy = new GeneralFive(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }
+
+  @Override
+  public String toString() {
+    return "piece=" + rank + ";powerLevel=" + powerLevel +
+           ";pieceCoords=" + pieceCoords +
+           ";legalPieceInstanceCount=" + legalPieceInstanceCount +
+           ";pieceOwner=" + pieceOwner.getAlliance() +
+           ";pieceAlliance=" + pieceAlliance;
+  }
 }
 

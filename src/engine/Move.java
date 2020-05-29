@@ -17,41 +17,41 @@ public class Move {
   private final Player player;
   private final int sourceTileCoords;
   private final int targetTileCoords;
-  private final Piece sourcePieceCopy;
-  private final Piece targetPieceCopy;
   private boolean isExecuted = false;
-  private Piece eliminatedPiece;
   private String moveType;
+  private Piece sourcePieceCopy;
+  private Piece targetPieceCopy;
+  private Piece eliminatedPiece;
 
   public Move(final Player player,
               final Board board,
-              final int sourcePieceCoords,
-              final int targetPieceCoords) {
+              final int sourceTileCoords,
+              final int targetTileCoords) {
     this.player = player;
     this.board = board;
-    this.sourceTileCoords = sourcePieceCoords;
-    this.targetTileCoords = targetPieceCoords;
-    this.sourcePieceCopy = board.getTile(sourcePieceCoords).getPiece().makeCopy();
-    if (board.getTile(targetPieceCoords).isTileOccupied())
-      this.targetPieceCopy = board.getTile(targetPieceCoords).getPiece().makeCopy();
-    else
-      this.targetPieceCopy = null;
-    evaluateMove();
+    this.sourceTileCoords = sourceTileCoords;
+    this.targetTileCoords = targetTileCoords;
   }
 
-  private void evaluateMove() {
+  public void evaluateMove() {
+    this.sourcePieceCopy = this.board.getTile(sourceTileCoords).getPiece().makeCopy();
+    if (this.board.getTile(targetTileCoords).isTileOccupied())
+      this.targetPieceCopy = this.board.getTile(targetTileCoords).getPiece().makeCopy();
+    else
+      this.targetPieceCopy = null;
+
     if (board.getTile(targetTileCoords).isTileOccupied())
       if (targetPieceCopy.getPieceAlliance() != sourcePieceCopy.getPieceAlliance())
         if (isSameRank() && isTargetPieceFlag())
-          moveType = "aggressive";
+          this.moveType = "aggressive";
         else if (isSameRank())
-          moveType = "draw";
+          this.moveType = "draw";
         else
-          moveType = "aggressive";
+          this.moveType = "aggressive";
       else
-        moveType = "invalid";
+        this.moveType = "invalid";
     else
-      moveType = "normal";
+      this.moveType = "normal";
   }
 
   // TODO: adjust for edge out of bounds/wrapping  moves
@@ -245,9 +245,24 @@ public class Move {
     return this.isExecuted;
   }
 
+  public void setExecutionState(boolean isExecuted) {
+    this.isExecuted = isExecuted;
+  }
+
+  public void setMoveType(String moveType) {
+    this.moveType = moveType;
+  }
+
+  public void setTurnId(int turnId) {
+    this.turnId = turnId;
+  }
+
   @Override
   public String toString() {
+    Alliance sourcePieceAlliance = sourcePieceCopy == null ? null : sourcePieceCopy.getPieceAlliance();
+    String sourcePiece = sourcePieceCopy == null ? "" : sourcePieceCopy.getRank() + " ";
     String targetPiece = targetPieceCopy == null ? "" : targetPieceCopy.getRank() + " ";
+
     if (isExecuted) {
       String superiorPieceAlliance = "";
       if (this.moveType == "aggressive") {
@@ -255,16 +270,16 @@ public class Move {
           " " + Alliance.WHITE: " " + Alliance.BLACK;
       }
       return "Turn " + this.turnId + ": " +
-        sourcePieceCopy.getPieceAlliance() + " " +
-        sourcePieceCopy.getRank() + " " +
+        sourcePieceAlliance + " " +
+        sourcePiece + " " +
         sourceTileCoords + " to " +
         targetPiece + targetTileCoords + " " +
         this.moveType + superiorPieceAlliance +
         " EXECUTED";
     } else {
       return "Turn " + this.turnId + ": " +
-        sourcePieceCopy.getPieceAlliance() + " " +
-        sourcePieceCopy.getRank() + " " +
+        sourcePieceAlliance + " " +
+        sourcePiece + " " +
         sourceTileCoords + " to " +
         targetPiece + targetTileCoords + " ";
     }

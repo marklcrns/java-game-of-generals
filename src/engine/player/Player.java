@@ -67,6 +67,7 @@ public class Player {
 
     if (moveMakerCheck() && pieceOwnerCheck(pieceCoords)) {
       Move move = new Move(this, board, pieceCoords, destinationCoords);
+      move.evaluateMove();
 
       if (move.execute()) {
         if (board.isDebugMode())

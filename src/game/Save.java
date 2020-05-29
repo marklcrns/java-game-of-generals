@@ -40,14 +40,14 @@ public class Save {
       FileWriter fWriter = new FileWriter(outFile);
       PrintWriter pWriter = new PrintWriter (fWriter);
       pWriter.println(getBoardConfigData());
-      pWriter.println(getFirstMoveMaker());
+      pWriter.println(getBoardStateData());
       pWriter.println(getBoardExecutions());
       pWriter.close();
       System.out.println("File saved: " + outFile.getPath());
 
       if (this.board.isDebugMode()) {
         System.out.println(getBoardConfigData());
-        System.out.println(getFirstMoveMaker());
+        System.out.println(getBoardStateData());
         System.out.println(getBoardExecutions());
       }
     } catch (IOException e) {
@@ -60,8 +60,14 @@ public class Save {
     return boardConfigData + convertBoardConfigToData(this.boardConfig);
   }
 
-  public String getFirstMoveMaker() {
-    return "FirstMoveMaker=" + this.board.getFirstMoveMaker() + "\n";
+  public String getBoardStateData() {
+    String boardStateData = "BoardStateData:\n";
+    boardStateData += "firstMoveMaker=" + this.board.getFirstMoveMaker() + ";";
+    boardStateData += "currentTurn=" + this.board.getCurrentTurn() + ";";
+    boardStateData += "lastExecutedTurn=" + this.board.getLastExecutedTurn() + ";";
+    boardStateData += "\n";
+
+    return boardStateData;
   }
 
   public String getBoardExecutions() {
@@ -123,5 +129,4 @@ public class Save {
       "\n";
     return moveData;
   }
-
 }

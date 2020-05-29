@@ -318,9 +318,27 @@ public class MainFrame {
         if (gameStateBoard.isDebugMode())
           System.out.println("Loading " + loadSelected.replace(".txt", "..."));
 
-        Load.loadSaveGame(loadSelected);
-
+        new Load(gameStateBoard, loadSelected).loadSaveGame();
         mainMenuLoadDialog.setVisible(false);
+
+        boardPanel = gameStateBoard.getBoardPanel();
+        boardPanel.initBoardPanel();
+
+        fetchMenuBarButtons(boardPanel);
+        fetchDoneArrangingBtn(boardPanel);
+        fetchStartGameBtn(boardPanel);
+
+        addMenuBarButtonsListeners();
+        addDoneArrangingButtonListener();
+        addStartGameButtonListener();
+
+        createMenuBarQuitPopupMenu();
+
+        layeredPane.add(boardPanel, new Integer(1));
+        boardPanel.setBounds(0, 0, FRAME_DIMENSION.width, FRAME_DIMENSION.height);
+
+        boardPanel.setVisible(true);
+        mainMenuPanel.setVisible(false);
       }
     });
 

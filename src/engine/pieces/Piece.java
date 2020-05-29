@@ -36,6 +36,7 @@ public abstract class Piece {
   });
   private Map<String, Move> moveSet;
 
+  // TODO: Remove constructor and fix all pieces toString()
   public Piece(final Player owner, final Alliance alliance) {
     this.pieceOwner = owner;
     this.pieceAlliance = alliance;
@@ -81,20 +82,25 @@ public abstract class Piece {
     // prevent out of bounds and board wrapping moves
 
     final int upAdjacentPieceCoords = this.pieceCoords + mobility.get("u");
-    if (pieceCoords >= BoardUtils.SECOND_ROW_INIT)
+    if (pieceCoords >= BoardUtils.SECOND_ROW_INIT) {
       moveSet.put("up", new Move(pieceOwner, board, pieceCoords, upAdjacentPieceCoords));
-
+      moveSet.get("up").evaluateMove();
+    }
     final int downAdjacentPieceCoords = this.pieceCoords + mobility.get("d");
-    if (pieceCoords < BoardUtils.LAST_ROW_INIT)
+    if (pieceCoords < BoardUtils.LAST_ROW_INIT) {
       moveSet.put("down", new Move(pieceOwner, board, pieceCoords, downAdjacentPieceCoords));
-
+      moveSet.get("down").evaluateMove();
+    }
     final int leftAdjacentPieceCoords = this.pieceCoords + mobility.get("l");
-    if (this.pieceCoords % 9 != 0)
+    if (this.pieceCoords % 9 != 0) {
       moveSet.put("left", new Move(pieceOwner, board, pieceCoords, leftAdjacentPieceCoords));
-
+      moveSet.get("left").evaluateMove();
+    }
     final int rightAdjacentPieceCoords = this.pieceCoords + mobility.get("r");
-    if (rightAdjacentPieceCoords % 9 != 0)
+    if (rightAdjacentPieceCoords % 9 != 0) {
       moveSet.put("right", new Move(pieceOwner, board, pieceCoords, rightAdjacentPieceCoords));
+      moveSet.get("right").evaluateMove();
+    }
 
     return moveSet;
   }

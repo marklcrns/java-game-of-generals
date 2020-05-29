@@ -46,4 +46,13 @@ public class GeneralThree extends Piece {
     GeneralThree copy = new GeneralThree(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }
+
+  @Override
+  public String toString() {
+    return "piece=" + rank + ";powerLevel=" + powerLevel +
+           ";pieceCoords=" + pieceCoords +
+           ";legalPieceInstanceCount=" + legalPieceInstanceCount +
+           ";pieceOwner=" + pieceOwner.getAlliance() +
+           ";pieceAlliance=" + pieceAlliance;
+  }
 }

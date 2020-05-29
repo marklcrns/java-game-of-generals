@@ -1,5 +1,24 @@
 package utils;
 
+import engine.Alliance;
+import engine.pieces.Captain;
+import engine.pieces.Colonel;
+import engine.pieces.Flag;
+import engine.pieces.GeneralFive;
+import engine.pieces.GeneralFour;
+import engine.pieces.GeneralOne;
+import engine.pieces.GeneralThree;
+import engine.pieces.GeneralTwo;
+import engine.pieces.LtCol;
+import engine.pieces.LtOne;
+import engine.pieces.LtTwo;
+import engine.pieces.Major;
+import engine.pieces.Piece;
+import engine.pieces.Private;
+import engine.pieces.Sergeant;
+import engine.pieces.Spy;
+import engine.player.Player;
+
 /**
  * Author: Mark Lucernas
  * Date: 2020-05-17
@@ -35,6 +54,47 @@ public class BoardUtils {
 
   public static final int LAST_ROW_INIT = (TILE_ROW_COUNT - 1) * TILE_COLUMN_COUNT;
   public static final int SECOND_TO_LAST_ROW_INIT = LAST_ROW_INIT - TILE_COLUMN_COUNT;
+
+  public static Piece pieceInstanceCreator(String pieceRankName, Player owner,
+                                           Alliance alliance) {
+    Piece piece = null;
+
+    if (pieceRankName.contains(GENERAL_FIVE_RANK))
+      piece = new GeneralFive(owner, alliance);
+    else if (pieceRankName.contains(GENERAL_FOUR_RANK))
+      piece = new GeneralFour(owner, alliance);
+    else if (pieceRankName.contains(GENERAL_THREE_RANK))
+      piece = new GeneralThree(owner, alliance);
+    else if (pieceRankName.contains(GENERAL_TWO_RANK))
+      piece = new GeneralTwo(owner, alliance);
+    else if (pieceRankName.contains(GENERAL_ONE_RANK))
+      piece = new GeneralOne(owner, alliance);
+    else if (pieceRankName.contains(COLONEL_RANK))
+      piece = new Colonel(owner, alliance);
+    else if (pieceRankName.contains(LT_COLONEL_RANK))
+      piece = new LtCol(owner, alliance);
+    else if (pieceRankName.contains(MAJOR_RANK))
+      piece = new Major(owner, alliance);
+    else if (pieceRankName.contains(CAPTAIN_RANK))
+      piece = new Captain(owner, alliance);
+    else if (pieceRankName.contains(LT_ONE_RANK))
+      piece = new LtOne(owner, alliance);
+    else if (pieceRankName.contains(LT_TWO_RANK))
+      piece = new LtTwo(owner, alliance);
+    else if (pieceRankName.contains(SERGEANT_RANK))
+      piece = new Sergeant(owner, alliance);
+    else if (pieceRankName.contains(PRIVATE_RANK))
+      piece = new Private(owner, alliance);
+    else if (pieceRankName.contains(FLAG_RANK))
+      piece = new Flag(owner, alliance);
+    else if (pieceRankName.contains(SPY_RANK))
+      piece = new Spy(owner, alliance);
+
+    // if (piece != null)
+    //   System.out.println(piece);
+
+    return piece;
+  }
 
   private BoardUtils() {
     throw new RuntimeException("You cannot instantiate BoardUtils class");
