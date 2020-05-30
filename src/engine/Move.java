@@ -72,10 +72,10 @@ public class Move {
 
           if (isTargetPieceEliminated()) {
             board.replacePiece(targetTileCoords, sourcePieceCopy);
-            board.getTile(sourceTileCoords).empty();
+            board.getTile(sourceTileCoords).removePiece();
             eliminatedPiece = targetPieceCopy;
           } else {
-            board.getTile(sourceTileCoords).empty();
+            board.getTile(sourceTileCoords).removePiece();
             eliminatedPiece = sourcePieceCopy;
           }
           this.isExecuted = true;
@@ -92,8 +92,8 @@ public class Move {
           break;
 
         case "draw":
-          board.getTile(sourceTileCoords).empty();
-          board.getTile(targetTileCoords).empty();
+          board.getTile(sourceTileCoords).removePiece();
+          board.getTile(targetTileCoords).removePiece();
           break;
 
         case "invalid":

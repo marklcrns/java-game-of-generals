@@ -41,7 +41,7 @@ import utils.Utils;
  */
 public class Board {
 
-  /** List of all Tiles that contains data of each piece  */
+  /** List of all Tiles that contains data of each piece */
   private static List<Tile> gameBoard;
 
   /** Player instance that all contains all infos on black pieces */
@@ -124,9 +124,9 @@ public class Board {
     for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
       // Set Tile territory
       if (i < BoardUtils.ALL_TILES_COUNT / 2)
-        this.addTile(i, Alliance.BLACK , false);
+        this.addTile(i, Alliance.BLACK);
       else
-        this.addTile(i, Alliance.WHITE , false);
+        this.addTile(i, Alliance.WHITE);
     }
   }
 
@@ -145,7 +145,7 @@ public class Board {
     for (Map.Entry<Integer, Piece> entry : builder.boardConfig.entrySet()) {
       // insert piece to Tile if empty
       if (gameBoard.get(entry.getKey()).isTileEmpty()) {
-        gameBoard.get(entry.getKey()).insert(entry.getValue());
+        gameBoard.get(entry.getKey()).insertPiece(entry.getValue());
       }
     };
     blackPiecesLeft = builder.getBlackPiecesCount();
@@ -225,8 +225,8 @@ public class Board {
   /**
    * Method that Resumes ongoing game state. Companion for Load class.
    */
-  // TODO: Finish Load implementation.
   public void resumeGame() {
+    // TODO: Finish Load implementation.
     this.gameStarted = true;
     this.gameInitialized = false;
     this.firstMoveMaker = getMoveMaker();
@@ -295,7 +295,7 @@ public class Board {
   }
 
   /**
-   * Debug mode checker method. Used staticly by other classes.
+   * Debug mode checker method. Used in static way by other classes.
    */
   public static boolean isDebugMode() {
     return debugMode;
@@ -331,8 +331,8 @@ public class Board {
       Piece targetPiece = this.getTile(targetPieceCoords).getPiece().clone();
       sourcePiece.updateCoords(targetPieceCoords);
       targetPiece.updateCoords(sourcePieceCoords);
-      this.getBoard().get(sourcePieceCoords).replace(targetPiece);
-      this.getBoard().get(targetPieceCoords).replace(sourcePiece);
+      this.getBoard().get(sourcePieceCoords).replacePiece(targetPiece);
+      this.getBoard().get(targetPieceCoords).replacePiece(sourcePiece);
 
       return true;
     }
@@ -349,8 +349,8 @@ public class Board {
     if (this.getTile(targetCoords).isTileOccupied()) {
       // TODO: improve piece manipulation efficiency
       sourcePiece.updateCoords(targetCoords);
-      this.getBoard().get(targetCoords).replace(sourcePiece);
-      this.getTile(targetCoords).replace(sourcePiece);
+      this.getBoard().get(targetCoords).replacePiece(sourcePiece);
+      this.getTile(targetCoords).replacePiece(sourcePiece);
 
       return true;
     }
@@ -368,9 +368,9 @@ public class Board {
     if (this.getTile(targetPieceCoords).isTileEmpty()) {
       Piece sourcePieceCopy = this.getTile(sourcePieceCoords).getPiece().clone();
       sourcePieceCopy.updateCoords(targetPieceCoords);
-      this.getTile(targetPieceCoords).insert(sourcePieceCopy);
+      this.getTile(targetPieceCoords).insertPiece(sourcePieceCopy);
       // delete source piece
-      this.getTile(sourcePieceCoords).empty();
+      this.getTile(sourcePieceCoords).removePiece();
 
       return true;
     }
@@ -386,8 +386,8 @@ public class Board {
   public boolean insertPiece(int sourcePieceCoords, Piece piece) {
     if (this.getTile(sourcePieceCoords).isTileEmpty()) {
       piece.updateCoords(sourcePieceCoords);
-      this.getBoard().get(sourcePieceCoords).insert(piece);
-      this.getTile(sourcePieceCoords).insert(piece);
+      this.getBoard().get(sourcePieceCoords).insertPiece(piece);
+      this.getTile(sourcePieceCoords).insertPiece(piece);
       return true;
     }
     return false;
@@ -400,7 +400,7 @@ public class Board {
    */
   public boolean deletePiece(int pieceCoords) {
     if (this.getTile(pieceCoords).isTileOccupied()) {
-      this.getTile(pieceCoords).empty();
+      this.getTile(pieceCoords).removePiece();
 
       if (isDebugMode())
         System.out.println(this);
@@ -416,8 +416,8 @@ public class Board {
    * @param territory tile territory Alliance.
    * @param occupied is tile occupied by a piece.
    */
-  private final void addTile(int tileId, Alliance territory, boolean occupied) {
-    gameBoard.add(new Tile(tileId, territory, occupied));
+  private final void addTile(int tileId, Alliance territory) {
+    gameBoard.add(new Tile(tileId, territory));
   }
 
   /**
@@ -579,7 +579,7 @@ public class Board {
 
   /**
    * Gets the black player designated name.
-   * @return String plaerBlackName field.
+   * @return String playerBlackName field.
    */
   public String getBlackPlayerName() {
     return playerBlackName;
@@ -593,18 +593,33 @@ public class Board {
     return playerWhiteName;
   }
 
+  /**
+   * Sets the black player name.
+   */
   public void setBlackPlayerName(String playerName) {
     playerBlackName = playerName;
   }
 
+  /**
+   * Sets the white player name.
+   */
   public void setWhitePlayerName(String playerName) {
     playerWhiteName = playerName;
   }
 
+  /**
+   * Gets the current move maker
+   * @return Alliance moveMaker field.
+   */
   public Alliance getMoveMaker() {
     return this.moveMaker;
   }
 
+  /**
+   * Set the current move maker player.
+   * @param player Player to replace current move maker.
+   * @return boolean true if successful, else false.
+   */
   public boolean setMoveMaker(Player player) {
     if (!player.isMoveMaker()) {
       if (player.getAlliance() == Alliance.BLACK) {
@@ -623,6 +638,10 @@ public class Board {
     return false;
   }
 
+  /**
+   * Method to check if a player has won.
+   * @return boolean true if endGameWinner has been initialized, else false.
+   */
   public boolean isEndGame() {
     if (this.endGameWinner != null) {
       return true;
@@ -630,10 +649,22 @@ public class Board {
     return false;
   }
 
+  /**
+   * Gets the end game winner.
+   * @return Alliance endGameWinner field if not null, else null.
+   */
   public Alliance getEndGameWinner() {
-    return this.endGameWinner;
+    if (this.endGameWinner != null) {
+      return this.endGameWinner;
+    }
+    return null;
   }
 
+  /**
+   * Sets the end game winner.
+   * @param endGameWinner Alliance of the game winner.
+   * @return boolean true if successful, else false.
+   */
   public boolean setEndGameWinner(Alliance endGameWinner) {
     if (endGameWinner != null) {
       this.endGameWinner = endGameWinner;
@@ -685,30 +716,55 @@ public class Board {
     return debugBoard;
   }
 
+  /**
+   * Class for building board configurations. This class sets and arranges the
+   * piece of each Tile of the Board. Required for Board initialization.
+   */
   public static class BoardBuilder {
 
+    /** HashMap of board configuration that contains all designated pieces */
     private Map<Integer, Piece> boardConfig;
+
+    /** Black pieces counter */
     private int blackPiecesCount;
+
+    /** White pieces counter */
     private int whitePiecesCount;
 
+    /** No argument constructor that initializes all class fields. */
     public BoardBuilder() {
       this.boardConfig = new HashMap<>();
       this.blackPiecesCount = 0;
       this.whitePiecesCount = 0;
     }
 
+    /**
+     * Gets black pieces count added to boardConfig field.
+     * @return int blackPiecesCount field.
+     */
     public int getBlackPiecesCount() {
       return blackPiecesCount;
     }
 
+    /**
+     * Gets white pieces count added to boardConfig field.
+     * @return int whitePiecesCount field.
+     */
     public int getWhitePiecesCount() {
       return blackPiecesCount;
     }
 
+    /**
+     * Method that creates a sample demo board configuration.
+     * @return this with pre-made board configuration.
+     */
     public BoardBuilder createDemoBoardBuild() {
+      // Start Tile row index.
       int[] row = {0, 8, 17, 26};
+
       // Black territory
       int boardOffset = 0;
+
       // row 0
       setPiece(new GeneralTwo(playerBlack, Alliance.BLACK, boardOffset + row[0] + 9));
       setPiece(new Major(playerBlack, Alliance.BLACK, boardOffset + row[0] + 8));
@@ -764,10 +820,15 @@ public class Board {
       setPiece(new Sergeant(playerWhite, Alliance.WHITE, boardOffset + row[3] + 6));
       setPiece(new Private(playerWhite, Alliance.WHITE, boardOffset + row[3] + 7));
       setPiece(new Major(playerWhite, Alliance.WHITE, boardOffset + row[3] + 8));
-      setPiece(new Major(playerWhite, Alliance.WHITE, boardOffset + row[3] + 9));
+      setPiece(new GeneralTwo(playerWhite, Alliance.WHITE, boardOffset + row[3] + 9));
+
       return this;
     }
 
+    /**
+     * Method thats creates random board configuration.
+     * @return this with random board configuration.
+     */
     public BoardBuilder createRandomBuild() {
       int[] occupiedTiles = {};
 
@@ -776,8 +837,8 @@ public class Board {
 
       // Black pieces
       int[] blackTerritoryBounds = {0, (BoardUtils.ALL_TILES_COUNT / 2) - 1};
-
       List<Piece> unsetBlackPieces = new ArrayList<>();
+
       unsetBlackPieces.add(new GeneralFive(playerBlack, Alliance.BLACK));
       unsetBlackPieces.add(new GeneralFour(playerBlack, Alliance.BLACK));
       unsetBlackPieces.add(new GeneralThree(playerBlack, Alliance.BLACK));
@@ -794,10 +855,8 @@ public class Board {
       unsetBlackPieces.add(new Flag(playerBlack, Alliance.BLACK));
       unsetBlackPieces.add(new Spy(playerBlack, Alliance.BLACK));
 
+      // Sets black pieces randomly excluding already occupied tiles.
       for (Piece unsetPiece : unsetBlackPieces) {
-        if (debugMode)
-          System.out.println("Inserting " + unsetPiece.getPieceAlliance() + " " +
-                             unsetPiece.getRank() + "...");
         setAllPieceInstanceRandomly(
             this, unsetPiece, blackTerritoryBounds[0],
             blackTerritoryBounds[1], occupiedTiles);
@@ -806,8 +865,8 @@ public class Board {
       // White pieces
       int[] whiteTerritoryBounds = {BoardUtils.ALL_TILES_COUNT / 2,
         (BoardUtils.ALL_TILES_COUNT) - 1};
-
       List<Piece> unsetWhitePieces = new ArrayList<>();
+
       unsetWhitePieces.add(new GeneralFive(playerWhite, Alliance.WHITE));
       unsetWhitePieces.add(new GeneralFour(playerWhite, Alliance.WHITE));
       unsetWhitePieces.add(new GeneralThree(playerWhite, Alliance.WHITE));
@@ -824,14 +883,21 @@ public class Board {
       unsetWhitePieces.add(new Flag(playerWhite, Alliance.WHITE));
       unsetWhitePieces.add(new Spy(playerWhite, Alliance.WHITE));
 
+      // Sets white pieces randomly excluding already occupied tiles.
       for (Piece unsetPiece : unsetWhitePieces) {
         setAllPieceInstanceRandomly(
             this, unsetPiece, whiteTerritoryBounds[0],
             whiteTerritoryBounds[1], occupiedTiles);
       }
+
       return this;
     }
 
+    /**
+     * Sets piece in designated Tile location.
+     * @param piece Piece instance to insert into specific Tile.
+     * @return boolean true if successful, else false.
+     */
     public boolean setPiece(final Piece piece) {
       // checks if within bounds, correct territory, and piece legal count
       if (isPieceWithinBounds(piece) &&
@@ -856,6 +922,16 @@ public class Board {
       return false;
     }
 
+    /**
+     * Method thats sets all available amount of a single pieces in random
+     * locations within its respective Alliance territory.
+     * @param builder BoardBuilder to set the Piece into
+     * @param piece Piece to set all legal amount of instance randomly.
+     * @param from start index bounds to set the piece/pieces within.
+     * @param to end index bounds to set the piece/pieces within.
+     * @param occupiedTiles int array that contains all Tile exclusions to stop
+     * inserting piece in.
+     */
     public void setAllPieceInstanceRandomly(BoardBuilder builder, Piece piece,
                                             int from, int to,
                                             int[] occupiedTiles) {
@@ -872,13 +948,25 @@ public class Board {
           pieceCopy = piece.clone();
           Utils.appendToIntArray(occupiedTiles, randomEmptyTile);
           pieceInstanceCounter++;
+
+          if (debugMode)
+            System.out.println(piece.getPieceAlliance() + " " +
+                piece.getRank() + " random placement successful");
         }
       }
     }
 
+    /**
+     * Method that counts all piece instances that has been set into boardConfig
+     * field.
+     * @param rank Piece rank of the piece to be counted.
+     * @param alliance Alliance of the piece to be counted.
+     * @return int the count of the specified piece.
+     */
     public int countPieceInstances(String rank, Alliance alliance) {
       int pieceInstanceCounter = 0;
 
+      // Count all pieces from boardConfig HashMap field.
       for (Map.Entry<Integer, Piece> entry : boardConfig.entrySet()) {
         if (entry.getValue().getRank() == rank &&
             entry.getValue().getPieceAlliance() == alliance)
@@ -888,6 +976,11 @@ public class Board {
       return pieceInstanceCounter;
     }
 
+    /**
+     * Checks if a Piece to be inserted is within bounds of the Board.
+     * @param piece the Piece instance to be checked.
+     * @return boolean true if piece is within bounds, else false.
+     */
     public boolean isPieceWithinBounds(Piece piece) {
       if (piece.getPieceCoords() < BoardUtils.ALL_TILES_COUNT &&
           piece.getPieceCoords() > 0) {
@@ -902,6 +995,13 @@ public class Board {
       return false;
     }
 
+    /**
+     * Checks if a Piece to be inserted is within its respective territory
+     * Alliance.
+     * @param piece the Piece instance to be checked.
+     * @return boolean true if piece is within its respective territory, else
+     * false.
+     */
     public boolean isPieceInCorrectTerritory(Piece piece) {
       if ((piece.getPieceAlliance() == Alliance.BLACK &&
             piece.getPieceCoords() < BoardUtils.ALL_TILES_COUNT / 2) ||
@@ -918,6 +1018,13 @@ public class Board {
       return false;
     }
 
+    /**
+     * Checks if a Piece to be inserted exceeds the amount of allowed instance
+     * in a single game.
+     * @param piece the Piece instance to be checked.
+     * @return boolean true if the piece is still less than or equal the amount
+     * of allowed instance of the specific piece.
+     */
     public boolean isLegalPieceInstanceChecker(Piece piece) {
       int pieceInstanceCounter = 0;
       for (Map.Entry<Integer, Piece> entry : this.boardConfig.entrySet()) {
@@ -935,6 +1042,10 @@ public class Board {
       return false;
     }
 
+    /**
+     * Checks if Tile is empty or does not contain a Piece instance.
+     * @return boolean true if Tile is empty, else false.
+     */
     public boolean isTileEmpty(int coords) {
       if (!boardConfig.containsKey(coords))
         return true;
@@ -944,6 +1055,10 @@ public class Board {
       return false;
     }
 
+    /**
+     * Gets the boardConfig field.
+     * @return Map<Integer, Piece> boardConfig field if not null, else null.
+     */
     public Map<Integer, Piece> getBoardConfig() {
       try {
         return this.boardConfig;
@@ -970,19 +1085,38 @@ public class Board {
 
   } // BoardBuilder
 
+  /**
+   * Tile class that will contain a single piece instance. All together,
+   * represents the whole board arrangement.
+   */
   public static class Tile {
 
+    /** Tile unique index or ID number. From 0 to 71 */
     private final int tileId;
+
+    /** Tile territorial Alliance. 0 - 35 black and 36 - 71 white territory. */
     private final Alliance territory;
+
+    /** Is tile occupied by piece */
     private boolean occupied;
+
+    /** Containing piece. Null if empty or remains uninitialized. */
     private Piece piece;
 
-    public Tile(int tileId, Alliance territory, boolean occupied) {
+    /**
+     * Constructor that takes in the tileId and territorial Alliance, and sets
+     * the tile as empty.
+     */
+    public Tile(int tileId, Alliance territory) {
       this.tileId = tileId;
       this.territory = territory;
-      this.occupied = occupied;
+      this.occupied = false;
     }
 
+    /**
+     * Checks if this Tile is empty of Piece instance.
+     * @return boolean true if this Tile is empty, else false.
+     */
     public boolean isTileEmpty() {
       if (!this.occupied) {
         return true;
@@ -990,6 +1124,10 @@ public class Board {
       return false;
     }
 
+    /**
+     * Checks if this Tile is occupied by Piece instance.
+     * @return boolean true if this Tile is occupied, else false.
+     */
     public boolean isTileOccupied() {
       if (this.occupied) {
         return true;
@@ -997,41 +1135,86 @@ public class Board {
       return false;
     }
 
+    /**
+     * Returns the Tile index or ID.
+     * @return int tileId field.
+     */
     public int getTileId() {
       return this.tileId;
     }
 
+    /**
+     * Gets the Tile territorial Alliance.
+     * @return Alliance territory field.
+     */
     public Alliance getTerritory() {
       return this.territory;
     }
 
+    /**
+     * Gets the occupying Piece of the Tile.
+     * @return the Piece occupying the Tile, else null.
+     */
     public Piece getPiece() {
-      return this.piece;
+      if (this.occupied)
+        return this.piece;
+      else
+
+        if (isDebugMode())
+          System.out.println("Board.Tile.getPiece() E: Tile Piece does not exist.");
+
+        return null;
     }
 
-    public boolean insert(Piece piece) {
+    /**
+     * Inserts the Piece into this Tile.
+     * @param piece the Piece insatance to insert.
+     * @return boolean true if successful, else false if already occupied.
+     */
+    public boolean insertPiece(Piece piece) {
       if (isTileEmpty()) {
         this.piece = piece;
         this.occupied = true;
         return true;
       }
+
+      if (isDebugMode())
+        System.out.println("Board.Tile.insertPiece() E: Tile is occupied.");
+
       return false;
     }
 
-    public boolean replace(Piece piece) {
+    /**
+     * Replaces the occupying Piece with another Piece instance.
+     * @param piece the Piece to replace the existing with.
+     * @return boolean true if successful, else false if is Tile is empty.
+     */
+    public boolean replacePiece(Piece piece) {
       if (isTileOccupied()) {
         this.piece = piece;
         return true;
       }
+
+      if (isDebugMode())
+        System.out.println("Board.Tile.replacePiece() E: Tile is empty.");
+
       return false;
     }
 
-    public boolean empty() {
+    /**
+     * Empties the occupying piece of this Tile.
+     * @return boolean true if successful, else false if tile is empty.
+     */
+    public boolean removePiece() {
       if (isTileOccupied()) {
         this.piece = null;
         this.occupied = false;
         return true;
       }
+
+      if (isDebugMode())
+        System.out.println("Board.Tile.removePiece() E: Tile is already empty.");
+
       return false;
     }
 
@@ -1044,4 +1227,5 @@ public class Board {
         return "Tile " + this.tileId + " is empty";
     }
   }
-}
+
+} // Board
