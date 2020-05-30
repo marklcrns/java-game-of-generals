@@ -163,7 +163,7 @@ public class BoardPanel extends JPanel {
   }
 
   public final void undoMoveHistoryUpdate() {
-    moveHistoryPanel.removeFromMoveHistory(gameStateBoard.getLastMove());
+    moveHistoryPanel.removeMoveFromHistory(gameStateBoard.getLastMove());
   }
 
   public final void redoMoveHistoryUpdate() {
@@ -335,7 +335,7 @@ public class BoardPanel extends JPanel {
       return moveText;
     }
 
-    public void removeFromMoveHistory(Move move) {
+    public void removeMoveFromHistory(Move move) {
       if (move != null) {
         String fullMoveHistory = moveHistoryTextArea.getText();
         String moveToRemove = convertMoveToString(move);

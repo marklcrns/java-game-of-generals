@@ -121,6 +121,7 @@ public class Player {
     moveHistory.put(move.getTurnId(), move);
   }
 
+  // TODO: also erase INVALID moves from moveHistory panel
   public boolean undoLastMove() {
     int currentTurn = this.board.getCurrentTurn();
 
