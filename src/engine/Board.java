@@ -28,32 +28,86 @@ import utils.BoardUtils;
 import utils.Utils;
 
 /**
+ * Main class that orchestrates all the classes of the engine package and gui.
+ * This class serves as the driver of the program that builds the board game
+ * from scratch using internal and external classes.
+ * Uses 1D array for as coordinate system. 9x8 board with 0 to 71 tile indices.
+ * Contains BoardBuilder and Tile inner classes.
+ *
+ * Heavily inspired by https://github.com/amir650/BlackWidow-Chess
+
  * Author: Mark Lucernas
  * Date: 2020-05-18
  */
 public class Board {
 
+  /** List of all Tiles that contains data of each piece  */
   private static List<Tile> gameBoard;
+
+  /** Player instance that all contains all infos on black pieces */
   private static Player playerBlack;
+
+  /** Player instance that all contains all infos on white pieces */
   private static Player playerWhite;
+
+  /** Black player's name assigned when game initialized */
+  private static String playerBlackName;
+
+  /** White player's name assigned when game initialized */
+  private static String playerWhiteName;
+
+  /** Black pieces counter */
   private static int blackPiecesLeft = 0;
+
+  /** White pieces counter */
   private static int whitePiecesLeft = 0;
-  private BoardPanel boardPanel;
+
+  /** Board builder instance */
   private BoardBuilder customBuilder;
+
+  /** BoardPanel gui instance */
+  private BoardPanel boardPanel;
+
+  /** Board initial configurations for saving game state */
   private List<Tile> initBoardConfig;
-  private Map<Integer, Piece> initBoardBuilderConfig;
+
+  /** Game initialization checker */
   private boolean gameInitialized = false;
+
+  /** Game started checker */
   private boolean gameStarted = false;
+
+  /** Debug mode toggle for debugging purposes */
   private static boolean debugMode;
+
+  /** Current turn counter */
   private int currentTurn;
+
+  /** Holds value of last executed turn. Only changes when making a move */
   private int lastExecutedTurn;
+
+  /** Reference to most recent move */
   private Move lastMove;
+
+  /** First move maker */
   private Alliance firstMoveMaker;
+
+  /** Current move maker */
   private Alliance moveMaker;
+
+  /** End game winner */
   private Alliance endGameWinner;
 
+  /**
+   * No argument constructor
+   */
   public Board() {}
 
+  /**
+   * Constructor that takes in two Player instance.
+   * @param playerBlack
+   * @param playerWhite
+   */
   public Board(final Player playerBlack, final Player playerWhite) {
     playerBlack.setBoard(this);
     playerWhite.setBoard(this);
@@ -61,11 +115,14 @@ public class Board {
     this.playerWhite = playerWhite;
   }
 
+  /**
+   * Method that empties board Tiles pieces.
+   */
   private void emptyBoard() {
     gameBoard = new ArrayList<>();
     // Add new empty Tiles in board
     for (int i = 0; i < BoardUtils.ALL_TILES_COUNT; i++) {
-      // set territory
+      // Set Tile territory
       if (i < BoardUtils.ALL_TILES_COUNT / 2)
         this.addTile(i, Alliance.BLACK , false);
       else
@@ -73,35 +130,49 @@ public class Board {
     }
   }
 
+  /**
+   * Method that builds board pieces initial arrangement.
+   * Depends on BoardBuilder inner class.
+   */
   public void buildBoard() {
     this.emptyBoard();
+
+    // Use custom build if exists, else randomly placed pieces build.
     BoardBuilder builder = this.customBuilder == null ?
       new BoardBuilder().createRandomBuild() : this.customBuilder;
 
+    // Insert pieces to Board Tiles based on build config.
     for (Map.Entry<Integer, Piece> entry : builder.boardConfig.entrySet()) {
+      // insert piece to Tile if empty
       if (gameBoard.get(entry.getKey()).isTileEmpty()) {
-        // insert piece to tile
         gameBoard.get(entry.getKey()).insert(entry.getValue());
       }
     };
     blackPiecesLeft = builder.getBlackPiecesCount();
     whitePiecesLeft = builder.getWhitePiecesCount();
-
-    this.initBoardBuilderConfig = builder.getBoardConfig();
   }
 
+  /**
+   * Method that sets the builder for this board.
+   * @param builder BoardBuilder instance.
+   */
   public void setBoardBuilder(BoardBuilder builder) {
     this.customBuilder = builder;
   }
 
+  /**
+   * Method that initializes game. Enters initialize mode where players may
+   * arrange their respective board pieces.
+   */
   public void initGame() {
-    this.buildBoard();
+    buildBoard();
+
+    // Initialize players
     try {
       playerBlack.initPlayer();
     } catch(NullPointerException e) {
       System.out.println("E: BLACK player has not been assigned");
     }
-
     try {
       playerWhite.initPlayer();
     } catch(NullPointerException e) {
@@ -109,14 +180,18 @@ public class Board {
     }
 
     this.gameInitialized = true;
-    setMoveMaker(playerWhite);
+    setMoveMaker(playerWhite); // TODO: Option to pick first move
 
+    // Displays Board GUI
     displayBoard();
 
     if (isDebugMode())
       System.out.println("Board:\n" + this);
   }
 
+  /**
+   * Method that swtiches to opposing player a change to arrange pieces.
+   */
   public void playerDoneArranging() {
     if (this.getBlackPlayer().isMoveMaker()) {
       setMoveMaker(playerWhite);
@@ -125,6 +200,10 @@ public class Board {
     }
   }
 
+  /**
+   * Method that starts game. Disables initialize mode and enters actual game.
+   * Pieces no longer allowed to be arranged in this state.
+   */
   public void startGame() {
     this.gameStarted = true;
     this.gameInitialized = false;
@@ -132,6 +211,7 @@ public class Board {
     this.lastExecutedTurn = 0;
     this.firstMoveMaker = getMoveMaker();
 
+    // Save initial board arrangement for saving and loading game state.
     this.initBoardConfig = new ArrayList<>();
     this.initBoardConfig.addAll(gameBoard);
 
@@ -142,19 +222,23 @@ public class Board {
     }
   }
 
+  /**
+   * Method that Resumes ongoing game state. Companion for Load class.
+   */
+  // TODO: Finish Load implementation.
   public void resumeGame() {
     this.gameStarted = true;
     this.gameInitialized = false;
-    this.currentTurn = 1;
-    this.lastExecutedTurn = 0;
     this.firstMoveMaker = getMoveMaker();
 
     if (isDebugMode()) {
-      System.out.println(this);
-      System.out.println("CurrentTurn: " + currentTurn + "\n");
+      System.out.println("Game resumed");
     }
   }
 
+  /**
+   * Restarts and rebuild game with custom or randon build.
+   */
   public void restartGame() {
     buildBoard();
     this.gameStarted = false;
@@ -163,66 +247,104 @@ public class Board {
     setMoveMaker(playerWhite);
   }
 
+  /**
+   * Game initialization checker.
+   * @return boolean gameInitialized field.
+   */
   public boolean isGameInitialized() {
     return gameInitialized;
   }
 
+  /**
+   * Game started checker.
+   * @return boolean isGameStarted field.
+   */
   public boolean isGameStarted() {
     return gameStarted;
   }
 
+  /**
+   * Gets List of Tile that contains initial board
+   * pieces arrangement.
+   * @return List<Tile> initBoardConfig field.
+   */
   public List<Tile> getInitBoardConfig() {
     return this.initBoardConfig;
   }
 
-  public Map<Integer, Piece> getBoardBuilderConfig() {
-    try {
-      return this.initBoardBuilderConfig;
-    } catch(NullPointerException e) {
-      System.out.println("Board error: initBoardBuilder was not initialized");
-      return null;
-    }
-  }
-
+  /**
+   * Method that displays Board via GUI BoardPanel instance.
+   */
   public void displayBoard() {
     this.boardPanel = new BoardPanel(this);
   }
 
+  /**
+   * Gets boardPanel field instance.
+   * @return BoardPanel boardPanel field.
+   */
   public BoardPanel getBoardPanel() {
     return this.boardPanel;
   }
 
+  /**
+   * Method that sets debug mode state.
+   */
   public void setDebugMode(boolean debug) {
     debugMode = debug;
   }
 
+  /**
+   * Debug mode checker method. Used staticly by other classes.
+   */
   public static boolean isDebugMode() {
     return debugMode;
   }
 
-  public Tile getTile(int coordinates) {
-    return gameBoard.get(coordinates);
+  /**
+   * Gets specific tile from gameBoard field.
+   * @param tileId tile number.
+   * @return Tile from gameBoard field List.
+   */
+  public Tile getTile(int tileId) {
+    return gameBoard.get(tileId);
   }
 
+  /**
+   * Gets current board state.
+   * @return List<Tile> gameBoard field.
+   */
   public List<Tile> getBoard() {
     return gameBoard;
   }
 
-  public boolean swapPiece(int sourceCoords, int targetCoords) {
-    if (this.getTile(sourceCoords).isTileOccupied() &&
-        this.getTile(targetCoords).isTileOccupied()) {
-      Piece sourcePiece = this.getTile(sourceCoords).getPiece().makeCopy();
-      Piece targetPiece = this.getTile(targetCoords).getPiece().makeCopy();
-      sourcePiece.updateCoords(targetCoords);
-      targetPiece.updateCoords(sourceCoords);
-      this.getBoard().get(sourceCoords).replace(targetPiece);
-      this.getBoard().get(targetCoords).replace(sourcePiece);
+  /**
+   * Swaps two pieces and update piece coordinates.
+   * @param sourcePieceCoords source piece coordinates.
+   * @param targetPieceCoords target piece coordinates.
+   * @return boolean true if successful, else false.
+   */
+  public boolean swapPiece(int sourcePieceCoords, int targetPieceCoords) {
+    if (this.getTile(sourcePieceCoords).isTileOccupied() &&
+        this.getTile(targetPieceCoords).isTileOccupied()) {
+      Piece sourcePiece = this.getTile(sourcePieceCoords).getPiece().clone();
+      Piece targetPiece = this.getTile(targetPieceCoords).getPiece().clone();
+      sourcePiece.updateCoords(targetPieceCoords);
+      targetPiece.updateCoords(sourcePieceCoords);
+      this.getBoard().get(sourcePieceCoords).replace(targetPiece);
+      this.getBoard().get(targetPieceCoords).replace(sourcePiece);
 
       return true;
     }
     return false;
   }
 
+  /**
+   * Replaces Tile piece.
+   * @param targetCoords target occupied tile to replace.
+   * @param sourcePiece new Piece instance to replace with.
+   * @return boolean true if successful, else false.
+   */
   public boolean replacePiece(int targetCoords, Piece sourcePiece) {
     if (this.getTile(targetCoords).isTileOccupied()) {
       // TODO: improve piece manipulation efficiency
@@ -235,30 +357,47 @@ public class Board {
     return false;
   }
 
-  public boolean movePiece(int sourceCoords, int targetCoords) {
+  /**
+   * Moves piece from one Tile to another.
+   * @param sourcePieceCoords source piece coordinates.
+   * @param targetPieceCoords targetPiece coordinates.
+   * @return boolean true if successful, else false.
+   */
+  public boolean movePiece(int sourcePieceCoords, int targetPieceCoords) {
     // insert copy of source piece into target tile
-    if (this.getTile(targetCoords).isTileEmpty()) {
-      Piece sourcePieceCopy = this.getTile(sourceCoords).getPiece().makeCopy();
-      sourcePieceCopy.updateCoords(targetCoords);
-      this.getTile(targetCoords).insert(sourcePieceCopy);
+    if (this.getTile(targetPieceCoords).isTileEmpty()) {
+      Piece sourcePieceCopy = this.getTile(sourcePieceCoords).getPiece().clone();
+      sourcePieceCopy.updateCoords(targetPieceCoords);
+      this.getTile(targetPieceCoords).insert(sourcePieceCopy);
       // delete source piece
-      this.getTile(sourceCoords).empty();
+      this.getTile(sourcePieceCoords).empty();
 
       return true;
     }
     return false;
   }
 
-  public boolean insertPiece(int sourceCoords, Piece piece) {
-    if (this.getTile(sourceCoords).isTileEmpty()) {
-      piece.updateCoords(sourceCoords);
-      this.getBoard().get(sourceCoords).insert(piece);
-      this.getTile(sourceCoords).insert(piece);
+  /**
+   * Inserts piece into an empty tile.
+   * @param sourcePieceCoords source piece coordinates.
+   * @param piece Piece instance to insert.
+   * @return boolean true if successful, else false.
+   */
+  public boolean insertPiece(int sourcePieceCoords, Piece piece) {
+    if (this.getTile(sourcePieceCoords).isTileEmpty()) {
+      piece.updateCoords(sourcePieceCoords);
+      this.getBoard().get(sourcePieceCoords).insert(piece);
+      this.getTile(sourcePieceCoords).insert(piece);
       return true;
     }
     return false;
   }
 
+  /**
+   * Deletes occupied tile.
+   * @param pieceCoords piece coordinates.
+   * @return boolean true if successful, else false.
+   */
   public boolean deletePiece(int pieceCoords) {
     if (this.getTile(pieceCoords).isTileOccupied()) {
       this.getTile(pieceCoords).empty();
@@ -271,10 +410,19 @@ public class Board {
     return false;
   }
 
+  /**
+   * Method that adds Tile into gameBoard field.
+   * @param tileId tile id.
+   * @param territory tile territory Alliance.
+   * @param occupied is tile occupied by a piece.
+   */
   private final void addTile(int tileId, Alliance territory, boolean occupied) {
     gameBoard.add(new Tile(tileId, territory, occupied));
   }
 
+  /**
+   * Switches move maker to opposing player.
+   */
   public void switchMoveMakerPlayer() {
     if (this.getBlackPlayer().isMoveMaker()) {
       setMoveMaker(playerWhite);
@@ -286,68 +434,126 @@ public class Board {
       System.out.println(this.getMoveMaker());
   }
 
+  /**
+   * Setter method that sets last executed turn.
+   * @param turn turn to replace the last executed.
+   */
   public void updateLastExecutedTurn(int turn) {
     this.lastExecutedTurn = turn;
   }
 
+  /**
+   * Increments game turn.
+   */
   public void incrementTurn() {
     this.currentTurn++;
+
     if (isDebugMode()) {
       System.out.println(this);
       System.out.println("Current Turn: " + currentTurn + "\n");
     }
   }
 
+  /**
+   * Decrements game turn.
+   */
   public void decrementTurn() {
     this.currentTurn--;
+
     if (isDebugMode()) {
       System.out.println(this);
       System.out.println("Current Turn: " + currentTurn + "\n");
     }
   }
 
+  /**
+   * Gets first move maker.
+   * @return Alliance firstMoveMaker field.
+   */
   public Alliance getFirstMoveMaker() {
     return this.firstMoveMaker;
   }
 
+  /**
+   * Gets last executed turn.
+   * @return int lastExecutedTurn field.
+   */
   public int getLastExecutedTurn() {
     return this.lastExecutedTurn;
   }
 
+  /**
+   * Gets game current turn.
+   * @return int currentTurn field.
+   */
   public int getCurrentTurn() {
     return this.currentTurn;
   }
 
+  /**
+   * Sets first move maker.
+   * @param firstMoveMaker first move maker Alliance.
+   */
   public void setFirstMoveMaker(Alliance firstMoveMaker) {
     this.firstMoveMaker = firstMoveMaker;
   }
 
+  /**
+   * Sets last executed turn.
+   * @param lastExecutedTurn last move execution turn.
+   */
   public void setLastExecutedTurn(int lastExecutedTurn) {
     this.lastExecutedTurn = lastExecutedTurn;
   }
 
+  /**
+   * Sets current turn.
+   * @param turn turn to replace the game current turn.
+   */
   public void setCurrentTurn(int turn) {
     this.currentTurn = turn;
   }
 
+  /**
+   * Gets the most recent Move.
+   * @return Move lastMove field.
+   */
   public Move getLastMove() {
     return this.lastMove;
   }
 
+  /**
+   * Sets last Move field.
+   * @param move last move.
+   */
   public void setLastMove(Move move) {
     this.lastMove = move;
   }
 
-  public void addPlayerBlack(Player player) {
+  /**
+   * Sets the required black Player instance.
+   * @param player black Player instance.
+   */
+  public void setPlayerBlack(Player player) {
     player.setBoard(this);
     this.playerBlack = player;
   }
 
-  public void addPlayerWhite(Player player) {
+  /**
+   * Sets the required white Player instance.
+   * @param player white Player instance.
+   */
+  public void setPlayerWhite(Player player) {
     player.setBoard(this);
     this.playerWhite = player;
   }
 
+  /**
+   * Gets specific Player currently registered in this Board based on the
+   * alliance.
+   * @param alliance Alliance of the Player.
+   * @return Player based on the alliance param.
+   */
   public Player getPlayer(Alliance alliance) {
     if (alliance == Alliance.BLACK)
       return playerBlack;
@@ -355,12 +561,44 @@ public class Board {
       return playerWhite;
   }
 
+  /**
+   * Gets the black Player.
+   * @return Player playerBlack field.
+   */
   public Player getBlackPlayer() {
     return playerBlack;
   }
 
+  /**
+   * Gets the white Player.
+   * @return Player playerWhite field.
+   */
   public Player getWhitePlayer() {
     return playerWhite;
+  }
+
+  /**
+   * Gets the black player designated name.
+   * @return String plaerBlackName field.
+   */
+  public String getBlackPlayerName() {
+    return playerBlackName;
+  }
+
+  /**
+   * Gets the white player designated name.
+   * @return String playerWhiteName.
+   */
+  public String getWhitePlayerName() {
+    return playerWhiteName;
+  }
+
+  public void setBlackPlayerName(String playerName) {
+    playerBlackName = playerName;
+  }
+
+  public void setWhitePlayerName(String playerName) {
+    playerWhiteName = playerName;
   }
 
   public Alliance getMoveMaker() {
@@ -621,7 +859,7 @@ public class Board {
     public void setAllPieceInstanceRandomly(BoardBuilder builder, Piece piece,
                                             int from, int to,
                                             int[] occupiedTiles) {
-      Piece pieceCopy = piece.makeCopy();
+      Piece pieceCopy = piece.clone();
       int pieceInstanceCounter = countPieceInstances(piece.getRank(),
                                                      piece.getPieceAlliance());
       int randomEmptyTile;
@@ -631,7 +869,7 @@ public class Board {
         pieceCopy.setPieceCoords(randomEmptyTile);
         // TODO: Fix to check if randomEmptyTile is empty
         if (builder.setPiece(pieceCopy)) {
-          pieceCopy = piece.makeCopy();
+          pieceCopy = piece.clone();
           Utils.appendToIntArray(occupiedTiles, randomEmptyTile);
           pieceInstanceCounter++;
         }

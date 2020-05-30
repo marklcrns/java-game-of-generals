@@ -34,9 +34,9 @@ public class Move {
   }
 
   public void evaluateMove() {
-    this.sourcePieceCopy = this.board.getTile(sourceTileCoords).getPiece().makeCopy();
+    this.sourcePieceCopy = this.board.getTile(sourceTileCoords).getPiece().clone();
     if (this.board.getTile(targetTileCoords).isTileOccupied())
-      this.targetPieceCopy = this.board.getTile(targetTileCoords).getPiece().makeCopy();
+      this.targetPieceCopy = this.board.getTile(targetTileCoords).getPiece().clone();
     else
       this.targetPieceCopy = null;
 

@@ -37,11 +37,11 @@ public class Load {
     Board board = new Board();
     Player player1 = new Player(Alliance.WHITE);
     Player player2 = new Player(Alliance.BLACK);
-    board.addPlayerWhite(player1);
-    board.addPlayerBlack(player2);
+    board.setPlayerWhite(player1);
+    board.setPlayerBlack(player2);
     board.setDebugMode(true);
 
-    new Load(board, "2020-05-29_15:00:12.174.txt").loadSaveGame();
+    new Load(board, "2020-05-29_15:55:51.812.txt").loadSaveGame();
     new MainFrame(board);
   }
 
@@ -288,8 +288,15 @@ public class Load {
 
     for (Map.Entry<Integer, Move> entry : moveHistory.entrySet()) {
       if (entry.getValue().isMoveExecuted()) {
+
+        // TODO: Mimic player makeMove()
+        System.out.println(this.board);
         entry.getValue().evaluateMove();
         entry.getValue().execute();
+        System.out.println(this.board);
+
+        if (this.board.isDebugMode())
+          System.out.println("Executing turn " + entry.getKey() + ". Successful");
       }
     }
   }

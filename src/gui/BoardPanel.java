@@ -52,6 +52,8 @@ public class BoardPanel extends JPanel {
                          redoBtn, saveBtn, surrenderBtn, rulesBtn,
                          doneArrangingBtn, startGameBtn;
 
+  private static JLabel playerBlackNameLbl, playerWhiteNameLbl;
+
   private static MenuBarPanel menuBarPanel;
   private static MoveHistoryPanel moveHistoryPanel;
   private static InnerBoardPanel boardPanel;
@@ -95,6 +97,14 @@ public class BoardPanel extends JPanel {
     boardPanel.initInnerBoardPanel();
   }
 
+  public final JLabel getPlayerBlackNameLbl() {
+    return playerBlackNameLbl;
+  }
+
+  public final JLabel getPlayerWhiteNameLbl() {
+    return playerWhiteNameLbl;
+  }
+
   public final JButton getRestartBtn() {
     return restartBtn;
   }
@@ -135,6 +145,10 @@ public class BoardPanel extends JPanel {
     return startGameBtn;
   }
 
+  public final MenuBarPanel getMenuBarPanel() {
+    return menuBarPanel;
+  }
+
   public final void refreshBoardPanel() {
     boardPanel.setActiveTile(-1);
     boardPanel.refreshInnerBoardPanel();
@@ -161,13 +175,22 @@ public class BoardPanel extends JPanel {
       moveHistoryPanel.printOpeningMessage();
   }
 
-  private class MenuBarPanel extends JPanel {
+  public class MenuBarPanel extends JPanel {
 
     private JButton restart, load, quit, undo, redo, save, surrender, rules;
+    private JLabel playerBlackName, playerWhiteName;
 
     public MenuBarPanel() {
       this.setLayout(new FlowLayout());
       this.setPreferredSize(MENU_BAR_PANEL_DIMENSION);
+
+      playerBlackName = new JLabel("BLACK PLAYER:");
+      playerBlackName.setFont(new Font("SansSerif", Font.BOLD, 16));
+      playerBlackName.setVisible(false);
+      this.add(playerBlackName);
+
+      this.add(new JSeparator(SwingConstants.HORIZONTAL));
+      this.add(new JSeparator(SwingConstants.HORIZONTAL));
 
       restart = new JButton("Restart");
       this.add(restart);
@@ -201,10 +224,20 @@ public class BoardPanel extends JPanel {
       this.add(rules);
       rules.setVisible(false);
 
+      this.add(new JSeparator(SwingConstants.HORIZONTAL));
+      this.add(new JSeparator(SwingConstants.HORIZONTAL));
+
+      playerWhiteName = new JLabel("WHITE PLAYER:");
+      playerWhiteName.setFont(new Font("SansSerif", Font.BOLD, 16));
+      playerWhiteName.setVisible(false);
+      this.add(playerWhiteName);
+
       setAllButtons();
     }
 
     public void setAllButtons() {
+      playerBlackNameLbl = playerBlackName;
+      playerWhiteNameLbl = playerWhiteName;
       restartBtn = restart;
       loadBtn = load;
       quitBtn = quit;
@@ -213,6 +246,19 @@ public class BoardPanel extends JPanel {
       saveBtn = save;
       surrenderBtn = surrender;
       rulesBtn = rules;
+    }
+
+    public void setBlackPlayerName(String playerBlackName) {
+      playerBlackNameLbl.setText("BLACK PLAYER: " + playerBlackName);
+    }
+
+    public void setWhitePlayerName(String playerWhiteName) {
+      playerWhiteNameLbl.setText("WHITE PLAYER: " + playerWhiteName);
+    }
+
+    public void setPlayerNamesVisibility(boolean visibility) {
+      playerBlackName.setVisible(visibility);
+      playerWhiteName.setVisible(visibility);
     }
 
   }
@@ -314,7 +360,17 @@ public class BoardPanel extends JPanel {
 
     public void printOpeningMessage() {
       clearMoveHistory();
-      openingMessage = "Welcome to the Game of the Generals!\n\n" +
+
+      String name = "Player";
+      Alliance moveMaker = gameStateBoard.getMoveMaker();
+
+      if (gameStateBoard.getBlackPlayerName() != null && moveMaker == Alliance.BLACK)
+        name = gameStateBoard.getBlackPlayerName();
+      else if (gameStateBoard.getWhitePlayerName() != null && moveMaker == Alliance.WHITE)
+        name = gameStateBoard.getWhitePlayerName();
+
+      openingMessage = "Welcome " + name +
+        ",\nto the Game of the Generals!\n\n" +
         "Please arrange your pieces however\n" +
         "you like within your territory (" +
         gameStateBoard.getMoveMaker() + ").\n\n" +

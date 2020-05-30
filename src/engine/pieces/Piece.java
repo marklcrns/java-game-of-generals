@@ -108,5 +108,5 @@ public abstract class Piece {
   public abstract String getRank();
   public abstract int getLegalPieceInstanceCount();
   public abstract int getPowerLevel();
-  public abstract Piece makeCopy();
+  public abstract Piece clone();
 }

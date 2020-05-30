@@ -42,7 +42,7 @@ public class Spy extends Piece {
   }
 
   @Override
-  public final Piece makeCopy() {
+  public final Piece clone() {
     Spy copy = new Spy(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }

@@ -21,8 +21,8 @@ public class Main {
           Board board = new Board();
           Player player1 = new Player(Alliance.WHITE);
           Player player2 = new Player(Alliance.BLACK);
-          board.addPlayerWhite(player1);
-          board.addPlayerBlack(player2);
+          board.setPlayerWhite(player1);
+          board.setPlayerBlack(player2);
 
           board.setDebugMode(true);
           new MainFrame(board);

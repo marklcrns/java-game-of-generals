@@ -33,8 +33,8 @@ public class MoveTest {
   private static void aggressiveMoveTest() {
     System.out.println(board);
 
-    board.addPlayerWhite(playerWhite);
-    board.addPlayerBlack(playerBlack);
+    board.setPlayerWhite(playerWhite);
+    board.setPlayerBlack(playerBlack);
 
     board.initGame();
 

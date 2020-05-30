@@ -42,7 +42,7 @@ public class Flag extends Piece {
   }
 
   @Override
-  public final Piece makeCopy() {
+  public final Piece clone() {
     Flag copy = new Flag(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }

@@ -42,7 +42,7 @@ public class Major extends Piece {
   }
 
   @Override
-  public final Piece makeCopy() {
+  public final Piece clone() {
     Major copy = new Major(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }

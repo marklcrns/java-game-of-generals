@@ -1,13 +1,17 @@
 package gui;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.awt.Insets;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 
 /**
@@ -17,11 +21,18 @@ import java.awt.GridBagConstraints;
 // Tutorial: https://www.youtube.com/watch?v=g2vDARb7gx8&t=81s
 public class MainMenuPanel extends JPanel {
 
+  private final static String BG_DIR_PATH = "art/bg/";
   private JButton start, load, howToPlay, quit;
+  private BufferedImage backgroundImage;
 
   MainMenuPanel() {
+    try {
+      backgroundImage = ImageIO.read(new File(BG_DIR_PATH + "world_of_tanks.jpg"));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     this.setLayout(new GridBagLayout());
-    this.setBackground(Color.GRAY);
+    // this.setBackground(Color.GRAY);
     this.setVisible(true);
 
     GridBagConstraints gbc = new GridBagConstraints();
@@ -63,6 +74,12 @@ public class MainMenuPanel extends JPanel {
     gbc.gridy = 4;
     gbc.gridheight = 1;
     this.add(quit, gbc);
+  }
+
+  @Override
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    g.drawImage(backgroundImage, 0, 0, null);
   }
 
   public JButton getStartBtn() {

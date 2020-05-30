@@ -42,7 +42,7 @@ public class Captain extends Piece {
   }
 
   @Override
-  public final Piece makeCopy() {
+  public final Piece clone() {
     Captain copy = new Captain(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }

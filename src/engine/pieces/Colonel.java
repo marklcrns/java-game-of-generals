@@ -42,7 +42,7 @@ public class Colonel extends Piece {
   }
 
   @Override
-  public final Piece makeCopy() {
+  public final Piece clone() {
     Colonel copy = new Colonel(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }

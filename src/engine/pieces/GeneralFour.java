@@ -42,7 +42,7 @@ public class GeneralFour extends Piece {
   }
 
   @Override
-  public final Piece makeCopy() {
+  public final Piece clone() {
     GeneralFour copy = new GeneralFour(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }

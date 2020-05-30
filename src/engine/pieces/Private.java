@@ -42,7 +42,7 @@ public class Private extends Piece {
   }
 
   @Override
-  public final Piece makeCopy() {
+  public final Piece clone() {
     Private copy = new Private(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }

@@ -15,12 +15,14 @@ import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import engine.Alliance;
 import engine.Board;
 import game.Load;
 import game.Save;
+import gui.BoardPanel.MenuBarPanel;
 
 /**
  * Author: Mark Lucernas
@@ -32,30 +34,20 @@ public class MainFrame {
   private Board gameStateBoard;
   private JFrame frame;
 
-  private JButton doneArrangingBtn;
-  private JButton startGameBtn;
-
-  private JButton mainMenuStartBtn;
-  private JButton mainMenuLoadBtn;
-  private JButton mainMenuHowToPlayBtn;
-  private JButton mainMenuQuitBtn;
-
-  private JButton menuBarRestartBtn;
-  private JButton menuBarLoadBtn;
-  private JButton menuBarQuitBtn;
-  private JButton menuBarUndoBtn;
-  private JButton menuBarRedoBtn;
-  private JButton menuBarSaveBtn;
-  private JButton menuBarSurrenderBtn;
-  private JButton menuBarGameRulesBtn;
-
-  private JDialog mainMenuLoadDialog;
-  private JDialog menuBarLoadDialog;
-  private JPopupMenu mainMenuQuitPopup;
-  private JPopupMenu menuBarQuitPopup;
-
+  // TODO: access buttons directly from components container panels
+  private JButton doneArrangingBtn, startGameBtn;
+  private JButton mainMenuStartBtn, mainMenuLoadBtn,
+          mainMenuHowToPlayBtn, mainMenuQuitBtn;
+  private JButton menuBarRestartBtn, menuBarLoadBtn, menuBarQuitBtn,
+          menuBarUndoBtn, menuBarRedoBtn, menuBarSaveBtn,
+          menuBarSurrenderBtn, menuBarGameRulesBtn;
+  private JLabel menuBarPlayerBlackLbl, menuBarPlayerWhiteLbl;
+  private String playerBlackName, playerWhiteName;
+  private JDialog playerAssignDialog, mainMenuLoadDialog, menuBarLoadDialog;
+  private JPopupMenu mainMenuQuitPopup, menuBarQuitPopup;
 
   private BoardPanel boardPanel;
+  private MenuBarPanel menuBarPanel;
   private MainMenuPanel mainMenuPanel;
   private JLayeredPane layeredPane;
   private JPanel contentPane;
@@ -98,9 +90,10 @@ public class MainFrame {
       public void actionPerformed(ActionEvent e) {
         gameStateBoard.initGame();
         boardPanel = gameStateBoard.getBoardPanel();
+        menuBarPanel = boardPanel.getMenuBarPanel();
         boardPanel.initBoardPanel();
 
-        fetchMenuBarButtons(boardPanel);
+        fetchMenuBarComponents(boardPanel);
         fetchDoneArrangingBtn(boardPanel);
         fetchStartGameBtn(boardPanel);
 
@@ -108,6 +101,7 @@ public class MainFrame {
         addDoneArrangingButtonListener();
         addStartGameButtonListener();
 
+        createPlayerNameAssignDialog();
         createMenuBarQuitPopupMenu();
 
         layeredPane.add(boardPanel, new Integer(1));
@@ -115,6 +109,7 @@ public class MainFrame {
 
         boardPanel.setVisible(true);
         mainMenuPanel.setVisible(false);
+        playerAssignDialog.setVisible(true);
       }
     });
 
@@ -133,6 +128,14 @@ public class MainFrame {
         int quitPopupHeight = mainMenuQuitPopup.getHeight() / 2;
         mainMenuQuitPopup.show(frame, (FRAME_DIMENSION.width / 2) - quitPopupWidth,
                                (FRAME_DIMENSION.height / 2) - quitPopupHeight);
+      }
+    });
+
+    mainMenuHowToPlayBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        // System.out.println("width: " + mainMenuPanel.getWidth());
+        // System.out.println("height: " + mainMenuPanel.getHeight());
       }
     });
   }
@@ -230,6 +233,7 @@ public class MainFrame {
         menuBarSaveBtn.setVisible(true);
         menuBarSurrenderBtn.setVisible(true);
         menuBarGameRulesBtn.setVisible(true);
+        menuBarPanel.setPlayerNamesVisibility(true);
 
         gameStateBoard.startGame();
         doneArrangingBtn.setVisible(false);
@@ -248,7 +252,9 @@ public class MainFrame {
     mainMenuQuitBtn = mainMenuPanel.getQuitBtn();
   }
 
-  private void fetchMenuBarButtons(BoardPanel boardPanel) {
+  private void fetchMenuBarComponents(BoardPanel boardPanel) {
+    menuBarPlayerBlackLbl = boardPanel.getPlayerBlackNameLbl();
+    menuBarPlayerWhiteLbl = boardPanel.getPlayerWhiteNameLbl();
     menuBarRestartBtn = boardPanel.getRestartBtn();
     menuBarLoadBtn = boardPanel.getLoadBtn();
     menuBarQuitBtn = boardPanel.getQuitBtn();
@@ -286,7 +292,7 @@ public class MainFrame {
     // options pane
     // Ref: https://stackoverflow.com/a/40200144/11850077
     Object[] options = new Object[] {};
-    JOptionPane loadOptionsPane = new JOptionPane("Load Saved Game",
+    JOptionPane loadOptionsPane = new JOptionPane(loadMessageLbl,
                                       JOptionPane.PLAIN_MESSAGE,
                                       JOptionPane.DEFAULT_OPTION,
                                       null, options, null);
@@ -324,7 +330,7 @@ public class MainFrame {
         boardPanel = gameStateBoard.getBoardPanel();
         boardPanel.initBoardPanel();
 
-        fetchMenuBarButtons(boardPanel);
+        fetchMenuBarComponents(boardPanel);
         fetchDoneArrangingBtn(boardPanel);
         fetchStartGameBtn(boardPanel);
 
@@ -381,6 +387,78 @@ public class MainFrame {
     });
   }
 
+  public void createPlayerNameAssignDialog() {
+    JLabel playerAssignLbl = new JLabel("Please assign player names");
+    playerAssignLbl.setFont(new Font("TimesRoman", Font.PLAIN, 20));
+
+    JPanel playerBlackPanel = new JPanel();
+    JPanel playerWhitePanel = new JPanel();
+    menuBarPlayerBlackLbl = new JLabel("Black Player");
+    menuBarPlayerWhiteLbl = new JLabel("White Player");
+
+    JTextField playerBlackTextField = new JTextField(8);
+    playerBlackPanel.add(menuBarPlayerBlackLbl);
+    playerBlackPanel.add(playerBlackTextField);
+
+    JTextField playerWhiteTextField = new JTextField(8);
+    playerWhitePanel.add(menuBarPlayerWhiteLbl);
+    playerWhitePanel.add(playerWhiteTextField);
+
+    JPanel playerAssignActionsPanel = new JPanel();
+    JButton playerAssignConfirmBtn = new JButton("Confirm");
+    JButton playerAssignAbortBtn = new JButton("Abort");
+    playerAssignActionsPanel.add(playerAssignConfirmBtn);
+    playerAssignActionsPanel.add(playerAssignAbortBtn);
+
+    // options pane
+    // Ref: https://stackoverflow.com/a/40200144/11850077
+    Object[] options = new Object[] {};
+    JOptionPane playerAssignOptionsPane = new JOptionPane(playerAssignLbl,
+                                      JOptionPane.PLAIN_MESSAGE,
+                                      JOptionPane.DEFAULT_OPTION,
+                                      null, options, null);
+
+    playerAssignOptionsPane.add(playerBlackPanel);
+    playerAssignOptionsPane.add(playerWhitePanel);
+    playerAssignOptionsPane.add(playerAssignActionsPanel);
+
+    playerAssignDialog = new JDialog();
+    playerAssignDialog.getContentPane().add(playerAssignOptionsPane);
+    playerAssignDialog.pack();
+    playerAssignDialog.setVisible(false);
+
+    playerAssignConfirmBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        playerBlackName = playerBlackTextField.getText();
+        playerWhiteName = playerWhiteTextField.getText();
+
+        if (gameStateBoard.isDebugMode()) {
+          System.out.println("Black player: " + playerBlackName + " registered");
+          System.out.println("White player: " + playerWhiteName + " registered");
+        }
+
+        gameStateBoard.setBlackPlayerName(playerBlackName);
+        gameStateBoard.setWhitePlayerName(playerWhiteName);
+        menuBarPanel.setBlackPlayerName(playerBlackName);
+        menuBarPanel.setWhitePlayerName(playerWhiteName);
+
+        playerAssignDialog.setVisible(false);
+        boardPanel.clearBoardPanel();
+        boardPanel.printOpeningMessage();
+      }
+    });
+
+    playerAssignAbortBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        boardPanel.setVisible(false);
+        mainMenuPanel.setVisible(true);
+        playerAssignDialog.setVisible(false);
+      }
+    });
+  }
+
   private void createMenuBarQuitPopupMenu() {
     menuBarQuitPopup = new JPopupMenu();
     menuBarQuitPopup.setLayout(new BorderLayout());
@@ -388,15 +466,15 @@ public class MainFrame {
 
     JLabel quitMessageLbl = new JLabel("Back to main menu?");
     quitMessageLbl.setFont(new Font("TimesRoman", Font.PLAIN, 20));
-    JPanel menuBarQuitPopuptOptionsPanel = new JPanel();
+    JPanel menuBarQuitPopupOptionsPanel = new JPanel();
     JButton quitBackToMain = new JButton("Back to main");
     JButton quitConfirmBtn = new JButton("Quit");
 
-    menuBarQuitPopuptOptionsPanel.add(quitBackToMain);
-    menuBarQuitPopuptOptionsPanel.add(quitConfirmBtn);
+    menuBarQuitPopupOptionsPanel.add(quitBackToMain);
+    menuBarQuitPopupOptionsPanel.add(quitConfirmBtn);
 
     menuBarQuitPopup.add(quitMessageLbl, BorderLayout.NORTH);
-    menuBarQuitPopup.add(menuBarQuitPopuptOptionsPanel, BorderLayout.CENTER);
+    menuBarQuitPopup.add(menuBarQuitPopupOptionsPanel, BorderLayout.CENTER);
 
     quitConfirmBtn.addActionListener(new ActionListener() {
       @Override

@@ -42,7 +42,7 @@ public class Sergeant extends Piece {
   }
 
   @Override
-  public final Piece makeCopy() {
+  public final Piece clone() {
     Sergeant copy = new Sergeant(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }

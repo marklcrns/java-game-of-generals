@@ -42,7 +42,7 @@ public class LtOne extends Piece {
   }
 
   @Override
-  public final Piece makeCopy() {
+  public final Piece clone() {
     LtOne copy = new LtOne(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }

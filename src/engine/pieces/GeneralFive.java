@@ -42,7 +42,7 @@ public class GeneralFive extends Piece {
   }
 
   @Override
-  public final Piece makeCopy() {
+  public final Piece clone() {
     GeneralFive copy = new GeneralFive(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }
