@@ -1202,16 +1202,15 @@ public class Board {
       if (this.occupied)
         return this.piece;
       else
-
         if (isDebugMode())
           System.out.println("Board.Tile.getPiece() E: Tile Piece does not exist.");
 
-        return null;
+      return null;
     }
 
     /**
      * Inserts the Piece into this Tile.
-     * @param piece the Piece insatance to insert.
+     * @param piece the Piece instance to insert.
      * @return boolean true if successful, else false if already occupied.
      */
     public boolean insertPiece(final Piece piece) {

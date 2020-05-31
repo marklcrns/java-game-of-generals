@@ -391,7 +391,7 @@ public class MainFrame {
         if (gameStateBoard.isDebugMode())
           System.out.println("Loading " + loadSelected.replace(".txt", "..."));
 
-        // TODO: reimplement to be able to pass in Board as argument.
+        // TODO: reimplement to be able to pass into Board as argument.
         // Load selected saved game.
         new Load(gameStateBoard, loadSelected).loadSaveGame();
         mainMenuLoadDialog.setVisible(false);

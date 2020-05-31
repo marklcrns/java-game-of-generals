@@ -16,16 +16,27 @@ import engine.Board.Tile;
 import engine.player.Player;
 
 /**
+ * Save game feature for the Board engine that saves the current in-game state.
+ * Companion for Load class.
+ *
  * Author: Mark Lucernas
  * Date: 2020-05-28
  */
 public class Save {
 
-  private List<Tile> boardConfig;
-  private Board board;
+  /** Save data path */
   private final String DATA_PATH = "data/save/";
 
-  // ref: Timstammp = https://tecadmin.net/get-current-timestamp-in-java/
+  /** List of Tile the contains the initial board arrangement before game starts. */
+  private List<Tile> boardConfig;
+
+  /** Reference to the Board engine */
+  private Board board;
+
+  /**
+   * Constructor method that takes in Board instance as parameter.
+   * Timestamp ref: https://tecadmin.net/get-current-timestamp-in-java/
+   */
   public Save(Board board) {
     this.board = board;
     this.boardConfig = board.getInitBoardConfig();
@@ -34,18 +45,20 @@ public class Save {
     long time = date.getTime();
     Timestamp ts = new Timestamp(time);
 
+    // Set current date and timestamp as file output name.
     String filePath = DATA_PATH + (ts + "").replace(" ", "_") + ".txt";
     try {
       File outFile = new File(filePath);
       FileWriter fWriter = new FileWriter(outFile);
       PrintWriter pWriter = new PrintWriter (fWriter);
+      // Write all necessary data into output file
       pWriter.println(getBoardConfigData());
       pWriter.println(getBoardStateData());
       pWriter.println(getBoardExecutions());
       pWriter.close();
-      System.out.println("File saved: " + outFile.getPath());
 
       if (this.board.isDebugMode()) {
+        System.out.println("File saved: " + outFile.getPath());
         System.out.println(getBoardConfigData());
         System.out.println(getBoardStateData());
         System.out.println(getBoardExecutions());
@@ -55,11 +68,19 @@ public class Save {
     }
   }
 
+  /**
+   * Gets the initial Board configuration and convert into savable data string.
+   * @return String of board config data.
+   */
   public String getBoardConfigData() {
     String boardConfigData = "BoardConfig=" + this.boardConfig.size() + ";\n";
     return boardConfigData + convertBoardConfigToData(this.boardConfig);
   }
 
+  /**
+   * Gets the Board state and convert into savable data string.
+   * @return String of board sate data.
+   */
   public String getBoardStateData() {
     String boardStateData = "BoardStateData:\n";
     boardStateData += "firstMoveMaker=" + this.board.getFirstMoveMaker() + ";";
@@ -70,6 +91,11 @@ public class Save {
     return boardStateData;
   }
 
+  /**
+   * Gets all the Board execution from move history and convert into a savable
+   * data string.
+   * @return String data of all board executions.
+   */
   public String getBoardExecutions() {
 
     Player playerBlack = this.board.getBlackPlayer();
@@ -100,6 +126,11 @@ public class Save {
     return data;
   }
 
+  /**
+   * Board configuration to string data converter.
+   * @param boardConfig List<Tile> initial board configuration to be converted.
+   * @return String converted board configuration data.
+   */
   public String convertBoardConfigToData(List<Tile> boardConfig) {
     String boardConfigData = "";
 
@@ -114,6 +145,11 @@ public class Save {
     return boardConfigData;
   }
 
+  /**
+   * Move to string data converter.
+   * @param move Move to be converted
+   * @return String converted move data.
+   */
   public String convertMoveToData(Move move) {
     String moveData = "";
 
