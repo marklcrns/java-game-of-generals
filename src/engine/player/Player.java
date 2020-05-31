@@ -29,7 +29,7 @@ public class Player {
   private Board board;
 
   /** Alliance of the Player. */
-  private Alliance alliance;
+  private final Alliance alliance;
 
   /** Move history that holds all the successfully executed moves. */
   private Map<Integer, Move> moveHistory;
@@ -45,7 +45,7 @@ public class Player {
   /**
    * Constructor that takes in the Alliance of this Player instance.
    */
-  public Player(Alliance alliance) {
+  public Player(final Alliance alliance) {
     this.alliance = alliance;
   }
 
@@ -55,7 +55,7 @@ public class Player {
    * @param board the Board in which to participate in.
    * @return boolean true if successful, else false.
    */
-  public boolean setBoard(Board board) {
+  public boolean setBoard(final Board board) {
     if (board.isPlayerExisting(this))
       return false;
 
@@ -92,7 +92,7 @@ public class Player {
    * Sets the move maker field to true or false.
    * @param isMoveMaker boolean is Player the move maker.
    */
-  public void setMoveMaker(boolean isMoveMaker) {
+  public void setMoveMaker(final boolean isMoveMaker) {
     this.isMoveMaker = isMoveMaker;
   }
 
@@ -104,17 +104,17 @@ public class Player {
    * to be moved.
    * @return boolean true if successful, else false.
    */
-  public boolean makeMove(int pieceCoords, int destinationCoords) {
+  public boolean makeMove(final int pieceCoords, final int destinationCoords) {
 
     // Prints all possible moves in debug mode.
     if (this.board.isDebugMode()) {
-      Map<String, Move> possiblePieceMoves = this.board.getTile(pieceCoords).getPiece().evaluateMoves(board);
+      final Map<String, Move> possiblePieceMoves = this.board.getTile(pieceCoords).getPiece().evaluateMoves(board);
 
       System.out.println(this.board.getTile(pieceCoords).getPiece().getPieceAlliance() +
                          " " + this.board.getTile(pieceCoords).getPiece().getRank());
       System.out.println("Candidate moves size: " + possiblePieceMoves.size());
 
-      for (Map.Entry<String, Move> entry : possiblePieceMoves.entrySet()) {
+      for (final Map.Entry<String, Move> entry : possiblePieceMoves.entrySet()) {
         System.out.println(entry.getKey() + "=" + entry.getValue() + ";");
       };
       System.out.println("\n");
@@ -122,7 +122,7 @@ public class Player {
 
     // Execute if Player's turn and owns the selected piece.
     if (isMoveMaker() && pieceOwnerCheck(pieceCoords)) {
-      Move move = new Move(this, board, pieceCoords, destinationCoords);
+      final Move move = new Move(this, board, pieceCoords, destinationCoords);
       move.evaluateMove();
 
       // Execute if move is valid, else register move as recent invalid move.
@@ -176,7 +176,7 @@ public class Player {
    * Checks if the passed in piece coordinates is owned by this Player instance.
    * @return boolean true if piece is owned by this Player, else false.
    */
-  public boolean pieceOwnerCheck(int pieceCoords) {
+  public boolean pieceOwnerCheck(final int pieceCoords) {
     if (board.getTile(pieceCoords).getPiece().getPieceAlliance() == alliance)
       return true;
     else
@@ -192,7 +192,7 @@ public class Player {
    * Records Move into move history
    * @param move Move to record into moveHistory field.
    */
-  private void recordMove(Move move) {
+  private void recordMove(final Move move) {
     moveHistory.put(move.getTurnId(), move);
   }
 
@@ -201,17 +201,17 @@ public class Player {
    * @return boolean true if successful, else false.
    */
   public boolean undoLastMove() {
-    int currentTurn = this.board.getCurrentTurn();
+    final int currentTurn = this.board.getCurrentTurn();
 
     // Ensures not to undo on Player's first turn.
     if (getMoveFromHistory(currentTurn - 1) != null) {
 
-      Move recentMove = getMoveFromHistory(currentTurn - 1);
-      Move lastMove = getMoveFromHistory(currentTurn - 2);
+      final Move recentMove = getMoveFromHistory(currentTurn - 1);
+      final Move lastMove = getMoveFromHistory(currentTurn - 2);
 
       if (isMoveMaker()) {
-        int recentMoveOrigin = recentMove.getOriginCoords();
-        int recentMoveDestination = recentMove.getDestinationCoords();
+        final int recentMoveOrigin = recentMove.getOriginCoords();
+        final int recentMoveDestination = recentMove.getDestinationCoords();
 
         // Reverse the most recent executed move
         if (recentMove.getMoveType() == "aggressive") {
@@ -261,15 +261,15 @@ public class Player {
    * @return boolean true if successful, else false.
    */
   public boolean redoLastMove() {
-    int currentTurn = this.board.getCurrentTurn();
+    final int currentTurn = this.board.getCurrentTurn();
 
     // Prevents redoing when theres nothing to redo
     if (getMoveFromHistory(currentTurn) != null) {
-      Move nextMove = getMoveFromHistory(currentTurn);
+      final Move nextMove = getMoveFromHistory(currentTurn);
 
       if (isMoveMaker()) {
-        int nextMoveOrigin = nextMove.getOriginCoords();
-        int nextMoveDestination = nextMove.getDestinationCoords();
+        final int nextMoveOrigin = nextMove.getOriginCoords();
+        final int nextMoveDestination = nextMove.getDestinationCoords();
 
         // Reexecute undid move from the move history that matches the current turn.
         if (nextMove.getMoveType() == "aggressive") {
@@ -328,8 +328,8 @@ public class Player {
    * @param turnId int turn ID of the Move.
    * @return Move from the moveHistory field that matches the turnId.
    */
-  public Move getMoveFromHistory(int turnId) {
-    Player opposingPlayer = this.alliance == Alliance.BLACK ?
+  public Move getMoveFromHistory(final int turnId) {
+    final Player opposingPlayer = this.alliance == Alliance.BLACK ?
       this.board.getWhitePlayer() : this.board.getBlackPlayer();
 
     if (opposingPlayer.moveHistory.get(turnId) != null)
@@ -344,11 +344,11 @@ public class Player {
    * @param startPointTurn starting point turn from where to start clearing move
    * history forward.
    */
-  public void clearForwardMoveHistory(int startPointTurn) {
-    Player lastMoveMakerPlayer = this.alliance == Alliance.BLACK ?
+  public void clearForwardMoveHistory(final int startPointTurn) {
+    final Player lastMoveMakerPlayer = this.alliance == Alliance.BLACK ?
       this.board.getWhitePlayer() : this.board.getBlackPlayer();
 
-    int moveHistorySize = this.moveHistory.size() + lastMoveMakerPlayer.moveHistory.size();
+    final int moveHistorySize = this.moveHistory.size() + lastMoveMakerPlayer.moveHistory.size();
     for (int i = startPointTurn; i < moveHistorySize; i++) {
 
       if (lastMoveMakerPlayer.getMoveFromHistory(i) != null) {
@@ -368,7 +368,7 @@ public class Player {
     String history = "";
     if (moveHistory.size() > 0) {
       history += alliance + " player move history:\n";
-      for (Map.Entry<Integer, Move> entry : moveHistory.entrySet()) {
+      for (final Map.Entry<Integer, Move> entry : moveHistory.entrySet()) {
         history += "Turn " + entry.getKey() + ": " + entry.getValue() + "\n";
       };
     } else {

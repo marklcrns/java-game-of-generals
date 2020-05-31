@@ -176,11 +176,11 @@ public class Move {
    */
   private boolean legalMoveCheck() {
     // Fetch all possible moves if any.
-    Map<String, Move> possiblePieceMoves =
+    final Map<String, Move> possiblePieceMoves =
       this.board.getTile(sourceTileCoords).getPiece().evaluateMoves(board);
 
     // Check if one of possible piece moves
-    for (Map.Entry<String, Move> entry : possiblePieceMoves.entrySet()) {
+    for (final Map.Entry<String, Move> entry : possiblePieceMoves.entrySet()) {
       if (entry.getValue().getDestinationCoords() == targetTileCoords) {
         return true;
       }
@@ -394,7 +394,7 @@ public class Move {
    * Sets the execution state to true or false.
    * @param isExecuted boolean
    */
-  public void setExecutionState(boolean isExecuted) {
+  public void setExecutionState(final boolean isExecuted) {
     this.isExecuted = isExecuted;
   }
 
@@ -402,7 +402,7 @@ public class Move {
    * Sets the move type of this Move instance.
    * @param moveType String move type to set.
    */
-  public void setMoveType(String moveType) {
+  public void setMoveType(final String moveType) {
     this.moveType = moveType;
   }
 
@@ -410,15 +410,15 @@ public class Move {
    * Sets the turn ID of this move instance.
    * @param turnId int turn id
    */
-  public void setTurnId(int turnId) {
+  public void setTurnId(final int turnId) {
     this.turnId = turnId;
   }
 
   @Override
   public String toString() {
-    Alliance sourcePieceAlliance = sourcePieceCopy == null ? null : sourcePieceCopy.getPieceAlliance();
-    String sourcePiece = sourcePieceCopy == null ? "" : sourcePieceCopy.getRank() + " ";
-    String targetPiece = targetPieceCopy == null ? "" : targetPieceCopy.getRank() + " ";
+    final Alliance sourcePieceAlliance = sourcePieceCopy == null ? null : sourcePieceCopy.getPieceAlliance();
+    final String sourcePiece = sourcePieceCopy == null ? "" : sourcePieceCopy.getRank() + " ";
+    final String targetPiece = targetPieceCopy == null ? "" : targetPieceCopy.getRank() + " ";
 
     if (isExecuted) {
       String superiorPieceAlliance = "";

@@ -5,45 +5,74 @@ import utils.BoardUtils;
 import engine.player.Player;
 
 /**
+ * Flag piece class that inherits from abstract Piece class.
+ *
  * Author: Mark Lucernas
  * Date: 2020-05-18
  */
 public class Flag extends Piece {
 
+  /** Rank of the piece */
   private final String rank = BoardUtils.FLAG_RANK;
-  private final int powerLevel = 1;
-  private int legalPieceInstanceCount = 1;
 
-  public Flag(Player owner, Alliance alliance) {
+  /** Power level of the piece to compare ranks */
+  private final int powerLevel = 1;
+
+  /** Allowed amount of piece instance owned by a Player in a single game */
+  private final int legalPieceInstanceCount = 1;
+
+  /**
+   * Constructor that takes in the owner Player, and Alliance of this piece.
+   * Sets pieceCoords to -1 temporarily.
+   */
+  public Flag(final Player owner, final Alliance alliance) {
     super(owner, alliance);
   }
 
-  public Flag(Player owner, Alliance alliance, int coords) {
+  /**
+   * Constructor that takes in the owner Player, Alliance and coordinates of
+   * this Piece.
+   */
+  public Flag(final Player owner, final Alliance alliance,
+              final int coords) {
     super(owner, alliance, coords);
   }
 
-  public Flag(Piece piece) {
-    super(piece.getPieceOwner(), piece.getPieceAlliance(), piece.getPieceCoords());
-  }
-
+  /**
+   * Gets the current rank of this specific Piece instance.
+   * @return String rank field.
+   */
   @Override
   public final String getRank() {
     return this.rank;
   }
 
+  /**
+   * Gets the allowed legal instance per Player of this specific piece.
+   * @return int legalPieceInstanceCount field.
+   */
   @Override
   public final int getLegalPieceInstanceCount() {
     return this.legalPieceInstanceCount;
   }
 
+  /**
+   * Gets this Pieces instance power level.
+   * @return int powerLevel field.
+   */
   @Override
   public final int getPowerLevel() {
     return this.powerLevel;
   }
 
+  /**
+   * Create deep copy of this specific Piece instance.
+   * @return Piece deep copy if this Piece instance.
+   */
   @Override
   public final Piece clone() {
-    Flag copy = new Flag(this.pieceOwner, this.pieceAlliance, this.pieceCoords);
+    final Flag copy = new Flag(
+        this.pieceOwner, this.pieceAlliance, this.pieceCoords);
     return copy;
   }
 
