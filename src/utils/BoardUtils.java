@@ -20,19 +20,32 @@ import engine.pieces.Spy;
 import engine.player.Player;
 
 /**
+ * Utility class for engine and gui convenience.
+ *
  * Author: Mark Lucernas
  * Date: 2020-05-17
  */
 public class BoardUtils {
 
-  public static final int TILE_SPACING = 3;
+  /** Board tile display size */
   public static final int TILE_SIZE = 80;
+
+  /** Number of columns in the game board */
   public static final int TILE_COLUMN_COUNT = 9;
+
+  /** Number of row in the game board */
   public static final int TILE_ROW_COUNT = 8;
+
+  /** Count of all tiles in the game board */
   public static final int ALL_TILES_COUNT = TILE_COLUMN_COUNT * TILE_ROW_COUNT;
+
+  /** Board display width */
   public static final int BOARD_WIDTH = TILE_SIZE * TILE_COLUMN_COUNT;
+
+  /** Board display height */
   public static final int BOARD_HEIGHT = TILE_SIZE * TILE_ROW_COUNT;
 
+  /** Pieces ranks based on their class name */
   public static final String GENERAL_FIVE_RANK = "GeneralFive";
   public static final String GENERAL_FOUR_RANK = "GeneralFour";
   public static final String GENERAL_THREE_RANK = "GeneralThree";
@@ -49,12 +62,25 @@ public class BoardUtils {
   public static final String FLAG_RANK = "Flag";
   public static final String SPY_RANK = "Spy";
 
+  /** First tile index of the first board row */
   public static final int FIRST_ROW_INIT = 0;
+
+  /** First tile index of the second board row */
   public static final int SECOND_ROW_INIT = FIRST_ROW_INIT + TILE_COLUMN_COUNT;
 
+  /** First tile index of the last board row */
   public static final int LAST_ROW_INIT = (TILE_ROW_COUNT - 1) * TILE_COLUMN_COUNT;
+
+  /** First tile index of the second to las board row */
   public static final int SECOND_TO_LAST_ROW_INIT = LAST_ROW_INIT - TILE_COLUMN_COUNT;
 
+  /**
+   * Creates Piece instance of the passed in piece rank and alliance.
+   * @param pieceRankName name or rank of the piece to be created.
+   * @param owner Player reference who will own the piece.
+   * @param alliance Alliance of the piece.
+   * @return the Piece created. Null unsuccessful.
+   */
   public static Piece pieceInstanceCreator(String pieceRankName, Player owner,
                                            Alliance alliance) {
     Piece piece = null;
@@ -96,6 +122,9 @@ public class BoardUtils {
     return piece;
   }
 
+  /**
+   * Constructor method that ensures this BoardUtils class cannot be instantiated.
+   */
   private BoardUtils() {
     throw new RuntimeException("You cannot instantiate BoardUtils class");
   }

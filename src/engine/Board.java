@@ -984,7 +984,7 @@ public class Board {
       int randomEmptyTile;
 
       while (pieceInstanceCounter < piece.getLegalPieceInstanceCount()) {
-        randomEmptyTile = Utils.getRandomWithExclusion(new Random(), from, to, occupiedTiles);
+        randomEmptyTile = Utils.getRandomWithExclusion(from, to, occupiedTiles);
         pieceCopy.setPieceCoords(randomEmptyTile);
         // TODO: Fix to check if randomEmptyTile is empty
         if (builder.setPiece(pieceCopy)) {

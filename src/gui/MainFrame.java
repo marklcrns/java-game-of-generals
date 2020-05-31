@@ -22,7 +22,6 @@ import engine.Alliance;
 import engine.Board;
 import game.Load;
 import game.Save;
-import gui.BoardPanel.MenuBarPanel;
 
 /**
  * The main class that serves as the JFrame that puts the BoardPanel and

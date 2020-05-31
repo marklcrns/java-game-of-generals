@@ -1,21 +1,27 @@
 package utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 /**
+ * Various utility functions for coding convenience.
+ *
  * Author: Mark Lucernas
  * Date: 2020-05-25
  */
 public class Utils {
 
-  private Utils() {
-    throw new RuntimeException("You cannot instantiate Utils class");
-  }
-
-  public static int getRandomWithExclusion(Random rnd, int start, int end, int... exclude) {
+  /**
+   * Generates random integer with exclusive of some numbers.
+   * @param start starting number to generate random numbers from.
+   * @param end end number to generate random numbers until.
+   * @param exlude int or int array number/numbers to exclude from being
+   * generated.
+   * @return randomly generated int.
+   *
+   * ref: https://stackoverflow.com/a/6443346/11850077
+   */
+  public static int getRandomWithExclusion(int start, int end, int... exclude) {
+    Random rnd = new Random();
     int random = start + rnd.nextInt(end - start + 1 - exclude.length);
     for (int ex : exclude) {
       if (random < ex) {
@@ -26,7 +32,12 @@ public class Utils {
     return random;
   }
 
-  // ref: https://stackoverflow.com/a/29172210/11850077
+  /**
+   * Appends an integer number to an existing int array.
+   * @param arr int array to append to.
+   * @param num number to append to int array.
+   * @return new int[] with arr and num appended to it.
+   */
   public static int[] appendToIntArray(int[] arr, int num) {
     int[] newArr = new int[arr.length + 1];
 
@@ -38,38 +49,28 @@ public class Utils {
     return newArr;
   }
 
-  public static String[] appendToStringArray(String[] arr, String text) {
+  /**
+   * Appends a string to an existing string array.
+   * @param arr String arr to append to.
+   * @param str String to append ti string array.
+   * @return new String[] with arr and str appended to it.
+   */
+  public static String[] appendToStringArray(String[] arr, String str) {
     String[] newArr = new String[arr.length + 1];
 
     for (int i = 0; i < arr.length; i++) {
       newArr[i] = arr[i];
     }
-    newArr[arr.length] = text;
+    newArr[arr.length] = str;
 
     return newArr;
   }
 
-  // // ref: https://www.educative.io/edpresso/how-to-generate-random-numbers-in-java
-  // public static int getRandomNumber(int start, int end) {
-  //   return (int) (Math.random() * (end - start + 1) + start);
-  // }
+  /**
+   * Constructor method that ensures this Utils class cannot be instantiated.
+   */
+  private Utils() {
+    throw new RuntimeException("You cannot instantiate Utils class");
+  }
 
-  // public static int getRandomNumber(int start, int end, Integer[] exclusion) {
-  //   int randomTile = (int) (Math.random() * (end - start + 1) + start);
-  //
-  //   if (Arrays.asList(exclusion).contains(randomTile))
-  //     randomTile = (int) (Math.random() * (end - start + 1) + start);
-  //
-  //   return randomTile;
-  // }
-
-
-  // // ref: https://www.techiedelight.com/add-new-elements-to-array-java/
-  // public static Integer[] appendToIntegerArray(Integer[] arr, int element) {
-  //   List<Integer> list = new ArrayList<>(Arrays.asList(arr));
-  //   list.add(element);
-  //
-  //   return list.toArray(new Integer[0]);
-  // }
-
-}
+} // Utils
