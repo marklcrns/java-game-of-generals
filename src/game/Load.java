@@ -17,26 +17,48 @@ import utils.BoardUtils;
 import utils.Utils;
 
 /**
+ * Load class that loads saved game state data into the board engine.
+ *
  * Author: Mark Lucernas
  * Date: 2020-05-28
  */
 public class Load {
 
+  /** Saved game state data path. */
   private static final String DATA_PATH = "data/save/";
+
+  /** Reference to the Board engine. */
+  private final Board board;
+
+  /** Stores the save data filename. */
   private final String fileName;
-  private Map<Integer, Move> moveHistory;
-  private Board board;
-  private BoardBuilder builder;
-  private Player playerBlack;
-  private Player playerWhite;
+
+  /** Stores the move history of the saved game state. */
+  private final Map<Integer, Move> moveHistory;
+
+  /** Stores first move maker from the saved game state. */
   private Alliance firstMoveMaker;
+
+  /** Stores the current turn ID from the saved game state. */
   private int currentTurn;
+
+  /** Stores the last executed turn ID from the saved game state. */
   private int lastExecutedTurn;
 
-  public static void main(String[] args) {
-    Board board = new Board();
-    Player player1 = new Player(Alliance.WHITE);
-    Player player2 = new Player(Alliance.BLACK);
+  /** BoardBuilder instance for rebuilding saved game state. */
+  private final BoardBuilder builder;
+
+  /** Black player instance */
+  private Player playerBlack;
+
+  /** White player instance */
+  private Player playerWhite;
+
+  // TODO: Delete later
+  public static void main(final String[] args) {
+    final Board board = new Board();
+    final Player player1 = new Player(Alliance.WHITE);
+    final Player player2 = new Player(Alliance.BLACK);
     board.setPlayerWhite(player1);
     board.setPlayerBlack(player2);
     board.setDebugMode(true);
@@ -45,47 +67,66 @@ public class Load {
     new MainFrame(board);
   }
 
-  public Load(Board board, String fileName) {
+  /**
+   * Constructor method that takes in the Board engine the filename of the saved
+   * game data.
+   * @param board the Board engine
+   * @param filename filename of the saved data.
+   */
+  public Load(final Board board, final String filename) {
     this.board = board;
-    this.fileName = fileName;
+    this.fileName = filename;
     this.moveHistory = new HashMap<Integer, Move>();
     this.builder = new BoardBuilder();
   }
 
+  /**
+   * Gets the list of all existing saved game state data from save directory.
+   * @return String[] of all saved data filenames.
+   */
   public static String[] getSaveList() {
-    File saveListPathFiles = new File(DATA_PATH);
-    String[] saveList = saveListPathFiles.list();
+    final File saveListPathFiles = new File(DATA_PATH);
+    final String[] saveList = saveListPathFiles.list();
 
     return saveList;
   }
 
+  /**
+   * Loads the save game data file and stores all data into this class fields
+   * then reexecute all moves from history.
+   */
   public void loadSaveGame() {
-    File saveFile = new File(DATA_PATH + fileName);
+    final File saveFile = new File(DATA_PATH + fileName);
 
     String[] saveData = {};
     try {
-      Scanner scan = new Scanner(saveFile);
+      final Scanner scan = new Scanner(saveFile);
 
       while (scan.hasNextLine()) {
-        String scanLine = scan.nextLine();
+        final String scanLine = scan.nextLine();
         if (board.isDebugMode())
           System.out.println(scanLine);
         saveData = Utils.appendToStringArray(saveData, scanLine);
       }
       scan.close();
 
+      // Parse sanned data and execute.
       if (parseSaveData(saveData)) {
         executeSaveData();
         this.board.startGame();
         if (this.board.isDebugMode())
           System.out.println("Game successfully loaded");
       }
-    } catch (FileNotFoundException e) {
+    } catch (final FileNotFoundException e) {
       System.out.println("Load error: Save data not found");
     }
   }
 
-  public boolean parseSaveData(String[] saveData) {
+  /**
+   * Parse saved game state data and stores all data into this class fields.
+   * @return boolean true if successful, else false.
+   */
+  public boolean parseSaveData(final String[] saveData) {
     if (saveData.length != 0 && saveData != null) {
       boolean isBoardConfig = false;
       boolean isBoardStateData = false;
@@ -127,7 +168,7 @@ public class Load {
       }
       if (this.board.isDebugMode()) {
         System.out.println("Move history Loaded:\n");
-        for (Map.Entry<Integer, Move> entry : moveHistory.entrySet()) {
+        for (final Map.Entry<Integer, Move> entry : moveHistory.entrySet()) {
           System.out.println("TurnId=" + entry.getKey() + ";Move=" + entry.getValue());
         }
       }
@@ -136,25 +177,33 @@ public class Load {
     return false;
   }
 
-  public boolean boardConfigDataParser(String saveData) {
+  /**
+   * Board config data parser that reads a line from saved game state data and
+   * restore into board config field.
+   * @param saveData String data from saved game state data under board config.
+   * @return boolean true if successful, else false.
+   */
+  public boolean boardConfigDataParser(final String saveData) {
     if (!saveData.isEmpty() && saveData != null) {
-      String tileIdKey = "tileId=";
-      String territoryKey = "territory=";
-      String pieceRankKey = "piece=";
-      String pieceAllianceKey = "pieceAlliance=";
+      final String tileIdKey = "tileId=";
+      final String territoryKey = "territory=";
+      final String pieceRankKey = "piece=";
+      final String pieceAllianceKey = "pieceAlliance=";
 
-      int tileIdIndex = saveData.indexOf(tileIdKey);
-      int territoryIndex = saveData.indexOf(territoryKey);
-      int pieceRankIndex = saveData.indexOf(pieceRankKey);
-      int pieceAllianceIndex = saveData.indexOf(pieceAllianceKey);
+      // Index
+      final int tileIdIndex = saveData.indexOf(tileIdKey);
+      final int territoryIndex = saveData.indexOf(territoryKey);
+      final int pieceRankIndex = saveData.indexOf(pieceRankKey);
+      final int pieceAllianceIndex = saveData.indexOf(pieceAllianceKey);
 
-      int tileId = Integer.parseInt(saveData.substring(
+      // Value
+      final int tileId = Integer.parseInt(saveData.substring(
             tileIdIndex + tileIdKey.length(), territoryIndex - 1));
-      String territory = saveData.substring(
+      final String territory = saveData.substring(
           territoryIndex + territoryKey.length(), pieceRankIndex - 1);
-      String pieceRank = saveData.substring(
+      final String pieceRank = saveData.substring(
           pieceRankIndex + pieceRankKey.length(), pieceAllianceIndex - 1);
-      String pieceAlliance = saveData.substring(
+      final String pieceAlliance = saveData.substring(
           pieceAllianceIndex + pieceAllianceKey.length(), saveData.length() - 1);
 
       if (this.board.isDebugMode()) {
@@ -164,6 +213,7 @@ public class Load {
         System.out.println("pieceAllianceIndex=" + pieceAllianceIndex + ";pieceAlliance=" + pieceAlliance);
       }
 
+      // Rebuild board configuration.
       Piece piece = null;
       if (territory.contains("BLACK") && !pieceRank.contains("null")) {
         piece = BoardUtils.pieceInstanceCreator(pieceRank, playerBlack, Alliance.BLACK);
@@ -188,27 +238,35 @@ public class Load {
     return false;
   }
 
-  public boolean boardStateDataParser(String boardState) {
+  /**
+   * Board state data parser that reads a line from saved game state data and
+   * restore into corresponding field.
+   * @param boardState String data from saved game state data under board state.
+   * @return boolean true if successful, else false.
+   */
+  public boolean boardStateDataParser(final String boardState) {
     if (!boardState.isEmpty() && boardState != null) {
-      String firstMoveMakerKey = "firstMoveMaker=";
-      String currentTurnKey = "currentTurn=";
-      String lastExecutedTurnKey = "lastExecutedTurn=";
+      final String firstMoveMakerKey = "firstMoveMaker=";
+      final String currentTurnKey = "currentTurn=";
+      final String lastExecutedTurnKey = "lastExecutedTurn=";
 
       // index
-      int firstMoveMakerIndex = boardState.indexOf(firstMoveMakerKey);
-      int currentTurnIndex = boardState.indexOf(currentTurnKey);
-      int lastExecutedTurnIndex = boardState.indexOf(lastExecutedTurnKey);
+      final int firstMoveMakerIndex = boardState.indexOf(firstMoveMakerKey);
+      final int currentTurnIndex = boardState.indexOf(currentTurnKey);
+      final int lastExecutedTurnIndex = boardState.indexOf(lastExecutedTurnKey);
 
       // value
-      String firstMoveMaker = boardState.substring(
+      final String firstMoveMaker = boardState.substring(
           firstMoveMakerIndex + firstMoveMakerKey.length(), currentTurnIndex);
-      int currentTurn = Integer.parseInt(boardState.substring(
+      final int currentTurn = Integer.parseInt(boardState.substring(
           currentTurnIndex + currentTurnKey.length(), lastExecutedTurnIndex));
-      int lastExecutedTurn = Integer.parseInt(boardState.substring(
+      final int lastExecutedTurn = Integer.parseInt(boardState.substring(
             lastExecutedTurnIndex + lastExecutedTurnKey.length(), boardState.length() - 1));
 
       if (firstMoveMaker.contains("BLACK"))
         this.firstMoveMaker = Alliance.BLACK;
+      else
+        this.firstMoveMaker = Alliance.WHITE;
 
       this.currentTurn = currentTurn;
       this.lastExecutedTurn = lastExecutedTurn;
@@ -218,41 +276,50 @@ public class Load {
     return false;
   }
 
-  public boolean boardExecutionsDataParser(String dataExecution) {
+  /**
+   * Board execution data parser that reads a line from the saved game state
+   * data and restore into move history field.
+   * @param String data execution from the saved game state data under board
+   * execution.
+   * @return boolean true if successful, else false.
+   */
+  public boolean boardExecutionsDataParser(final String dataExecution) {
     if (!dataExecution.isEmpty() && dataExecution != null) {
-      String turnIdKey = "turnId=";
-      String moveTypeKey = "moveType=";
-      String sourceAllianceKey = "sourceAlliance=";
-      String sourcePieceRankKey = "sourcePiece=";
-      String targetPieceKey = "targetPiece=";
-      String originCoordsKey = "originCoords=";
-      String destinationCoordsKey = "destinationCoords=";
-      String isExecutedKey = "isExecuted=";
+      final String turnIdKey = "turnId=";
+      final String moveTypeKey = "moveType=";
+      final String sourceAllianceKey = "sourceAlliance=";
+      final String sourcePieceRankKey = "sourcePiece=";
+      final String targetPieceKey = "targetPiece=";
+      final String originCoordsKey = "originCoords=";
+      final String destinationCoordsKey = "destinationCoords=";
+      final String isExecutedKey = "isExecuted=";
 
-      int turnIdIndex = dataExecution.indexOf(turnIdKey);
-      int moveTypeIndex = dataExecution.indexOf(moveTypeKey);
-      int sourceAllianceIndex = dataExecution.indexOf(sourceAllianceKey);
-      int sourcePieceRankIndex = dataExecution.indexOf(sourcePieceRankKey);
-      int targetPieceIndex = dataExecution.indexOf(targetPieceKey);
-      int originCoordsIndex = dataExecution.indexOf(originCoordsKey);
-      int destinationCoordsIndex = dataExecution.indexOf(destinationCoordsKey);
-      int isExecutedIndex = dataExecution.indexOf(isExecutedKey);
+      // Index
+      final int turnIdIndex = dataExecution.indexOf(turnIdKey);
+      final int moveTypeIndex = dataExecution.indexOf(moveTypeKey);
+      final int sourceAllianceIndex = dataExecution.indexOf(sourceAllianceKey);
+      final int sourcePieceRankIndex = dataExecution.indexOf(sourcePieceRankKey);
+      final int targetPieceIndex = dataExecution.indexOf(targetPieceKey);
+      final int originCoordsIndex = dataExecution.indexOf(originCoordsKey);
+      final int destinationCoordsIndex = dataExecution.indexOf(destinationCoordsKey);
+      final int isExecutedIndex = dataExecution.indexOf(isExecutedKey);
 
-      int turnId = Integer.parseInt(dataExecution.substring(
+      // Value
+      final int turnId = Integer.parseInt(dataExecution.substring(
           turnIdIndex + turnIdKey.length(), moveTypeIndex - 1));
-      String moveType = dataExecution.substring(
+      final String moveType = dataExecution.substring(
           moveTypeIndex + moveTypeKey.length(), sourceAllianceIndex - 1);
-      String sourceAlliance = dataExecution.substring(
+      final String sourceAlliance = dataExecution.substring(
           sourceAllianceIndex + sourceAllianceKey.length(), sourcePieceRankIndex - 1);
-      String sourcePieceRank = dataExecution.substring(
+      final String sourcePieceRank = dataExecution.substring(
           sourcePieceRankIndex + sourcePieceRankKey.length(), targetPieceIndex - 1);
-      String targetPiece = dataExecution.substring(
+      final String targetPiece = dataExecution.substring(
           targetPieceIndex + targetPieceKey.length(), originCoordsIndex - 1);
-      int originCoords = Integer.parseInt(dataExecution.substring(
+      final int originCoords = Integer.parseInt(dataExecution.substring(
           originCoordsIndex + originCoordsKey.length(), destinationCoordsIndex - 1));
-      int destinationCoords = Integer.parseInt(dataExecution.substring(
+      final int destinationCoords = Integer.parseInt(dataExecution.substring(
           destinationCoordsIndex + destinationCoordsKey.length(), isExecutedIndex - 1));
-      boolean isExecuted = Boolean.parseBoolean(dataExecution.substring(
+      final boolean isExecuted = Boolean.parseBoolean(dataExecution.substring(
           isExecutedIndex + isExecutedKey.length(), dataExecution.length() - 1));
 
       if (this.board.isDebugMode()) {
@@ -266,14 +333,17 @@ public class Load {
         System.out.println("isExecutedIndex=" + isExecutedIndex + ";isExecuted=" + isExecuted);
       }
 
-      Player player = sourceAlliance.contains("BLACK") ? playerBlack : playerWhite;
-      Move move = new Move(player, this.board, originCoords, destinationCoords);
+      // Recreate move.
+      final Player player = sourceAlliance.contains("BLACK") ? playerBlack : playerWhite;
+      final Move move = new Move(player, this.board, originCoords, destinationCoords);
 
+      // Reexecute executable Move.
       move.setTurnId(turnId);
       move.setMoveType(moveType);
       if (isExecuted)
         move.setExecutionState(true);
 
+      // Store into moveHistory field.
       moveHistory.put(turnId, move);
 
       return true;
@@ -281,24 +351,52 @@ public class Load {
     return false;
   }
 
-  public void executeSaveData() {
-    this.board.setFirstMoveMaker(this.firstMoveMaker);
-    this.board.setCurrentTurn(this.currentTurn);
-    this.board.setLastExecutedTurn(this.lastExecutedTurn);
+  /**
+   * Executes loaded saved game state data if ready.
+   * @return boolean true if successful, else false.
+   */
+  public boolean executeSaveData() {
 
-    for (Map.Entry<Integer, Move> entry : moveHistory.entrySet()) {
-      if (entry.getValue().isMoveExecuted()) {
+    if (isReadyToExecute()) {
+      this.board.setFirstMoveMaker(this.firstMoveMaker);
+      this.board.setCurrentTurn(this.currentTurn);
+      this.board.setLastExecutedTurn(this.lastExecutedTurn);
 
-        // TODO: Mimic player makeMove()
-        System.out.println(this.board);
-        entry.getValue().evaluateMove();
-        entry.getValue().execute();
-        System.out.println(this.board);
+      for (final Map.Entry<Integer, Move> entry : moveHistory.entrySet()) {
+        if (entry.getValue().isMoveExecuted()) {
 
-        if (this.board.isDebugMode())
-          System.out.println("Executing turn " + entry.getKey() + ". Successful");
+          // TODO: Mimic player makeMove()
+          System.out.println(this.board);
+          entry.getValue().evaluateMove();
+          entry.getValue().execute();
+          System.out.println(this.board);
+
+          if (this.board.isDebugMode())
+            System.out.println("Executing turn " + entry.getKey() + ". Successful");
+          return true;
+        }
       }
+    } else {
+      if (this.board.isDebugMode())
+        System.out.println("E: Loading saved game failed");
     }
+    return false;
   }
 
-}
+  /**
+   * Checks if all data from saved game state has been loaded and ready to be
+   * executed.
+   * @return boolean if ready to execute, else false.
+   */
+  public boolean isReadyToExecute() {
+    if (this.firstMoveMaker != null &&
+        this.currentTurn > 0 &&
+        this.lastExecutedTurn > 0 &&
+        builder != null &&
+        moveHistory != null)
+      return true;
+
+    return false;
+  }
+
+} // Load

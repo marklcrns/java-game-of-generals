@@ -28,29 +28,29 @@ public class Save {
   private final String DATA_PATH = "data/save/";
 
   /** List of Tile the contains the initial board arrangement before game starts. */
-  private List<Tile> boardConfig;
+  private final List<Tile> boardConfig;
 
   /** Reference to the Board engine */
-  private Board board;
+  private final Board board;
 
   /**
    * Constructor method that takes in Board instance as parameter.
    * Timestamp ref: https://tecadmin.net/get-current-timestamp-in-java/
    */
-  public Save(Board board) {
+  public Save(final Board board) {
     this.board = board;
     this.boardConfig = board.getInitBoardConfig();
 
-    Date date = new Date();
-    long time = date.getTime();
-    Timestamp ts = new Timestamp(time);
+    final Date date = new Date();
+    final long time = date.getTime();
+    final Timestamp ts = new Timestamp(time);
 
     // Set current date and timestamp as file output name.
-    String filePath = DATA_PATH + (ts + "").replace(" ", "_") + ".txt";
+    final String filePath = DATA_PATH + (ts + "").replace(" ", "_") + ".txt";
     try {
-      File outFile = new File(filePath);
-      FileWriter fWriter = new FileWriter(outFile);
-      PrintWriter pWriter = new PrintWriter (fWriter);
+      final File outFile = new File(filePath);
+      final FileWriter fWriter = new FileWriter(outFile);
+      final PrintWriter pWriter = new PrintWriter (fWriter);
       // Write all necessary data into output file
       pWriter.println(getBoardConfigData());
       pWriter.println(getBoardStateData());
@@ -63,7 +63,7 @@ public class Save {
         System.out.println(getBoardStateData());
         System.out.println(getBoardExecutions());
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       System.out.println("Save error: save unsuccessful.\npath: " + filePath);
     }
   }
@@ -73,7 +73,7 @@ public class Save {
    * @return String of board config data.
    */
   public String getBoardConfigData() {
-    String boardConfigData = "BoardConfig=" + this.boardConfig.size() + ";\n";
+    final String boardConfigData = "BoardConfig=" + this.boardConfig.size() + ";\n";
     return boardConfigData + convertBoardConfigToData(this.boardConfig);
   }
 
@@ -98,14 +98,14 @@ public class Save {
    */
   public String getBoardExecutions() {
 
-    Player playerBlack = this.board.getBlackPlayer();
-    Player playerWhite = this.board.getWhitePlayer();
-    Alliance firstMoveMaker = this.board.getFirstMoveMaker();
+    final Player playerBlack = this.board.getBlackPlayer();
+    final Player playerWhite = this.board.getWhitePlayer();
+    final Alliance firstMoveMaker = this.board.getFirstMoveMaker();
 
-    Map<Integer, Move> blackMoveHistory = playerBlack.getMoveHistory();
-    Map<Integer, Move> whiteMoveHistory = playerWhite.getMoveHistory();
+    final Map<Integer, Move> blackMoveHistory = playerBlack.getMoveHistory();
+    final Map<Integer, Move> whiteMoveHistory = playerWhite.getMoveHistory();
 
-    int moveHistorySize = blackMoveHistory.size() + whiteMoveHistory.size();
+    final int moveHistorySize = blackMoveHistory.size() + whiteMoveHistory.size();
 
     String data = "BoardExecutions=" + moveHistorySize + ";\n";
 
@@ -131,7 +131,7 @@ public class Save {
    * @param boardConfig List<Tile> initial board configuration to be converted.
    * @return String converted board configuration data.
    */
-  public String convertBoardConfigToData(List<Tile> boardConfig) {
+  public String convertBoardConfigToData(final List<Tile> boardConfig) {
     String boardConfigData = "";
 
     for (int i = 0; i < boardConfig.size(); i++) {
@@ -150,7 +150,7 @@ public class Save {
    * @param move Move to be converted
    * @return String converted move data.
    */
-  public String convertMoveToData(Move move) {
+  public String convertMoveToData(final Move move) {
     String moveData = "";
 
     moveData +=

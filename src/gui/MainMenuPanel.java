@@ -94,9 +94,9 @@ public class MainMenuPanel extends JPanel {
 
     // TODO: Fix
     // Centers image inside JPanel bounds
-    Graphics2D g2 = (Graphics2D) g;
-    int x = (this.getWidth() - this.backgroundImage.getWidth(null)) / 2;
-    int y = (this.getHeight() - this.backgroundImage.getWidth(null)) / 2;
+    final Graphics2D g2 = (Graphics2D) g;
+    final int x = (this.getWidth() - this.backgroundImage.getWidth(null)) / 2;
+    final int y = (this.getHeight() - this.backgroundImage.getWidth(null)) / 2;
     g2.drawImage(backgroundImage, x, y, null);
   }
 

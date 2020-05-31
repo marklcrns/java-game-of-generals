@@ -9,6 +9,9 @@ import engine.player.Player;
 import gui.MainFrame;
 
 /**
+ * Main class that serves as the controller that initializes Board, BoardBuilder
+ * and Players, and runs the program.
+ *
  * Author: Mark Lucernas
  * Date: 2020-05-16
  */

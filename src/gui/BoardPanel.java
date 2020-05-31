@@ -95,7 +95,7 @@ public class BoardPanel extends JPanel {
   /**
    * Constructor method that takes in Board engine as parameter.
    */
-  public BoardPanel(Board board) {
+  public BoardPanel(final Board board) {
     this.gameStateBoard = board;
     this.setLayout(new BorderLayout());
     this.setVisible(false);
@@ -137,7 +137,7 @@ public class BoardPanel extends JPanel {
   /**
    * Set the visibility of the Player names in the menu bar panel.
    */
-  public void setPlayerNamesVisibility(boolean visibility) {
+  public void setPlayerNamesVisibility(final boolean visibility) {
     playerBlackNameLbl.setVisible(visibility);
     playerWhiteNameLbl.setVisible(visibility);
   }
@@ -267,10 +267,10 @@ public class BoardPanel extends JPanel {
   public class MenuBarPanel extends JPanel {
 
     /** Menu bar buttons */
-    private JButton restart, load, quit, undo, redo, save, surrender, rules;
+    private final JButton restart, load, quit, undo, redo, save, surrender, rules;
 
     /** Player names label */
-    private JLabel playerBlackName, playerWhiteName;
+    private final JLabel playerBlackName, playerWhiteName;
 
     /**
      * Constructor method that initializes this MenuBarPanel and all its components
@@ -355,7 +355,7 @@ public class BoardPanel extends JPanel {
   private class MoveHistoryPanel extends JPanel {
 
     /** Move history text area */
-    private JTextArea moveHistoryTextArea = new JTextArea();
+    private final JTextArea moveHistoryTextArea = new JTextArea();
 
     /** Move history opening message string */
     private String openingMessage;
@@ -369,17 +369,17 @@ public class BoardPanel extends JPanel {
       this.setPreferredSize(MOVE_HISTORY_PANEL_DIMENSION);
       moveHistoryTextArea.setEditable(false);
 
-      JLabel label = new JLabel("MOVE HISTORY");
+      final JLabel label = new JLabel("MOVE HISTORY");
       label.setHorizontalAlignment(JLabel.CENTER);
       label.setVerticalAlignment(JLabel.CENTER);
       label.setFont(new Font("SansSerif", Font.BOLD, 18));
 
-      JButton doneArrangingBtn = new JButton("Done Arranging");
-      JButton startGameBtn = new JButton("Start Game");
+      final JButton doneArrangingBtn = new JButton("Done Arranging");
+      final JButton startGameBtn = new JButton("Start Game");
       setDoneArrangingBtn(doneArrangingBtn);
       setStartGameBtn(startGameBtn);
 
-      JPanel initGameButtonsPanel = new JPanel();
+      final JPanel initGameButtonsPanel = new JPanel();
       initGameButtonsPanel.add(doneArrangingBtn);
       initGameButtonsPanel.add(startGameBtn);
 
@@ -387,7 +387,7 @@ public class BoardPanel extends JPanel {
       moveHistoryTextArea.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
       // set scrollable vertically as needed
-      JScrollPane moveHistoryVScrollable = new JScrollPane(moveHistoryTextArea);
+      final JScrollPane moveHistoryVScrollable = new JScrollPane(moveHistoryTextArea);
       moveHistoryVScrollable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
       this.add(label, BorderLayout.NORTH);
@@ -401,7 +401,7 @@ public class BoardPanel extends JPanel {
      * Appends String into move history text area.
      * @param text texts to append into text area.
      */
-    public void appendTextToMoveHistory(String text) {
+    public void appendTextToMoveHistory(final String text) {
       moveHistoryTextArea.append(text);
     }
 
@@ -409,7 +409,7 @@ public class BoardPanel extends JPanel {
      * Converts Move into string and appends to move history text area
      * @param move Move to append into text area.
      */
-    public void appendToMoveHistory(Move move) {
+    public void appendToMoveHistory(final Move move) {
       moveHistoryTextArea.append(convertMoveToString(move));
     }
 
@@ -418,11 +418,11 @@ public class BoardPanel extends JPanel {
      * @param move Move to be converted into String object.
      * @return String version of the move instance.
      */
-    public String convertMoveToString(Move move) {
+    public String convertMoveToString(final Move move) {
       String moveString = "";
 
       if (move.getMoveType() == "aggressive") {
-        Alliance superiorPieceAlliance =
+        final Alliance superiorPieceAlliance =
           move.getEliminatedPiece().getPieceAlliance() ==
           Alliance.BLACK ? Alliance.WHITE : Alliance.BLACK;
 
@@ -449,12 +449,12 @@ public class BoardPanel extends JPanel {
      * @param move move entry to be removed from move history text area.
      */
     // TODO: Fix only removing invalid moves
-    public void removeMoveFromHistory(Move move) {
+    public void removeMoveFromHistory(final Move move) {
       if (move != null) {
         removeRecentInvalidMove();
 
-        String fullMoveHistory = moveHistoryTextArea.getText();
-        String moveString = convertMoveToString(move);
+        final String fullMoveHistory = moveHistoryTextArea.getText();
+        final String moveString = convertMoveToString(move);
 
         clearMoveHistory();
         appendTextToMoveHistory(fullMoveHistory.replace(moveString, ""));
@@ -466,8 +466,8 @@ public class BoardPanel extends JPanel {
      */
     public void removeRecentInvalidMove() {
       if (gameStateBoard.getLastInvalidMove() != null) {
-        String fullMoveHistory = moveHistoryTextArea.getText();
-        String invalidMoveString = convertMoveToString(gameStateBoard.getLastInvalidMove());
+        final String fullMoveHistory = moveHistoryTextArea.getText();
+        final String invalidMoveString = convertMoveToString(gameStateBoard.getLastInvalidMove());
 
         clearMoveHistory();
         appendTextToMoveHistory(fullMoveHistory.replace(invalidMoveString, ""));
@@ -486,7 +486,7 @@ public class BoardPanel extends JPanel {
      * Sets or hoist done arranging button up to parent BoardPanel class for
      * easy access.
      */
-    public void setDoneArrangingBtn(JButton doneArranging) {
+    public void setDoneArrangingBtn(final JButton doneArranging) {
       doneArrangingBtn = doneArranging;
     }
 
@@ -494,7 +494,7 @@ public class BoardPanel extends JPanel {
      * Sets or hoist start game button up to parent BoardPanel class for
      * easy access.
      */
-    public void setStartGameBtn(JButton startGame) {
+    public void setStartGameBtn(final JButton startGame) {
       startGameBtn = startGame;
     }
 
@@ -506,7 +506,7 @@ public class BoardPanel extends JPanel {
       String name = "Player";
 
       // Get current move maker Player name
-      Alliance moveMaker = gameStateBoard.getMoveMaker();
+      final Alliance moveMaker = gameStateBoard.getMoveMaker();
 
       if (gameStateBoard.getBlackPlayerName() != null && moveMaker == Alliance.BLACK)
         name = gameStateBoard.getBlackPlayerName();
@@ -593,14 +593,14 @@ public class BoardPanel extends JPanel {
      * and move types. Also sets all highlighted tiles as candidate move tiles.
      */
     // TODO: add tileId on top left of tile panel
-    private void highlightPieceMoves(int tileId) {
+    private void highlightPieceMoves(final int tileId) {
       final Tile sourceTile = gameStateBoard.getTile(tileId);
 
       if (sourceTile.isTileOccupied()) {
         currentPieceMoves = sourceTile.getPiece().evaluateMoves(gameStateBoard);
 
-        for (Map.Entry<String, Move> entry : currentPieceMoves.entrySet()) {
-          int destinationCoords = entry.getValue().getDestinationCoords();
+        for (final Map.Entry<String, Move> entry : currentPieceMoves.entrySet()) {
+          final int destinationCoords = entry.getValue().getDestinationCoords();
 
           if (entry.getValue().getMoveType() == "aggressive" ||
               entry.getValue().getMoveType() == "draw") {
@@ -640,7 +640,7 @@ public class BoardPanel extends JPanel {
      * active or not active.
      * @param newActiveTile new active tile id
      */
-    private void setActiveTile(int newActiveTile) {
+    private void setActiveTile(final int newActiveTile) {
       if (newActiveTile == -1) {
         if (this.activeTileId != -1) {
           boardTiles.get(this.activeTileId).setIsTileActive(false);
@@ -673,7 +673,7 @@ public class BoardPanel extends JPanel {
      * Deactivate specific tile.
      * @param tileId tile id of the tile to be deactivated.
      */
-    private void deactivateTile(int tileId) {
+    private void deactivateTile(final int tileId) {
       if (boardTiles.get(tileId).isTileActive()) {
         boardTiles.get(tileId).deactivateTile();
       }
@@ -682,7 +682,7 @@ public class BoardPanel extends JPanel {
     /**
      * Enables or disables TilePanel hover highlight.
      */
-    private void setHoverHighlight(boolean enabled) {
+    private void setHoverHighlight(final boolean enabled) {
       this.enableHoverHighlight = enabled;
     }
 
@@ -727,8 +727,8 @@ public class BoardPanel extends JPanel {
      */
     private void preLoadImages() {
       // Pre-load piece image
-      Map<String, Image> blackPieceIcons = new HashMap<>();
-      Map<String, Image> whitePieceIcons = new HashMap<>();
+      final Map<String, Image> blackPieceIcons = new HashMap<>();
+      final Map<String, Image> whitePieceIcons = new HashMap<>();
 
       final String blackPiecesPath = PIECE_IMAGES_PATH + "black/";
       final String whitePiecesPath = PIECE_IMAGES_PATH + "white/";
@@ -737,39 +737,39 @@ public class BoardPanel extends JPanel {
       BufferedImage bufferedImage;
       Image image;
 
-      File blackImageFiles = new File(blackPiecesPath);
-      File whiteImageFiles = new File(whitePiecesPath);
+      final File blackImageFiles = new File(blackPiecesPath);
+      final File whiteImageFiles = new File(whitePiecesPath);
 
       blackPathNames = blackImageFiles.list();
       whitePathNames = whiteImageFiles.list();
 
       // TODO Improve code redundancy
       // load black images
-      for (String pathFile : blackPathNames) {
+      for (final String pathFile : blackPathNames) {
         try {
-          String strippedAlliancePathName = pathFile.replaceAll("^BLACK_", "");
-          String pathNameRank = strippedAlliancePathName.replaceAll(".png$", "");
+          final String strippedAlliancePathName = pathFile.replaceAll("^BLACK_", "");
+          final String pathNameRank = strippedAlliancePathName.replaceAll(".png$", "");
 
           bufferedImage = ImageIO.read(new File(blackPiecesPath + pathFile));
           image = bufferedImage.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
 
           blackPieceIcons.put(pathNameRank, image);
-        } catch (IOException e) {
+        } catch (final IOException e) {
           e.printStackTrace();
         }
       }
 
       // load white images
-      for (String pathFile : whitePathNames) {
+      for (final String pathFile : whitePathNames) {
         try {
-          String strippedAlliancePathName = pathFile.replaceAll("^WHITE_", "");
-          String pathNameRank = strippedAlliancePathName.replaceAll(".png$", "");
+          final String strippedAlliancePathName = pathFile.replaceAll("^WHITE_", "");
+          final String pathNameRank = strippedAlliancePathName.replaceAll(".png$", "");
 
           bufferedImage = ImageIO.read(new File(whitePiecesPath + pathFile));
           image = bufferedImage.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
 
           whitePieceIcons.put(pathNameRank, image);
-        } catch (IOException e) {
+        } catch (final IOException e) {
           e.printStackTrace();
         }
       }
@@ -806,7 +806,7 @@ public class BoardPanel extends JPanel {
      * Sets hovered tile ID.
      * @param tileId tile Id being hovered.
      */
-    private void setHoveredTileId(int tileId) {
+    private void setHoveredTileId(final int tileId) {
       this.hoveredTileId = tileId;
     }
   } // InnerBoardPanel
@@ -860,7 +860,7 @@ public class BoardPanel extends JPanel {
       this.addMouseListener(new MouseListener() {
 
         @Override
-        public void mouseClicked(MouseEvent e) {
+        public void mouseClicked(final MouseEvent e) {
         }
 
         /**
@@ -869,7 +869,7 @@ public class BoardPanel extends JPanel {
          * has a winner.
          */
         @Override
-        public void mouseEntered(MouseEvent e) {
+        public void mouseEntered(final MouseEvent e) {
           if (gameStateBoard.getEndGameWinner() == null &&
               gameStateBoard.isGameStarted()) {
             if (isOccupyingPieceOwnedByMoveMaker() || isCandidateMoveTile) {
@@ -895,7 +895,7 @@ public class BoardPanel extends JPanel {
          * when game concludes or has a winner.
          */
         @Override
-        public void mouseExited(MouseEvent e) {
+        public void mouseExited(final MouseEvent e) {
           if (gameStateBoard.getEndGameWinner() == null &&
               gameStateBoard.isGameStarted()) {
             if (isOccupyingPieceOwnedByMoveMaker()) {
@@ -922,7 +922,7 @@ public class BoardPanel extends JPanel {
          * Listener disables once the game concludes or has game winner.
          */
         @Override
-        public void mousePressed(MouseEvent e) {
+        public void mousePressed(final MouseEvent e) {
           // Ensures TilePanel can only be pressed if game is ongoing
           if (gameStateBoard.getEndGameWinner() == null &&
               gameStateBoard.isGameStarted()) {
@@ -977,7 +977,7 @@ public class BoardPanel extends JPanel {
          * released from being clicked.
          */
         @Override
-        public void mouseReleased(MouseEvent e) {
+        public void mouseReleased(final MouseEvent e) {
           // Ensures TilePanel can only be pressed if game is ongoing.
           if (gameStateBoard.getEndGameWinner() == null &&
               gameStateBoard.isGameStarted()) {
@@ -992,22 +992,22 @@ public class BoardPanel extends JPanel {
                 final Piece activePiece = gameStateBoard.getTile(boardPanel.getActiveTileId()).getPiece();
 
                 // Get player and execute move.
-                Player player = gameStateBoard.getPlayer(activePiece.getPieceAlliance());
+                final Player player = gameStateBoard.getPlayer(activePiece.getPieceAlliance());
                 player.makeMove(activePiece.getPieceCoords(), tileId);
 
                 // The executed move will now be the last move after being
                 // executed. Append move to mov history panel.
                 if (gameStateBoard.getLastMove() != null) {
-                  Move lastMove = gameStateBoard.getLastMove();
+                  final Move lastMove = gameStateBoard.getLastMove();
                   moveHistoryPanel.appendToMoveHistory(lastMove);
                 }
 
                 // If game has concluded or has a winner, announce to move
                 // history text area.
                 if (gameStateBoard.isEndGame()) {
-                  String endGameMessage = "GAME OVER, " +
+                  final String endGameMessage = "GAME OVER, " +
                     gameStateBoard.getEndGameWinner() + " PLAYER WON!";
-                  String separator = "\n**********************************\n";
+                  final String separator = "\n**********************************\n";
                   moveHistoryPanel.appendTextToMoveHistory("\n" + separator +
                                                   endGameMessage + separator);
                   boardPanel.refreshTilesBackgroundColor();
@@ -1028,8 +1028,8 @@ public class BoardPanel extends JPanel {
                  tileId < BoardUtils.ALL_TILES_COUNT / 2) ||
                 (gameStateBoard.getMoveMaker() == Alliance.WHITE &&
                  tileId >= BoardUtils.ALL_TILES_COUNT / 2 )) {
-              int hoveredTileId = boardPanel.getHoveredTileId();
-              int activeTileId = boardPanel.getActiveTileId();
+              final int hoveredTileId = boardPanel.getHoveredTileId();
+              final int activeTileId = boardPanel.getActiveTileId();
 
               if (gameStateBoard.isDebugMode()) {
                 System.out.println("hoveredTileId=" + hoveredTileId +
@@ -1075,8 +1075,8 @@ public class BoardPanel extends JPanel {
       // Pre-load piece image
       if (gameStateBoard.getTile(tileId).isTileOccupied()) {
         final Tile currTile = gameStateBoard.getTile(tileId);
-        Alliance pieceAlliance = currTile.getPiece().getPieceAlliance();
-        String pieceRank = currTile.getPiece().getRank();
+        final Alliance pieceAlliance = currTile.getPiece().getPieceAlliance();
+        final String pieceRank = currTile.getPiece().getRank();
 
         if (pieceAlliance == Alliance.BLACK) {
           this.iconNormal = boardPanel.getBlackPieceIcons().get(pieceRank);
@@ -1137,7 +1137,7 @@ public class BoardPanel extends JPanel {
      * Sets the state of this TilePanel.
      * @param isTileActive state of tile.
      */
-    private void setIsTileActive(boolean isTileActive) {
+    private void setIsTileActive(final boolean isTileActive) {
       this.isTileActive = isTileActive;
     }
 
@@ -1145,7 +1145,7 @@ public class BoardPanel extends JPanel {
      * Sets the if this TilePanel is a candidate move tile.
      * @param isCandidateMoveTile is tile is a candidate piece move tile.
      */
-    private void setIsCandidateMoveTile(boolean isCandidateMoveTile) {
+    private void setIsCandidateMoveTile(final boolean isCandidateMoveTile) {
       this.isCandidateMoveTile = isCandidateMoveTile;
     }
 
