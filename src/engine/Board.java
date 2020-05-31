@@ -89,6 +89,9 @@ public class Board {
   /** Reference to most recent move */
   private Move lastMove;
 
+  /** Reference to most recent invalid move */
+  private Move lastInvalidMove;
+
   /** First move maker */
   private Alliance firstMoveMaker;
 
@@ -516,18 +519,40 @@ public class Board {
 
   /**
    * Gets the most recent Move.
-   * @return Move lastMove field.
+   * @return Move lastMove field, else null.
    */
   public Move getLastMove() {
-    return this.lastMove;
+    if (this.lastMove != null)
+      return this.lastMove;
+
+    return null;
+  }
+
+  /**
+   * Gets the most recent invalid move.
+   * @return Move lastInvalidMove field, else null.
+   */
+  public Move getLastInvalidMove() {
+    if (this.lastInvalidMove != null)
+      return this.lastInvalidMove;
+
+    return null;
   }
 
   /**
    * Sets last Move field.
-   * @param move last move.
+   * @param move last executed Move.
    */
   public void setLastMove(Move move) {
     this.lastMove = move;
+  }
+
+  /**
+   * Sets last invalid Move field.
+   * @param move last invalid Move.
+   */
+  public void setLastInvalidMove(Move move) {
+    this.lastInvalidMove = move;
   }
 
   /**
@@ -563,18 +588,36 @@ public class Board {
 
   /**
    * Gets the black Player.
-   * @return Player playerBlack field.
+   * @return Player playerBlack field. Null if uninitialized.
    */
   public Player getBlackPlayer() {
-    return playerBlack;
+    if (this.playerBlack != null)
+      return playerBlack;
+
+    return null;
   }
 
   /**
    * Gets the white Player.
-   * @return Player playerWhite field.
+   * @return Player playerWhite field. Null if uninitialized.
    */
   public Player getWhitePlayer() {
-    return playerWhite;
+    if (this.playerWhite != null)
+      return playerWhite;
+
+    return null;
+  }
+
+  /**
+   * Checks if a Player of the same Alliance exists in this Board instance.
+   * @return true if a player already exists, else false.
+   */
+  public boolean isPlayerExisting(Player player) {
+    if ((player.getAlliance() == Alliance.BLACK && getBlackPlayer() != null) ||
+        (player.getAlliance() == Alliance.WHITE && getWhitePlayer() != null))
+      return true;
+
+    return false;
   }
 
   /**
@@ -623,12 +666,12 @@ public class Board {
   public boolean setMoveMaker(Player player) {
     if (!player.isMoveMaker()) {
       if (player.getAlliance() == Alliance.BLACK) {
-        playerBlack.makeMoveMaker(true);
-        playerWhite.makeMoveMaker(false);
+        playerBlack.setMoveMaker(true);
+        playerWhite.setMoveMaker(false);
         this.moveMaker = playerBlack.getAlliance();
       } else {
-        playerBlack.makeMoveMaker(false);
-        playerWhite.makeMoveMaker(true);
+        playerBlack.setMoveMaker(false);
+        playerWhite.setMoveMaker(true);
         this.moveMaker = playerWhite.getAlliance();
       }
       return true;

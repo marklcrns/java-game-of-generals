@@ -335,13 +335,26 @@ public class BoardPanel extends JPanel {
       return moveText;
     }
 
+    // TODO: Fix only removing invalid moves
     public void removeMoveFromHistory(Move move) {
       if (move != null) {
+        removeRecentInvalidMove();
+
         String fullMoveHistory = moveHistoryTextArea.getText();
-        String moveToRemove = convertMoveToString(move);
+        String moveString = convertMoveToString(move);
 
         clearMoveHistory();
-        appendToMoveHistory(fullMoveHistory.replace(moveToRemove, ""));
+        appendToMoveHistory(fullMoveHistory.replace(moveString, ""));
+      }
+    }
+
+    public void removeRecentInvalidMove() {
+      if (gameStateBoard.getLastInvalidMove() != null) {
+        String fullMoveHistory = moveHistoryTextArea.getText();
+        String invalidMoveString = convertMoveToString(gameStateBoard.getLastInvalidMove());
+
+        clearMoveHistory();
+        appendToMoveHistory(fullMoveHistory.replace(invalidMoveString, ""));
       }
     }
 
