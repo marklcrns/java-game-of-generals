@@ -25,35 +25,58 @@ import game.Save;
 import gui.BoardPanel.MenuBarPanel;
 
 /**
+ * The main class that serves as the JFrame that puts the BoardPanel and
+ * MainMenuPanel together using JLayeredPane.
+ *
  * Author: Mark Lucernas
  * Date: 2020-05-25
  */
-// Ref: https://www.youtube.com/watch?v=KNGbmsq3huQ
 public class MainFrame {
 
+  /** Main JFrame dimension */
+  private final static Dimension FRAME_DIMENSION = new Dimension(1200, 835);
+
+  /** Reference to Board engine */
   private Board gameStateBoard;
+
+  /** Reference to BoardPanel */
+  private BoardPanel boardPanel;
+
+  /** Reference to MainMenuPanel */
+  private MainMenuPanel mainMenuPanel;
+
+  /** Reference to main the JFrame JLayeredPanel */
+  private JLayeredPane layeredPane;
+
+  /** JPanel that serves as the main JFrame content pane */
+  private JPanel contentPane;
+
+  /** The main JFrame */
   private JFrame frame;
 
-  // TODO: access buttons directly from components container panels
+  /** MainMenuPanel buttons */
   private JButton doneArrangingBtn, startGameBtn;
   private JButton mainMenuStartBtn, mainMenuLoadBtn,
           mainMenuHowToPlayBtn, mainMenuQuitBtn;
+
+  /** BoardPanel menu bar buttons and labels */
   private JButton menuBarRestartBtn, menuBarLoadBtn, menuBarQuitBtn,
           menuBarUndoBtn, menuBarRedoBtn, menuBarSaveBtn,
           menuBarSurrenderBtn, menuBarGameRulesBtn;
   private JLabel menuBarPlayerBlackLbl, menuBarPlayerWhiteLbl;
+
+  /** Stores Player names */
   private String playerBlackName, playerWhiteName;
+
+  /** JDialog as alternative popup menus */
   private JDialog playerAssignDialog, mainMenuLoadDialog, menuBarLoadDialog;
+
+  /** Pop menu prompt for quit buttons */
   private JPopupMenu mainMenuQuitPopup, menuBarQuitPopup;
 
-  private BoardPanel boardPanel;
-  private MainMenuPanel mainMenuPanel;
-  private JLayeredPane layeredPane;
-  private JPanel contentPane;
-
-  // private JPanel mainPanel;
-  private final static Dimension FRAME_DIMENSION = new Dimension(1200, 835);
-
+  /**
+   * MainFrame constructor that takes in engine Board class.
+   */
   public MainFrame(Board board) {
     this.gameStateBoard = board;
     frame = new JFrame();
@@ -65,32 +88,40 @@ public class MainFrame {
     layeredPane = new JLayeredPane();
     layeredPane.setPreferredSize(FRAME_DIMENSION);
 
+    // Fetch main menu panel and all its components into this frame then add
+    // listeners.
     mainMenuPanel = new MainMenuPanel();
-
     fetchMainMenuButtons(mainMenuPanel);
     addMainMenuButtonsListeners();
     createMainMenuQuitPopupMenu();
     createMainMenuLoadPopupMenu();
 
+    // Add main menu at the top of the JLayeredPane
     layeredPane.add(mainMenuPanel, new Integer(2));
     mainMenuPanel.setBounds(0, 0, FRAME_DIMENSION.width, FRAME_DIMENSION.height);
 
-
+    // Add everything into the frame.
     contentPane.add(layeredPane);
     frame.add(contentPane);
-
     frame.pack();
     frame.setVisible(true);
   }
 
+  /**
+   * Adds each main menu buttons a listeners.
+   */
   private void addMainMenuButtonsListeners() {
+
+    // Main menu start button action listener to hide main menu and load board panel.
     mainMenuStartBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        // Initialize game and load BoardPanel.
         gameStateBoard.initGame();
         boardPanel = gameStateBoard.getBoardPanel();
         boardPanel.initBoardPanel();
 
+        // Fetch and add listeners to all BoardPanel buttons.
         fetchMenuBarComponents(boardPanel);
         fetchDoneArrangingBtn(boardPanel);
         fetchStartGameBtn(boardPanel);
@@ -102,15 +133,18 @@ public class MainFrame {
         createPlayerNameAssignDialog();
         createMenuBarQuitPopupMenu();
 
+        // Add BoardPanel into JLayeredPane below the MainMenuPanel.
         layeredPane.add(boardPanel, new Integer(1));
         boardPanel.setBounds(0, 0, FRAME_DIMENSION.width, FRAME_DIMENSION.height);
 
-        boardPanel.setVisible(true);
+        // Hide MainMenuPanel and set BoardPanel visible.
         mainMenuPanel.setVisible(false);
+        boardPanel.setVisible(true);
         playerAssignDialog.setVisible(true);
       }
     });
 
+    // Load button action listener.
     mainMenuLoadBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -118,6 +152,7 @@ public class MainFrame {
       }
     });
 
+    // Main menu quit button action listener to show quit dialog.
     mainMenuQuitBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -132,20 +167,26 @@ public class MainFrame {
     mainMenuHowToPlayBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        System.out.println("height: " + mainMenuPanel.getHeight());
-        System.out.println("width: " + mainMenuPanel.getWidth());
+        // TODO: implement.
       }
     });
   }
 
+  /**
+   * Adds all BoardPanel menu bar buttons event listeners.
+   */
   private void addMenuBarButtonsListeners() {
+
+    // Restart button action listener.
     menuBarRestartBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent arg0) {
+        // Restart board engine and clear board panel.
         gameStateBoard.restartGame();
         boardPanel.clearBoardPanel();
         boardPanel.printOpeningMessage();
 
+        // Go into arrange mode
         menuBarUndoBtn.setVisible(false);
         menuBarRedoBtn.setVisible(false);
         menuBarSaveBtn.setVisible(false);
@@ -158,6 +199,7 @@ public class MainFrame {
       }
     });
 
+    // Menu bar quit button action listener.
     menuBarQuitBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -169,6 +211,7 @@ public class MainFrame {
       }
     });
 
+    // Undo button action listener that undo most recent move execution.
     menuBarUndoBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -185,6 +228,7 @@ public class MainFrame {
       }
     });
 
+    // Redo button action listener that redo move execution
     menuBarRedoBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -201,6 +245,7 @@ public class MainFrame {
       }
     });
 
+    // Save button action listener that saves current game state into text file.
     menuBarSaveBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -210,6 +255,11 @@ public class MainFrame {
     });
   }
 
+  /**
+   * Adds BoardPanel done arranging button an action listener. This switches the
+   * current move maker to the opposing Player. Will remain in arrange mode
+   * until the game starts..
+   */
   private void addDoneArrangingButtonListener() {
     doneArrangingBtn.addActionListener(new ActionListener() {
       @Override
@@ -218,14 +268,18 @@ public class MainFrame {
         boardPanel.clearBoardPanel();
         boardPanel.printOpeningMessage();
       }
-
     });
   }
 
+  /**
+   * Adds BoardPanel start game button an cation listener. When triggered, game
+   * would no longer be in arrange mode and starts making turns.
+   */
   private void addStartGameButtonListener() {
     startGameBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        // Shows in-game menu buttons.
         menuBarUndoBtn.setVisible(true);
         menuBarRedoBtn.setVisible(true);
         menuBarSaveBtn.setVisible(true);
@@ -233,6 +287,7 @@ public class MainFrame {
         menuBarGameRulesBtn.setVisible(true);
         boardPanel.setPlayerNamesVisibility(true);
 
+        // Start game
         gameStateBoard.startGame();
         doneArrangingBtn.setVisible(false);
         startGameBtn.setVisible(false);
@@ -243,6 +298,10 @@ public class MainFrame {
     });
   }
 
+  /**
+   * Fetch all MainMenuPanel buttons.
+   * @param mainMenuPanel the MainMenuPanel instance.
+   */
   private void fetchMainMenuButtons(MainMenuPanel mainMenuPanel) {
     mainMenuStartBtn = mainMenuPanel.getStartBtn();
     mainMenuLoadBtn = mainMenuPanel.getLoadBtn();
@@ -250,6 +309,10 @@ public class MainFrame {
     mainMenuQuitBtn = mainMenuPanel.getQuitBtn();
   }
 
+  /**
+   * Fetch all BoardPanel inner MenuBarPanel buttons.
+   * @param boardPanel the BoardPanel instance.
+   */
   private void fetchMenuBarComponents(BoardPanel boardPanel) {
     menuBarPlayerBlackLbl = boardPanel.getPlayerBlackNameLbl();
     menuBarPlayerWhiteLbl = boardPanel.getPlayerWhiteNameLbl();
@@ -263,31 +326,46 @@ public class MainFrame {
     menuBarGameRulesBtn = boardPanel.getGameRulesBtn();
   }
 
+  /**
+   * Fetch BoardPanel inner MoveHistoryPanel done arranging button.
+   * @param boardPanel the BoardPanel instance.
+   */
   private void fetchDoneArrangingBtn(BoardPanel boardPanel) {
     this.doneArrangingBtn = boardPanel.getDoneArrangingBtn();
   }
 
+  /**
+   * Fetch BoardPanel inner MoveHistoryPanel start game button.
+   * @param boardPanel the BoardPanel instance.
+   */
   private void fetchStartGameBtn(BoardPanel boardPanel) {
     this.startGameBtn = boardPanel.getStartGameBtn();
   }
 
+  /**
+   * Create MainMenuPanel load button pop up menu. Uses JDialog instead of
+   * JPopupMenu.
+   */
   private void createMainMenuLoadPopupMenu() {
     JLabel loadMessageLbl = new JLabel("Load saved game");
     loadMessageLbl.setFont(new Font("TimesRoman", Font.PLAIN, 20));
 
+    // Get all existing saved game.
     String[] saveList  = Load.getSaveList();
 
+    // Append all save list Strings into JComboBox.
     JComboBox<String> loadComboBox = new JComboBox<>(saveList);
     loadComboBox.setSelectedIndex(saveList.length - 1);
     loadComboBox.setEditable(true);
 
+    // Load actions panel for confirm and abort buttons.
     JPanel loadActionsPanel = new JPanel();
     JButton loadConfirmBtn = new JButton("Load");
     JButton loadAbortBtn = new JButton("Abort");
     loadActionsPanel.add(loadConfirmBtn);
     loadActionsPanel.add(loadAbortBtn);
 
-    // options pane
+    // Load options pane
     // Ref: https://stackoverflow.com/a/40200144/11850077
     Object[] options = new Object[] {};
     JOptionPane loadOptionsPane = new JOptionPane(loadMessageLbl,
@@ -295,25 +373,17 @@ public class MainFrame {
                                       JOptionPane.DEFAULT_OPTION,
                                       null, options, null);
 
+    // Add combo box and actions panel into options pane.
     loadOptionsPane.add(loadComboBox);
     loadOptionsPane.add(loadActionsPanel);
 
+    // initialize load JDialog and mount the options pane
     mainMenuLoadDialog = new JDialog();
     mainMenuLoadDialog.getContentPane().add(loadOptionsPane);
     mainMenuLoadDialog.pack();
     mainMenuLoadDialog.setVisible(false);
 
-
-    loadComboBox.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        // JComboBox<String> cb = (JComboBox<String>) e.getSource();
-        // String loadSelected = (String) cb.getSelectedItem();
-
-        // System.out.println(loadSelected);
-      }
-    });
-
+    // Adds confirm button action listener to selected saved game from combo box.
     loadConfirmBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -322,12 +392,16 @@ public class MainFrame {
         if (gameStateBoard.isDebugMode())
           System.out.println("Loading " + loadSelected.replace(".txt", "..."));
 
+        // TODO: reimplement to be able to pass in Board as argument.
+        // Load selected saved game.
         new Load(gameStateBoard, loadSelected).loadSaveGame();
         mainMenuLoadDialog.setVisible(false);
 
+        // Initialize board panel.
         boardPanel = gameStateBoard.getBoardPanel();
         boardPanel.initBoardPanel();
 
+        // Fetch BoardPanel menu bar buttons and add listeners
         fetchMenuBarComponents(boardPanel);
         fetchDoneArrangingBtn(boardPanel);
         fetchStartGameBtn(boardPanel);
@@ -338,14 +412,15 @@ public class MainFrame {
 
         createMenuBarQuitPopupMenu();
 
+        // Add BoardPanel to JLayeredPane and hide MainManuPanel
         layeredPane.add(boardPanel, new Integer(1));
         boardPanel.setBounds(0, 0, FRAME_DIMENSION.width, FRAME_DIMENSION.height);
-
-        boardPanel.setVisible(true);
         mainMenuPanel.setVisible(false);
+        boardPanel.setVisible(true);
       }
     });
 
+    // Adds abort button action listener.
     loadAbortBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -353,6 +428,9 @@ public class MainFrame {
     });
   }
 
+  /**
+   * Creates MainMenuPanel quit button popup menu for confirmation.
+   */
   private void createMainMenuQuitPopupMenu() {
     mainMenuQuitPopup = new JPopupMenu();
     mainMenuQuitPopup.setLayout(new BorderLayout());
@@ -370,6 +448,7 @@ public class MainFrame {
     mainMenuQuitPopup.add(quitMessageLbl, BorderLayout.NORTH);
     mainMenuQuitPopup.add(quitPopupOptionsPanel, BorderLayout.CENTER);
 
+    // Adds confirm button action listener to exit program.
     quitConfirmBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -377,6 +456,7 @@ public class MainFrame {
       }
     });
 
+    // Adds confirm button to hide popup menu.
     quitAbortBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -385,6 +465,9 @@ public class MainFrame {
     });
   }
 
+  /**
+   * Creates player assignment dialog for MainMenuPanel start game button.
+   */
   public void createPlayerNameAssignDialog() {
     JLabel playerAssignLbl = new JLabel("Please assign player names");
     playerAssignLbl.setFont(new Font("TimesRoman", Font.PLAIN, 20));
@@ -425,6 +508,8 @@ public class MainFrame {
     playerAssignDialog.pack();
     playerAssignDialog.setVisible(false);
 
+    // Adds confirm button action listener to pass along the input players name
+    // to the board engine and board panel to update the board.
     playerAssignConfirmBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -444,12 +529,15 @@ public class MainFrame {
         boardPanel.getPlayerWhiteNameLbl().setText(
             "WHITE PLAYER: " + playerWhiteName);
 
+        // Hide player assign dialog and update opening message to greet the
+        // move maker player with the input name.
         playerAssignDialog.setVisible(false);
         boardPanel.clearBoardPanel();
         boardPanel.printOpeningMessage();
       }
     });
 
+    // Adds abort button action listener to exit back to main menu.
     playerAssignAbortBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -460,6 +548,7 @@ public class MainFrame {
     });
   }
 
+  // Creates BoardPanel quit button pop up menu confirmation.
   private void createMenuBarQuitPopupMenu() {
     menuBarQuitPopup = new JPopupMenu();
     menuBarQuitPopup.setLayout(new BorderLayout());
@@ -477,6 +566,7 @@ public class MainFrame {
     menuBarQuitPopup.add(quitMessageLbl, BorderLayout.NORTH);
     menuBarQuitPopup.add(menuBarQuitPopupOptionsPanel, BorderLayout.CENTER);
 
+    // Adds confirm button action listener to exit the program.
     quitConfirmBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -484,6 +574,7 @@ public class MainFrame {
       }
     });
 
+    // Adds back to main action listener to exit back to main menu.
     quitBackToMain.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
