@@ -12,34 +12,45 @@ import java.awt.Insets;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 
 /**
+ * Main menu JPanel that displays game main menu.
+ *
  * Author: Mark Lucernas
  * Date: 2020-05-25
  */
-// Tutorial: https://www.youtube.com/watch?v=g2vDARb7gx8&t=81s
 public class MainMenuPanel extends JPanel {
 
+  /** Background image directory */
   private final static String BG_DIR_PATH = "art/bg/";
-  private JButton start, load, howToPlay, quit;
+
+  /** Main menu options buttons */
+  private final JButton start, load, howToPlay, quit;
+
+  /** Background image */
   private BufferedImage backgroundImage;
 
-  MainMenuPanel() {
+  /**
+   * No argument constructor that creates the main menu JPanel.
+   */
+  public MainMenuPanel() {
+    // Load background image.
     try {
-      backgroundImage = ImageIO.read(new File(BG_DIR_PATH + "world_of_tanks.jpg"));
-    } catch (IOException e) {
+      backgroundImage = ImageIO.read(new File(BG_DIR_PATH + "tank_1200x.jpg"));
+    } catch (final IOException e) {
       e.printStackTrace();
     }
     this.setLayout(new GridBagLayout());
     // this.setBackground(Color.GRAY);
     this.setVisible(true);
 
-    GridBagConstraints gbc = new GridBagConstraints();
+    final GridBagConstraints gbc = new GridBagConstraints();
 
     gbc.insets = new Insets(5, 5, 5, 5);
 
-    JLabel title = new JLabel("Game of the Generals");
+    final JLabel title = new JLabel("Game of the Generals");
     title.setFont(new Font("TimesRoman", Font.BOLD, 70));
     gbc.gridx = 0;
     gbc.gridy = 0;
@@ -77,9 +88,14 @@ public class MainMenuPanel extends JPanel {
   }
 
   @Override
-  protected void paintComponent(Graphics g) {
+  protected void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    g.drawImage(backgroundImage, 0, 0, null);
+
+    // Centers image inside JPanel bounds
+    Graphics2D g2 = (Graphics2D) g;
+    int x = (this.getWidth() - this.backgroundImage.getWidth(null)) / 2;
+    int y = (this.getHeight() - this.backgroundImage.getWidth(null)) / 2;
+    g2.drawImage(backgroundImage, x, y, null);
   }
 
   public JButton getStartBtn() {

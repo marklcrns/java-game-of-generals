@@ -47,7 +47,6 @@ public class MainFrame {
   private JPopupMenu mainMenuQuitPopup, menuBarQuitPopup;
 
   private BoardPanel boardPanel;
-  private MenuBarPanel menuBarPanel;
   private MainMenuPanel mainMenuPanel;
   private JLayeredPane layeredPane;
   private JPanel contentPane;
@@ -90,7 +89,6 @@ public class MainFrame {
       public void actionPerformed(ActionEvent e) {
         gameStateBoard.initGame();
         boardPanel = gameStateBoard.getBoardPanel();
-        menuBarPanel = boardPanel.getMenuBarPanel();
         boardPanel.initBoardPanel();
 
         fetchMenuBarComponents(boardPanel);
@@ -134,8 +132,8 @@ public class MainFrame {
     mainMenuHowToPlayBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        // System.out.println("width: " + mainMenuPanel.getWidth());
-        // System.out.println("height: " + mainMenuPanel.getHeight());
+        System.out.println("height: " + mainMenuPanel.getHeight());
+        System.out.println("width: " + mainMenuPanel.getWidth());
       }
     });
   }
@@ -181,7 +179,7 @@ public class MainFrame {
           else
             gameStateBoard.getWhitePlayer().undoLastMove();
 
-          boardPanel.refreshBoardPanel();
+          boardPanel.repaintBoardPanel();
           frame.repaint();
         }
       }
@@ -197,7 +195,7 @@ public class MainFrame {
             gameStateBoard.getWhitePlayer().redoLastMove();
 
           boardPanel.redoMoveHistoryUpdate();
-          boardPanel.refreshBoardPanel();
+          boardPanel.repaintBoardPanel();
           frame.repaint();
         }
       }
@@ -233,7 +231,7 @@ public class MainFrame {
         menuBarSaveBtn.setVisible(true);
         menuBarSurrenderBtn.setVisible(true);
         menuBarGameRulesBtn.setVisible(true);
-        menuBarPanel.setPlayerNamesVisibility(true);
+        boardPanel.setPlayerNamesVisibility(true);
 
         gameStateBoard.startGame();
         doneArrangingBtn.setVisible(false);
@@ -438,10 +436,13 @@ public class MainFrame {
           System.out.println("White player: " + playerWhiteName + " registered");
         }
 
+        // Sets player names in both Board and BoardPanel.
         gameStateBoard.setBlackPlayerName(playerBlackName);
         gameStateBoard.setWhitePlayerName(playerWhiteName);
-        menuBarPanel.setBlackPlayerName(playerBlackName);
-        menuBarPanel.setWhitePlayerName(playerWhiteName);
+        boardPanel.getPlayerBlackNameLbl().setText(
+            "BLACK PLAYER: " + playerBlackName);
+        boardPanel.getPlayerWhiteNameLbl().setText(
+            "WHITE PLAYER: " + playerWhiteName);
 
         playerAssignDialog.setVisible(false);
         boardPanel.clearBoardPanel();
