@@ -47,9 +47,9 @@ public class MainMenuPanel extends JPanel {
     this.setVisible(true);
 
     final GridBagConstraints gbc = new GridBagConstraints();
-
     gbc.insets = new Insets(5, 5, 5, 5);
 
+    // Add main menu label
     final JLabel title = new JLabel("Game of the Generals");
     title.setFont(new Font("TimesRoman", Font.BOLD, 70));
     gbc.gridx = 0;
@@ -57,6 +57,7 @@ public class MainMenuPanel extends JPanel {
     gbc.gridheight = 1;
     this.add(title, gbc);
 
+    // Add main menu buttons
     start = new JButton("Start Game");
     start.setPreferredSize(new Dimension(200, 30));
     start.setSize(100, 100);
@@ -64,21 +65,18 @@ public class MainMenuPanel extends JPanel {
     gbc.gridy = 1;
     gbc.gridheight = 1;
     this.add(start, gbc);
-
     load  = new JButton("Load Game");
     load.setPreferredSize(new Dimension(200, 30));
     gbc.gridx = 0;
     gbc.gridy = 2;
     gbc.gridheight = 1;
     this.add(load, gbc);
-
     howToPlay = new JButton("How To Play");
     howToPlay.setPreferredSize(new Dimension(200, 30));
     gbc.gridx = 0;
     gbc.gridy = 3;
     gbc.gridheight = 1;
     this.add(howToPlay, gbc);
-
     quit = new JButton("Quit");
     quit.setPreferredSize(new Dimension(200, 30));
     gbc.gridx = 0;
@@ -87,10 +85,14 @@ public class MainMenuPanel extends JPanel {
     this.add(quit, gbc);
   }
 
+  /**
+   * Paints main menu JPanel background with image.
+   */
   @Override
   protected void paintComponent(final Graphics g) {
     super.paintComponent(g);
 
+    // TODO: Fix
     // Centers image inside JPanel bounds
     Graphics2D g2 = (Graphics2D) g;
     int x = (this.getWidth() - this.backgroundImage.getWidth(null)) / 2;
@@ -98,19 +100,36 @@ public class MainMenuPanel extends JPanel {
     g2.drawImage(backgroundImage, x, y, null);
   }
 
+  /**
+   * Gets the main menu start button.
+   * @return JButton start field.
+   */
   public JButton getStartBtn() {
     return this.start;
   }
 
+  /**
+   * Gets the main menu load button.
+   * @return JButton load field.
+   */
   public JButton getLoadBtn() {
     return this.load;
   }
 
+  /**
+   * Gets the main menu how to play button.
+   * @return JButton howToPlay field.
+   */
   public JButton getHowToPlayBtn() {
     return this.howToPlay;
   }
 
+  /**
+   * Gets the main menu quit button.
+   * @return JButton quit field.
+   */
   public JButton getQuitBtn() {
     return this.quit;
   }
-}
+
+} // MainMenuPanel
