@@ -223,19 +223,20 @@ public class MainFrame {
       public void actionPerformed(ActionEvent arg0) {
         // Restart board engine and clear board panel.
         gameStateBoard.restartGame();
-        boardPanel.clearBoardPanel();
-        boardPanel.printOpeningMessage();
-
-        // Go into arrange mode
-        menuBarUndoBtn.setVisible(false);
-        menuBarRedoBtn.setVisible(false);
-        menuBarSaveBtn.setVisible(false);
-        menuBarSurrenderBtn.setVisible(false);
-        menuBarGameRulesBtn.setVisible(false);
-
-        doneArrangingBtn.setVisible(true);
-        startGameBtn.setVisible(true);
         frame.repaint();
+      }
+    });
+
+    // Loads existing saved game state.
+    menuBarLoadBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        // TODO: Fix not loading properly.
+        // Reload all existing saved game into combo box.
+        saveList  = Load.getSaveList();
+        loadComboBox = new JComboBox<>(saveList);
+
+        mainMenuLoadDialog.setVisible(true);
       }
     });
 
@@ -326,18 +327,10 @@ public class MainFrame {
     startGameBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        // Shows in-game menu buttons.
-        menuBarUndoBtn.setVisible(true);
-        menuBarRedoBtn.setVisible(true);
-        menuBarSaveBtn.setVisible(true);
-        menuBarSurrenderBtn.setVisible(true);
-        menuBarGameRulesBtn.setVisible(true);
-        boardPanel.setPlayerNamesVisibility(true);
-
         // Start game
         gameStateBoard.startGame();
-        doneArrangingBtn.setVisible(false);
-        startGameBtn.setVisible(false);
+        boardPanel.startMode();
+
         boardPanel.clearBoardPanel();
         frame.repaint();
       }

@@ -12,6 +12,7 @@ import engine.Move;
 import engine.Board.BoardBuilder;
 import engine.pieces.Piece;
 import engine.player.Player;
+import gui.BoardPanel;
 import utils.BoardUtils;
 import utils.Utils;
 
@@ -28,6 +29,9 @@ public class Load {
 
   /** Reference to the Board engine. */
   private final Board board;
+
+  /** Reference to the BoardPanel */
+  private final BoardPanel boardPanel;
 
   /** Stores the save data filename. */
   private final String fileName;
@@ -61,14 +65,13 @@ public class Load {
    */
   public Load(final Board board, final String filename) {
     this.board = board;
+    this.boardPanel = board.getBoardPanel();
+    this.playerBlack = this.board.getBlackPlayer();
+    this.playerWhite = this.board.getWhitePlayer();
+
     this.fileName = filename;
     this.moveHistory = new HashMap<Integer, Move>();
     this.builder = new BoardBuilder();
-
-    this.playerBlack = new Player(Alliance.BLACK);
-    this.playerWhite = new Player(Alliance.WHITE);
-    this.board.setPlayerBlack(this.playerBlack);
-    this.board.setPlayerWhite(this.playerWhite);
   }
 
   /**
@@ -104,6 +107,8 @@ public class Load {
       // Parse saved data and execute.
       if (parseSaveData(saveData)) {
         this.board.startGame();
+
+        this.board.getBoardPanel().clearBoardPanel();
         executeSaveData();
         if (this.board.isDebugMode())
           System.out.println("Game successfully loaded");
@@ -373,20 +378,21 @@ public class Load {
       for (final Map.Entry<Integer, Move> entry : moveHistory.entrySet()) {
         if (entry.getValue().isMoveExecuted()) {
 
-          System.out.println(this.board);
-
           if (this.board.getMoveMaker() == Alliance.BLACK)
             playerBlack.makeMove(entry.getValue());
           else
             playerWhite.makeMove(entry.getValue());
 
+          this.board.getBoardPanel().getMoveHistoryPanel().appendToMoveHistory(
+              entry.getValue());
+
           System.out.println(this.board);
 
           if (this.board.isDebugMode())
             System.out.println("Executing turn " + entry.getKey() + ". Successful");
-          return true;
         }
       }
+      return true;
     } else {
       if (this.board.isDebugMode())
         System.out.println("E: Loading saved game failed");

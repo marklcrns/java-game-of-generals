@@ -119,6 +119,40 @@ public class BoardPanel extends JPanel {
   }
 
   /**
+   * Hides in-game BoardPanel buttons and show arrange mode buttons.
+   */
+  public void arrangeMode() {
+    clearBoardPanel();
+    printOpeningMessage();
+
+    // Set up arrange mode button arrangement
+    undoBtn.setVisible(false);
+    redoBtn.setVisible(false);
+    saveBtn.setVisible(false);
+    surrenderBtn.setVisible(false);
+    rulesBtn.setVisible(false);
+
+    doneArrangingBtn.setVisible(true);
+    startGameBtn.setVisible(true);
+  }
+
+  /**
+   * Hides arrange mode board panel buttons and show in-game buttons.
+   */
+  public void startMode() {
+    // Show in-game menu buttons.
+    undoBtn.setVisible(true);
+    redoBtn.setVisible(true);
+    saveBtn.setVisible(true);
+    surrenderBtn.setVisible(true);
+    rulesBtn.setVisible(true);
+    setPlayerNamesVisibility(true);
+
+    doneArrangingBtn.setVisible(false);
+    startGameBtn.setVisible(false);
+  }
+
+  /**
    * Gets black player name JLabel
    * @return JLabel playerBlackNameLbl field.
    */
@@ -240,6 +274,14 @@ public class BoardPanel extends JPanel {
   }
 
   /**
+   * Gets the BoardPanel MoveHistoryPanel inner class.
+   * @return MoveHistoryPanel moveHistoryPanel class instance.
+   */
+  public final MoveHistoryPanel getMoveHistoryPanel() {
+    return moveHistoryPanel;
+  }
+
+  /**
    * Removes last executed move entry from move history text area.
    */
   public final void undoMoveHistoryUpdate() {
@@ -353,7 +395,7 @@ public class BoardPanel extends JPanel {
    * BoardPanel inner JPanel class for move history. Prints out opening message
    * and all executed moves.
    */
-  private class MoveHistoryPanel extends JPanel {
+  public class MoveHistoryPanel extends JPanel {
 
     /** Move history text area */
     private final JTextArea moveHistoryTextArea = new JTextArea();

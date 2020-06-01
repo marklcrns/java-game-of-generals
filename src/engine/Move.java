@@ -425,8 +425,8 @@ public class Move {
   @Override
   public String toString() {
     final Alliance sourcePieceAlliance = sourcePieceCopy == null ? null : sourcePieceCopy.getPieceAlliance();
-    final String sourcePiece = sourcePieceCopy == null ? "" : sourcePieceCopy.getRank() + " ";
-    final String targetPiece = targetPieceCopy == null ? "" : targetPieceCopy.getRank() + " ";
+    final String sourcePiece = sourcePieceCopy == null ? "" : sourcePieceCopy.getRank();
+    final String targetPiece = targetPieceCopy == null ? "" : targetPieceCopy.getRank();
 
     if (isExecuted) {
       String superiorPieceAlliance = "";

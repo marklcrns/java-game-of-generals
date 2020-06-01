@@ -187,6 +187,7 @@ public class Board {
 
     // Displays Board GUI
     displayBoard();
+    this.boardPanel.arrangeMode();
 
     if (isDebugMode())
       System.out.println("Board:\n" + this);
@@ -212,6 +213,7 @@ public class Board {
     this.gameInitialized = false;
     this.currentTurn = 1;
     this.lastExecutedTurn = 0;
+    this.boardPanel.startMode();
 
     if (getMoveMaker() == Alliance.BLACK)
       this.firstMoveMaker = Alliance.BLACK;
@@ -233,13 +235,11 @@ public class Board {
   }
 
   /**
-   * Method that Resumes ongoing game state. Companion for Load class.
+   * Method that Resumes ongoing game state.
    */
   public void resumeGame() {
-    // TODO: Finish Load implementation.
     this.gameStarted = true;
     this.gameInitialized = false;
-    this.firstMoveMaker = getMoveMaker();
 
     if (isDebugMode()) {
       System.out.println("Game resumed");
@@ -255,6 +255,9 @@ public class Board {
     this.gameInitialized = true;
     this.endGameWinner = null;
     setMoveMaker(playerWhite);
+
+    // Go into arrange mode
+    this.boardPanel.arrangeMode();
   }
 
   /**

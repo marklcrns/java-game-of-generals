@@ -31,10 +31,10 @@ public class MainMenuPanel extends JPanel {
   private final JButton start, load, howToPlay, quit;
 
   /** Main menu JButton size */
-  private final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(250, 35);
+  private final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(200, 25);
 
   /** Main menu JButton font */
-  private final Font MAIN_MENU_FONT = new Font("TimesRoman", Font.BOLD, 18);
+  private final Font MAIN_MENU_FONT = new Font("TimesRoman", Font.BOLD, 16);
 
   /** Background image */
   private BufferedImage backgroundImage;
@@ -102,14 +102,6 @@ public class MainMenuPanel extends JPanel {
   @Override
   protected void paintComponent(final Graphics g) {
     super.paintComponent(g);
-
-    // TODO: Fix
-    // Centers image inside JPanel bounds
-    // final Graphics2D g2 = (Graphics2D) g;
-    // final int x = (this.getWidth() - this.backgroundImage.getWidth(null)) / 2;
-    // final int y = (this.getHeight() - this.backgroundImage.getWidth(null)) / 2;
-    // g2.drawImage(backgroundImage, x, y, null);
-
     g.drawImage(backgroundImage, 0, 0, null);
   }
 
