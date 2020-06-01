@@ -144,15 +144,18 @@ public class Load {
 
         if (isBoardConfig) {
           if (this.board.isDebugMode())
-            System.out.println("\ndataLength=" + saveData[i].length() + "\nsaveData=" + saveData[i] + "\n");
+            System.out.println("\ndataLength=" + saveData[i].length() +
+                               "\nsaveData=" + saveData[i] + "\n");
           boardConfigDataParser(saveData[i]);
         } else if (isBoardStateData) {
           if (this.board.isDebugMode())
-            System.out.println("\ndataLength=" + saveData[i].length() + "\nsaveData=" + saveData[i] + "\n");
+            System.out.println("\ndataLength=" + saveData[i].length() +
+                               "\nsaveData=" + saveData[i] + "\n");
           boardStateDataParser(saveData[i]);
         } else if (isBoardExecutions) {
           if (this.board.isDebugMode())
-            System.out.println("\ndataLength=" + saveData[i].length() + "\nsaveData=" + saveData[i] + "\n");
+            System.out.println("\ndataLength=" + saveData[i].length() +
+                               "\nsaveData=" + saveData[i] + "\n");
           boardExecutionsDataParser(saveData[i]);
         }
 
@@ -160,7 +163,8 @@ public class Load {
       if (this.board.isDebugMode()) {
         System.out.println("Move history Loaded:\n");
         for (final Map.Entry<Integer, Move> entry : moveHistory.entrySet()) {
-          System.out.println("TurnId=" + entry.getKey() + ";Move=" + entry.getValue());
+          System.out.println("TurnId=" + entry.getKey() +
+                             ";Move=" + entry.getValue());
         }
       }
       return true;
@@ -198,16 +202,21 @@ public class Load {
           pieceAllianceIndex + pieceAllianceKey.length(), saveData.length() - 1);
 
       if (this.board.isDebugMode()) {
-        System.out.println("tileIdIndex=" + tileIdIndex + ";tileId=" + tileId);
-        System.out.println("territoryIndex=" + territoryIndex + ";territory=" + territory);
-        System.out.println("pieceRankIndex=" + pieceRankIndex + ";piece=" + pieceRank);
-        System.out.println("pieceAllianceIndex=" + pieceAllianceIndex + ";pieceAlliance=" + pieceAlliance);
+        System.out.println("tileIdIndex=" + tileIdIndex +
+                           ";tileId=" + tileId);
+        System.out.println("territoryIndex=" + territoryIndex +
+                           ";territory=" + territory);
+        System.out.println("pieceRankIndex=" + pieceRankIndex +
+                           ";piece=" + pieceRank);
+        System.out.println("pieceAllianceIndex=" + pieceAllianceIndex +
+                           ";pieceAlliance=" + pieceAlliance);
       }
 
       // Rebuild board configuration.
       Piece piece = null;
       if (territory.contains("BLACK") && !pieceRank.contains("null")) {
-        piece = BoardUtils.pieceInstanceCreator(pieceRank, playerBlack, Alliance.BLACK);
+        piece = BoardUtils.pieceInstanceCreator(
+            pieceRank, playerBlack, Alliance.BLACK);
 
         piece.setPieceCoords(tileId);
         builder.setPiece(piece);
@@ -216,7 +225,8 @@ public class Load {
           System.out.println("Piece has been set");
 
       } else if (territory.contains("WHITE") && !pieceRank.contains("null")) {
-        piece = BoardUtils.pieceInstanceCreator(pieceRank, playerWhite, Alliance.WHITE);
+        piece = BoardUtils.pieceInstanceCreator(
+            pieceRank, playerWhite, Alliance.WHITE);
 
         piece.setPieceCoords(tileId);
         builder.setPiece(piece);
@@ -313,14 +323,22 @@ public class Load {
           isExecutedIndex + isExecutedKey.length(), dataExecution.length() - 1));
 
       if (this.board.isDebugMode()) {
-        System.out.println("turnIdIndex=" + turnIdIndex + ";turnId=" + turnId);
-        System.out.println("moveTypeIndex=" + moveTypeIndex + ";moveType=" + moveType);
-        System.out.println("sourceAllianceIndex=" + sourceAllianceIndex + ";sourceAlliance=" + sourceAlliance);
-        System.out.println("sourcePieceIndex=" + sourcePieceRankIndex + ";sourcePiece=" + sourcePieceRank);
-        System.out.println("targetPieceIndex=" + targetPieceIndex + ";targetPiece=" + targetPiece);
-        System.out.println("originCoordsIndex=" + originCoordsIndex + ";originCoords=" + originCoords);
-        System.out.println("destinationCoordsIndex=" + destinationCoordsIndex + ";destinationCoords=" + destinationCoords);
-        System.out.println("isExecutedIndex=" + isExecutedIndex + ";isExecuted=" + isExecuted);
+        System.out.println("turnIdIndex=" + turnIdIndex +
+                           ";turnId=" + turnId);
+        System.out.println("moveTypeIndex=" + moveTypeIndex +
+                           ";moveType=" + moveType);
+        System.out.println("sourceAllianceIndex=" + sourceAllianceIndex +
+                           ";sourceAlliance=" + sourceAlliance);
+        System.out.println("sourcePieceIndex=" + sourcePieceRankIndex +
+                           ";sourcePiece=" + sourcePieceRank);
+        System.out.println("targetPieceIndex=" + targetPieceIndex +
+                           ";targetPiece=" + targetPiece);
+        System.out.println("originCoordsIndex=" + originCoordsIndex +
+                           ";originCoords=" + originCoords);
+        System.out.println("destinationCoordsIndex=" + destinationCoordsIndex +
+                           ";destinationCoords=" + destinationCoords);
+        System.out.println("isExecutedIndex=" + isExecutedIndex +
+                           ";isExecuted=" + isExecuted);
       }
 
       // Recreate move.
@@ -391,7 +409,7 @@ public class Load {
 
     if (this.board.isDebugMode()) {
       System.out.println(
-          "First move maker: " + (this.firstMoveMaker != null ? this.firstMoveMaker : "null") + "\n" + 
+          "First move maker: " + (this.firstMoveMaker != null ? this.firstMoveMaker : "null") + "\n" +
           "Current Turn: " + this.currentTurn + "\n" +
           "Last executed turn: " + this.lastExecutedTurn + "\n" +
           "Builder: " + (this.builder != null ? "Loaded" : "null") + "\n" +
