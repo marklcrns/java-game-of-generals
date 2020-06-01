@@ -10,104 +10,122 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 /**
+ * Class that paints a passed in image different colored stars at random
+ * locations, and outputs the painted image to the specified directory. Output
+ * file will serve as background image of the gui MainMenuPanel class.
+ *
+ * Uses Turtle and Picture class from bookClasses.
+ *
  * Author: Mark Lucernas
  * Date: 2020-05-29
  */
 public class PaintBg {
 
+  /** Background image directory path */
   private final static String BG_DIR_PATH = "art/bg/";
-  private static BufferedImage backgroundImage;
-  private Color red = new Color(255, 120, 120);
-  private Color darkred = new Color(180, 0, 0);
-  private Color green = new Color(120, 255, 120);
-  private Color blue = new Color(120, 120, 255);
-  private Color yellow = new Color(255, 255, 120);
-  private Color black = new Color(0, 0, 0);
-  private Color gold = new Color(212, 175, 55);
-  private Color grid = new Color(230, 230, 230);
-  private int pictureWidth = 1200;
-  private int pictureHeight= 835;
 
-  public static void main(String[] args) {
-    String fileName = "world_of_tanks.jpg";
+  /** Stores background image to be painted */
+  private static BufferedImage backgroundImage;
+
+  /** Colors of the start */
+  private final Color red = new Color(180, 0, 0);
+  private final Color yellow = new Color(255, 255, 120);
+  private final Color gold = new Color(212, 175, 55);
+  private final Color gray = new Color(150, 150, 150);
+
+  /** Output image dimensions  */
+  private final int pictureWidth = 1200;
+  private final int pictureHeight= 835;
+
+  /** Name of the file to modify */
+  private final static String fileName = "tank_1200x.jpg";
+
+  /** Output filename  */
+  private final static String outputFileName =
+    fileName.replace(".jpg", "_painted.jpg");
+
+  public static void main(final String[] args) {
+    // Load background image
     try {
       backgroundImage = ImageIO.read(new File(BG_DIR_PATH + fileName));
-    } catch (IOException e) {
+    } catch (final IOException e) {
       e.printStackTrace();
     }
 
-    new PaintBg(backgroundImage, "world_of_tanks_custom.jpg");
+    // Modify loaded background image
+    new PaintBg(backgroundImage);
   }
 
-  public PaintBg(BufferedImage background, String outputFileName) {
-    Picture bg = new Picture(background);
-    Turtle turtle1 = new Turtle(bg);
+  /**
+   * Constructor method that takes in BufferedImage to be painted with stars.
+   * @param image BufferedImage to be painted.
+   */
+  public PaintBg(final BufferedImage image) {
+    final Picture bg = new Picture(image);
+    final Turtle turtle = new Turtle(bg);
 
     // Color Switch
-    boolean moveRed = true;
-    boolean moveGreen = false;
-    boolean moveBlue = false;
-    boolean moveYellow= false;
+    boolean color1 = true;
+    boolean color2 = false;
+    boolean color3 = false;
+    boolean color4= false;
 
-    int starsCount = 250;
+    final int starsCount = 250;
+    final int startSize = 8;
     // Create small stars at random locations within the World
-    for (int i=0; i<=starsCount; i++)
-    {
+    for (int i = 0; i <= starsCount; i++) {
       // Cycle colors
-      if (moveRed)
-      {
-        moveRed = false;
-        moveGreen = true;
-        moveBlue = false;
-        moveYellow = false;
-        turtle1.setColor(green);
+      if (color1) {
+        color1 = false;
+        color2 = true;
+        color3 = false;
+        color4 = false;
+        turtle.setColor(red);
       }
-      else if (moveGreen)
-      {
-        moveRed = false;
-        moveGreen = false;
-        moveBlue = true;
-        moveYellow = false;
-        turtle1.setColor(blue);
+      else if (color2) {
+        color1 = false;
+        color2 = false;
+        color3 = true;
+        color4 = false;
+        turtle.setColor(yellow);
       }
-      else if (moveBlue)
-      {
-        moveRed = false;
-        moveGreen = false;
-        moveBlue = false;
-        moveYellow = true;
-        turtle1.setColor(red);
+      else if (color3) {
+        color1 = false;
+        color2 = false;
+        color3 = false;
+        color4 = true;
+        turtle.setColor(gold);
       }
-      else if (moveYellow)
-      {
-        moveRed = true;
-        moveGreen = false;
-        moveBlue = false;
-        moveYellow = false;
-        turtle1.setColor(yellow);
+      else if (color4) {
+        color1 = true;
+        color2 = false;
+        color3 = false;
+        color4 = false;
+        turtle.setColor(gray);
       }
 
       // Random number generator with Java Math class for spiral coordinates
-      int x = (int)((Math.random() * pictureWidth) + 0);
-      int y = (int)((Math.random() * pictureHeight) + 0);
-      turtle1.penUp();
-      turtle1.moveTo(x, y);
-      turtle1.penDown();
+      final int x = (int)((Math.random() * pictureWidth) + 0);
+      final int y = (int)((Math.random() * pictureHeight) + 0);
+      turtle.penUp();
+      turtle.moveTo(x, y);
+      turtle.penDown();
 
       // Draw small stars
-      for (int j=0; j<=20; j++)
-      {
-        turtle1.turn(45);
-        turtle1.forward(2);
-        turtle1.turn(-90);
-        turtle1.forward(-2);
+      for (int j=0; j<=20; j++) {
+        turtle.turn(45);
+        turtle.forward(startSize);
+        turtle.turn(-90);
+        turtle.forward(-startSize);
       }
 
-      turtle1.penUp();
+      turtle.penUp();
     }
 
+    // show resulting image
     bg.show();
-    bg.write("art/bg/" + outputFileName);
+    // writes the resulting image to bg directory
+    bg.write(BG_DIR_PATH + outputFileName);
   }
 
-}
+} // PaintImage

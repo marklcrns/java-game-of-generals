@@ -66,7 +66,7 @@ public class GeneralOne extends Piece {
   }
 
   /**
-   * Create deep copy of this specific Piece instance.
+   * Creates deep copy of this specific Piece instance.
    * @return Piece deep copy if this Piece instance.
    */
   @Override

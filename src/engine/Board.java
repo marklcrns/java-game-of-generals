@@ -193,7 +193,7 @@ public class Board {
   }
 
   /**
-   * Method that swtiches to opposing player a change to arrange pieces.
+   * Method that switches to opposing player a change to arrange pieces.
    */
   public void playerDoneArranging() {
     if (this.getBlackPlayer().isMoveMaker()) {
@@ -212,11 +212,18 @@ public class Board {
     this.gameInitialized = false;
     this.currentTurn = 1;
     this.lastExecutedTurn = 0;
-    this.firstMoveMaker = getMoveMaker();
+
+    if (getMoveMaker() == Alliance.BLACK)
+      this.firstMoveMaker = Alliance.BLACK;
+    else
+      this.firstMoveMaker = Alliance.WHITE;
 
     // Save initial board arrangement for saving and loading game state.
     this.initBoardConfig = new ArrayList<>();
-    this.initBoardConfig.addAll(gameBoard);
+    for (int i = 0; i < gameBoard.size(); i++) {
+      // Make copies of all Tiles in gameBoard into initBoardConfig.
+      initBoardConfig.add(gameBoard.get(i).clone());
+    }
 
     if (isDebugMode()) {
       System.out.println(this);
@@ -1026,13 +1033,13 @@ public class Board {
      */
     public boolean isPieceWithinBounds(final Piece piece) {
       if (piece.getPieceCoords() < BoardUtils.ALL_TILES_COUNT &&
-          piece.getPieceCoords() > 0) {
+          piece.getPieceCoords() >= 0) {
         return true;
       }
 
       if (isDebugMode())
         System.out.println(piece.getPieceAlliance() + " " +
-                           piece.getRank() + " at Tile" +
+                           piece.getRank() + " at Tile " +
                            piece.getPieceCoords() + " is out of bounds." +
                            " Piece not inserted.");
       return false;
@@ -1260,6 +1267,20 @@ public class Board {
       return false;
     }
 
+    /**
+     * Creates deep copy of this Tile instance.
+     * @return Tile deep copy of this Tile instance.
+     */
+    @Override
+    public Tile clone() {
+      final Tile tileCopy = new Tile(this.tileId, this.territory);
+
+      if (isTileOccupied())
+        tileCopy.insertPiece(getPiece().clone());
+
+      return tileCopy;
+    }
+
     @Override
     public String toString() {
       if (this.occupied)
@@ -1268,6 +1289,7 @@ public class Board {
       else
         return "Tile " + this.tileId + " is empty";
     }
-  }
+
+  } // Tile
 
 } // Board

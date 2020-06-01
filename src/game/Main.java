@@ -30,7 +30,7 @@ public class Main {
           board.setPlayerWhite(player1);
           board.setPlayerBlack(player2);
 
-          builder = builder.createDemoBoardBuild();
+          builder = builder.createRandomBuild();
           board.setBoardBuilder(builder);
 
           board.setDebugMode(true);

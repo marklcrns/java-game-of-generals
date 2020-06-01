@@ -12,7 +12,6 @@ import engine.Move;
 import engine.Board.BoardBuilder;
 import engine.pieces.Piece;
 import engine.player.Player;
-import gui.MainFrame;
 import utils.BoardUtils;
 import utils.Utils;
 
@@ -54,19 +53,6 @@ public class Load {
   /** White player instance */
   private Player playerWhite;
 
-  // TODO: Delete later
-  public static void main(final String[] args) {
-    final Board board = new Board();
-    final Player player1 = new Player(Alliance.WHITE);
-    final Player player2 = new Player(Alliance.BLACK);
-    board.setPlayerWhite(player1);
-    board.setPlayerBlack(player2);
-    board.setDebugMode(true);
-
-    new Load(board, "2020-05-29_15:55:51.812.txt").loadSaveGame();
-    new MainFrame(board);
-  }
-
   /**
    * Constructor method that takes in the Board engine the filename of the saved
    * game data.
@@ -78,6 +64,11 @@ public class Load {
     this.fileName = filename;
     this.moveHistory = new HashMap<Integer, Move>();
     this.builder = new BoardBuilder();
+
+    this.playerBlack = new Player(Alliance.BLACK);
+    this.playerWhite = new Player(Alliance.WHITE);
+    this.board.setPlayerBlack(this.playerBlack);
+    this.board.setPlayerWhite(this.playerWhite);
   }
 
   /**
@@ -110,10 +101,10 @@ public class Load {
       }
       scan.close();
 
-      // Parse sanned data and execute.
+      // Parse saved data and execute.
       if (parseSaveData(saveData)) {
-        executeSaveData();
         this.board.startGame();
+        executeSaveData();
         if (this.board.isDebugMode())
           System.out.println("Game successfully loaded");
       }
@@ -158,7 +149,7 @@ public class Load {
         } else if (isBoardStateData) {
           if (this.board.isDebugMode())
             System.out.println("\ndataLength=" + saveData[i].length() + "\nsaveData=" + saveData[i] + "\n");
-          // TODO: implement
+          boardStateDataParser(saveData[i]);
         } else if (isBoardExecutions) {
           if (this.board.isDebugMode())
             System.out.println("\ndataLength=" + saveData[i].length() + "\nsaveData=" + saveData[i] + "\n");
@@ -257,9 +248,9 @@ public class Load {
 
       // value
       final String firstMoveMaker = boardState.substring(
-          firstMoveMakerIndex + firstMoveMakerKey.length(), currentTurnIndex);
+          firstMoveMakerIndex + firstMoveMakerKey.length(), currentTurnIndex - 1);
       final int currentTurn = Integer.parseInt(boardState.substring(
-          currentTurnIndex + currentTurnKey.length(), lastExecutedTurnIndex));
+          currentTurnIndex + currentTurnKey.length(), lastExecutedTurnIndex - 1));
       final int lastExecutedTurn = Integer.parseInt(boardState.substring(
             lastExecutedTurnIndex + lastExecutedTurnKey.length(), boardState.length() - 1));
 
@@ -270,7 +261,6 @@ public class Load {
 
       this.currentTurn = currentTurn;
       this.lastExecutedTurn = lastExecutedTurn;
-
       return true;
     }
     return false;
@@ -359,16 +349,19 @@ public class Load {
 
     if (isReadyToExecute()) {
       this.board.setFirstMoveMaker(this.firstMoveMaker);
-      this.board.setCurrentTurn(this.currentTurn);
-      this.board.setLastExecutedTurn(this.lastExecutedTurn);
+      // this.board.setCurrentTurn(this.currentTurn);
+      // this.board.setLastExecutedTurn(this.lastExecutedTurn);
 
       for (final Map.Entry<Integer, Move> entry : moveHistory.entrySet()) {
         if (entry.getValue().isMoveExecuted()) {
 
-          // TODO: Mimic player makeMove()
           System.out.println(this.board);
-          entry.getValue().evaluateMove();
-          entry.getValue().execute();
+
+          if (this.board.getMoveMaker() == Alliance.BLACK)
+            playerBlack.makeMove(entry.getValue());
+          else
+            playerWhite.makeMove(entry.getValue());
+
           System.out.println(this.board);
 
           if (this.board.isDebugMode())
@@ -396,6 +389,14 @@ public class Load {
         moveHistory != null)
       return true;
 
+    if (this.board.isDebugMode()) {
+      System.out.println(
+          "First move maker: " + (this.firstMoveMaker != null ? this.firstMoveMaker : "null") + "\n" + 
+          "Current Turn: " + this.currentTurn + "\n" +
+          "Last executed turn: " + this.lastExecutedTurn + "\n" +
+          "Builder: " + (this.builder != null ? "Loaded" : "null") + "\n" +
+          "Move history: " + (this.moveHistory != null ? "Loaded" : "null"));
+    }
     return false;
   }
 

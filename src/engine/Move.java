@@ -280,6 +280,14 @@ public class Move {
   }
 
   /**
+   * Gets the player executing this Move.
+   * @return Player player field.
+   */
+  public Player getPlayer() {
+    return this.player;
+  }
+
+  /**
    * Gets the source Tile from Board.
    * @return Tile from the Board.
    */

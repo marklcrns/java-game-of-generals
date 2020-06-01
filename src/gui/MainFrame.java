@@ -73,8 +73,15 @@ public class MainFrame {
   /** Pop menu prompt for quit buttons */
   private JPopupMenu mainMenuQuitPopup, menuBarQuitPopup;
 
+  /** Stores array of existing saved game data */
+  private String[] saveList;
+
+  /** Combo box that will list contain all existing saved game data */
+  private static JComboBox<String> loadComboBox;
+
   /**
    * MainFrame constructor that takes in engine Board class.
+   * @param board Reference to the Board instance.
    */
   public MainFrame(Board board) {
     this.gameStateBoard = board;
@@ -147,6 +154,10 @@ public class MainFrame {
     mainMenuLoadBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        // Reload all existing saved game into combo box.
+        saveList  = Load.getSaveList();
+        loadComboBox = new JComboBox<>(saveList);
+
         mainMenuLoadDialog.setVisible(true);
       }
     });
@@ -350,10 +361,10 @@ public class MainFrame {
     loadMessageLbl.setFont(new Font("TimesRoman", Font.PLAIN, 20));
 
     // Get all existing saved game.
-    String[] saveList  = Load.getSaveList();
+    saveList  = Load.getSaveList();
 
     // Append all save list Strings into JComboBox.
-    JComboBox<String> loadComboBox = new JComboBox<>(saveList);
+    loadComboBox = new JComboBox<>(saveList);
     loadComboBox.setSelectedIndex(saveList.length - 1);
     loadComboBox.setEditable(true);
 
@@ -380,6 +391,7 @@ public class MainFrame {
     mainMenuLoadDialog = new JDialog();
     mainMenuLoadDialog.getContentPane().add(loadOptionsPane);
     mainMenuLoadDialog.pack();
+    mainMenuLoadDialog.setResizable(false);
     mainMenuLoadDialog.setVisible(false);
 
     // Adds confirm button action listener to selected saved game from combo box.
@@ -423,6 +435,7 @@ public class MainFrame {
     loadAbortBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        mainMenuLoadDialog.setVisible(false);
       }
     });
   }
@@ -465,7 +478,8 @@ public class MainFrame {
   }
 
   /**
-   * Creates player assignment dialog for MainMenuPanel start game button.
+   * Creates player name assignment dialog that takes user input for
+   * MainMenuPanel start game button.
    */
   public void createPlayerNameAssignDialog() {
     JLabel playerAssignLbl = new JLabel("Please assign player names");
@@ -547,7 +561,9 @@ public class MainFrame {
     });
   }
 
-  // Creates BoardPanel quit button pop up menu confirmation.
+  /**
+   * Creates BoardPanel quit button pop up menu confirmation.
+   */
   private void createMenuBarQuitPopupMenu() {
     menuBarQuitPopup = new JPopupMenu();
     menuBarQuitPopup.setLayout(new BorderLayout());

@@ -1,19 +1,20 @@
 package gui;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import java.awt.GridBagLayout;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.awt.Insets;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
 
 /**
  * Main menu JPanel that displays game main menu.
@@ -29,6 +30,12 @@ public class MainMenuPanel extends JPanel {
   /** Main menu options buttons */
   private final JButton start, load, howToPlay, quit;
 
+  /** Main menu JButton size */
+  private final Dimension MAIN_MENU_BUTTON_SIZE = new Dimension(250, 35);
+
+  /** Main menu JButton font */
+  private final Font MAIN_MENU_FONT = new Font("TimesRoman", Font.BOLD, 18);
+
   /** Background image */
   private BufferedImage backgroundImage;
 
@@ -38,12 +45,12 @@ public class MainMenuPanel extends JPanel {
   public MainMenuPanel() {
     // Load background image.
     try {
-      backgroundImage = ImageIO.read(new File(BG_DIR_PATH + "tank_1200x.jpg"));
+      backgroundImage = ImageIO.read(new File(BG_DIR_PATH + "tank_1200x_painted.jpg"));
     } catch (final IOException e) {
       e.printStackTrace();
     }
     this.setLayout(new GridBagLayout());
-    // this.setBackground(Color.GRAY);
+    this.setBackground(Color.GRAY);
     this.setVisible(true);
 
     final GridBagConstraints gbc = new GridBagConstraints();
@@ -52,33 +59,37 @@ public class MainMenuPanel extends JPanel {
     // Add main menu label
     final JLabel title = new JLabel("Game of the Generals");
     title.setFont(new Font("TimesRoman", Font.BOLD, 70));
+    title.setForeground(Color.WHITE);
     gbc.gridx = 0;
     gbc.gridy = 0;
     gbc.gridheight = 1;
     this.add(title, gbc);
 
     // Add main menu buttons
-    start = new JButton("Start Game");
-    start.setPreferredSize(new Dimension(200, 30));
-    start.setSize(100, 100);
+    start = new JButton("START GAME");
+    start.setPreferredSize(MAIN_MENU_BUTTON_SIZE);
+    start.setFont(MAIN_MENU_FONT);
     gbc.gridx = 0;
     gbc.gridy = 1;
     gbc.gridheight = 1;
     this.add(start, gbc);
-    load  = new JButton("Load Game");
-    load.setPreferredSize(new Dimension(200, 30));
+    load  = new JButton("LOAD GAME");
+    load.setPreferredSize(MAIN_MENU_BUTTON_SIZE);
+    load.setFont(MAIN_MENU_FONT);
     gbc.gridx = 0;
     gbc.gridy = 2;
     gbc.gridheight = 1;
     this.add(load, gbc);
-    howToPlay = new JButton("How To Play");
-    howToPlay.setPreferredSize(new Dimension(200, 30));
+    howToPlay = new JButton("HOW TO PLAY");
+    howToPlay.setPreferredSize(MAIN_MENU_BUTTON_SIZE);
+    howToPlay.setFont(MAIN_MENU_FONT);
     gbc.gridx = 0;
     gbc.gridy = 3;
     gbc.gridheight = 1;
     this.add(howToPlay, gbc);
-    quit = new JButton("Quit");
-    quit.setPreferredSize(new Dimension(200, 30));
+    quit = new JButton("QUIT");
+    quit.setPreferredSize(MAIN_MENU_BUTTON_SIZE);
+    quit.setFont(MAIN_MENU_FONT);
     gbc.gridx = 0;
     gbc.gridy = 4;
     gbc.gridheight = 1;
@@ -94,10 +105,12 @@ public class MainMenuPanel extends JPanel {
 
     // TODO: Fix
     // Centers image inside JPanel bounds
-    final Graphics2D g2 = (Graphics2D) g;
-    final int x = (this.getWidth() - this.backgroundImage.getWidth(null)) / 2;
-    final int y = (this.getHeight() - this.backgroundImage.getWidth(null)) / 2;
-    g2.drawImage(backgroundImage, x, y, null);
+    // final Graphics2D g2 = (Graphics2D) g;
+    // final int x = (this.getWidth() - this.backgroundImage.getWidth(null)) / 2;
+    // final int y = (this.getHeight() - this.backgroundImage.getWidth(null)) / 2;
+    // g2.drawImage(backgroundImage, x, y, null);
+
+    g.drawImage(backgroundImage, 0, 0, null);
   }
 
   /**

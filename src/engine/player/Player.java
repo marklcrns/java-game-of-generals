@@ -56,8 +56,11 @@ public class Player {
    * @return boolean true if successful, else false.
    */
   public boolean setBoard(final Board board) {
-    if (board.isPlayerExisting(this))
+    if (board.isPlayerExisting(this)) {
+      if (board.isDebugMode())
+        System.out.println("Player.setBoard() E: Player " + getAlliance() + " already exists");
       return false;
+    }
 
     this.board = board;
     return true;
@@ -105,10 +108,10 @@ public class Player {
    * @return boolean true if successful, else false.
    */
   public boolean makeMove(final int pieceCoords, final int destinationCoords) {
-
     // Prints all possible moves in debug mode.
     if (this.board.isDebugMode()) {
-      final Map<String, Move> possiblePieceMoves = this.board.getTile(pieceCoords).getPiece().evaluateMoves(board);
+      final Map<String, Move> possiblePieceMoves =
+        this.board.getTile(pieceCoords).getPiece().evaluateMoves(board);
 
       System.out.println(this.board.getTile(pieceCoords).getPiece().getPieceAlliance() +
                          " " + this.board.getTile(pieceCoords).getPiece().getRank());
@@ -123,6 +126,44 @@ public class Player {
     // Execute if Player's turn and owns the selected piece.
     if (isMoveMaker() && pieceOwnerCheck(pieceCoords)) {
       final Move move = new Move(this, board, pieceCoords, destinationCoords);
+      move.evaluateMove();
+
+      // Execute if move is valid, else register move as recent invalid move.
+      if (move.execute()) {
+
+        // Record to move history
+        clearForwardMoveHistory(this.board.getCurrentTurn());
+        recordMove(move);
+
+        // Change necessary states of the Board
+        this.board.setLastMove(move);
+        this.board.switchMoveMakerPlayer();
+        this.board.incrementTurn();
+        this.board.updateLastExecutedTurn(this.board.getCurrentTurn());
+
+        if (board.isDebugMode())
+          System.out.println(move);
+
+        return true;
+      } else {
+        // Record the move as last and invalid move
+        this.board.setLastMove(move);
+        this.board.setLastInvalidMove(move);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Alternative makeMove method that takes in Move instance that moves a piece
+   * owned by this Player instance, records into move history, and change the
+   * state of the board. Mainly used in Load class.
+   * @param move Move to be executed by this Player.
+   * @return boolean true if successful, else false.
+   */
+  public boolean makeMove(Move move) {
+    // Execute if Player's turn and owns the selected piece.
+    if (isMoveMaker() && move.getPlayer().getAlliance() == this.alliance) {
       move.evaluateMove();
 
       // Execute if move is valid, else register move as recent invalid move.

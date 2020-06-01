@@ -350,7 +350,8 @@ public class BoardPanel extends JPanel {
   } // MenuBarPanel
 
   /**
-   * BoardPanel inner JPanel class for move history
+   * BoardPanel inner JPanel class for move history. Prints out opening message
+   * and all executed moves.
    */
   private class MoveHistoryPanel extends JPanel {
 
@@ -557,7 +558,7 @@ public class BoardPanel extends JPanel {
      * Constructor method of InnerBoardPanel.
      */
     public InnerBoardPanel() {
-      super(new GridLayout(BoardUtils.TILE_ROW_COUNT, BoardUtils.TILE_COLUMN_COUNT));
+      this.setLayout(new GridLayout(BoardUtils.TILE_ROW_COUNT, BoardUtils.TILE_COLUMN_COUNT));
       this.boardTiles = new ArrayList<>();
       this.candidateMoveTiles = new ArrayList<>();
 
@@ -835,7 +836,7 @@ public class BoardPanel extends JPanel {
      * Constructor method that takes in tile ID.
      */
     public TilePanel(final int tileId) {
-      super(new GridBagLayout());
+      this.setLayout(new GridBagLayout());
       this.tileId = tileId;
       setPreferredSize(TILE_PANEL_DIMENSION);
       setBorder(BorderFactory.createLineBorder(Color.GRAY, 3));
