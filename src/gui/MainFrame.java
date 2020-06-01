@@ -2,10 +2,16 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -174,12 +180,36 @@ public class MainFrame {
       }
     });
 
+    // Displays game instruction in a new JFrame on click.
     mainMenuHowToPlayBtn.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        // TODO: implement.
+        displayGameInstructions();
       }
     });
+  }
+
+
+  /**
+   * Displays the game instruction in a new JFrame.
+   */
+  private void displayGameInstructions() {
+    try {
+      BufferedImage image = ImageIO.read(new File("art/bg/gog_instructions_1200x.jpg"));
+      ImageIcon icon = new ImageIcon(image);
+
+      JFrame frame = new JFrame();
+      frame.setLayout(new FlowLayout());
+      frame.setSize(1200, 1100);
+
+      JLabel iconContainerLbl = new JLabel();
+      iconContainerLbl.setIcon(icon);
+
+      frame.add(iconContainerLbl);
+      frame.setVisible(true);
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -261,6 +291,13 @@ public class MainFrame {
       public void actionPerformed(ActionEvent e) {
         if (gameStateBoard.isGameStarted())
           new Save(gameStateBoard);
+      }
+    });
+
+    menuBarGameRulesBtn.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        displayGameInstructions();
       }
     });
   }
