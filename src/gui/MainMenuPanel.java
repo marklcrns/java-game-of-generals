@@ -59,7 +59,7 @@ public class MainMenuPanel extends JPanel {
     // Add main menu label
     final JLabel title = new JLabel("Game of the Generals");
     title.setFont(new Font("TimesRoman", Font.BOLD, 70));
-    title.setForeground(Color.WHITE);
+    title.setForeground(new Color(219, 243, 250));
     gbc.gridx = 0;
     gbc.gridy = 0;
     gbc.gridheight = 1;
@@ -94,6 +94,14 @@ public class MainMenuPanel extends JPanel {
     gbc.gridy = 4;
     gbc.gridheight = 1;
     this.add(quit, gbc);
+    final JLabel author = new JLabel("by Mark Lucernas");
+    author.setFont(new Font("TimesRoman", Font.BOLD, 24));
+    author.setForeground(new Color(219, 243, 250));
+    gbc.gridx = 0;
+    gbc.gridy = 6;
+    gbc.gridheight = 1;
+    this.add(author, gbc);
+
   }
 
   /**

@@ -64,6 +64,7 @@ public class Load {
    * @param filename filename of the saved data.
    */
   public Load(final Board board, final String filename) {
+    // TODO: Fix game not loading properly after being saved from a loaded game.
     this.board = board;
     this.boardPanel = board.getBoardPanel();
     this.playerBlack = this.board.getBlackPlayer();
