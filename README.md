@@ -11,7 +11,8 @@ More info on [Game of the Generals](https://en.wikipedia.org/wiki/Game_of_the_Ge
 ![Demo 1](./demo/cisc-190_final_proj_week_4_1.gif)
 ![Demo 2](./demo/cisc-190_final_proj_week_4_2.gif)
 
-  - [Final project demo video](https://www.youtube.com/watch?v=O1iplL8vho8)
+  - [Module 8 - Final Project Notes](https://marklcrns.github.io/wiki/school/html/spring-2020/CISC-190/modules/module_8.html)
+  - [Final Project Demo Video](https://www.youtube.com/watch?v=O1iplL8vho8)
 
 
 JDK version used:
